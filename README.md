@@ -7,12 +7,21 @@ botaffiumeiro is a Telegram bot that detects Amazon, Aliexpress and other links 
 
 ## Features:
 
-- Detects both full URLs and short links (amzn.to, amzn.eu).
-- Replaces shared Amazon links with your personalized affiliate links.
-- Adds AliExpress discount codes when AliExpress links are detected.
-- Allows certain users to be excluded from Amazon link modifications.
-- Works seamlessly in group chats.
-- Easy to set up and customize.
+## Features:
+
+- **Short and long link detection**: The bot detects both full URLs and short links, such as *amzn.to* and *amzn.eu*.
+- **Affiliate link modification**: 
+  - If the link already contains an affiliate ID, it will replace it with your own.
+  - If no affiliate ID is present, the bot automatically adds your personalized affiliate ID.
+- **User exclusion**: You can specify certain users to be excluded from link modifications, allowing them to share links without alteration.
+- **AliExpress discount codes**: When AliExpress links are detected, the bot automatically adds current discount codes to the message.
+
+### Supported platforms:
+
+- **Amazon**
+- **AliExpress** (special case adding discount codes)
+- **Awin** stores (e.g., PcComponentes, Leroy Merlin)
+- **Admitad** stores (e.g., AliExpress, GiftMio)
 
 ## Installation
 
