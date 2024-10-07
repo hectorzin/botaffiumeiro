@@ -126,11 +126,6 @@ Once you have the **API ID**, **API Hash**, and **Bot Token**, replace the place
 BOT_TOKEN = "your_bot_token_here"  # Replace with your bot token
 ```
 
-### Supported affiliate services
-- Amazon
-- Awin (this can work for Aliexpress)
-- Admitad (this can work for Aliexpress)
-
 ### Exclude Certain Users from Link Modification
 
 You can exclude certain users from having their Amazon links modified by the bot. You can do this by defining a list of usernames or Telegram user IDs.
