@@ -21,7 +21,7 @@ async def modify_link(update: Update, context) -> None:
     message = update.message
 
     # Ensure the message contains text before trying to process links
-    if not message.text:
+    if message is None or not message.text:
         return  # If there's no text (e.g., it's an image or file), exit the function
 
     # Handle Amazon links
