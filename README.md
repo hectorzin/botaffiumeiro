@@ -38,6 +38,8 @@ Modify the `/path/to/host/data/config.py` file with your settings.
 $ docker start botaffiumeiro
 ```
 
+Once configured and running, the bot will detect Affiliate links in any group it's added to and replace them with your affiliate links, making it easy to earn commissions from shared products.
+
 ### Manual Installation
 
 To ensure that the bot works correctly, you need to install Python and the required libraries.
@@ -54,29 +56,17 @@ Once Python is installed, you need to run the following commands to install the 
 pip install -r requirements.txt
 ```
 
-## How to use:
+#### 3. Use the program
 
-1. Set up your bot token, API ID, API hash, and your Amazon Affiliate ID.
+1. Set up your Telegram Bot Token, and your Afiliates Settings in `data/config.py`.
 2. Install Python and the required libraries.
 3. Run the bot on a machine with Python by executing the following command: `python botaffiumeiro.py`
 
-Once configured and running, the bot will detect Amazon links in any group it's added to and replace them with your affiliate links, making it easy to earn commissions from shared products.
+Once configured and running, the bot will detect Affiliate links in any group it's added to and replace them with your affiliate links, making it easy to earn commissions from shared products.
 
-## How to Get API ID, API Hash, and Bot Token
+## How to configure your Bot
 
-### 1. Getting the API ID and API Hash
-
-To obtain your **API ID** and **API Hash**, follow these steps:
-
-1. Go to [my.telegram.org](https://my.telegram.org).
-2. Log in using the phone number associated with your Telegram account.
-3. Once logged in, click on **API Development Tools**.
-4. Fill in the required details to create a new app:
-   - **App title**: Choose a name for your app (it can be anything).
-   - **Short name**: Enter a short identifier for your app.
-5. After submitting the form, you'll be provided with your **API ID** and **API Hash**. Save these for later use.
-
-### 2. Getting the Bot Token
+### 1. Getting the Bot Token
 
 To obtain the **Bot Token**, follow these steps:
 
@@ -87,7 +77,7 @@ To obtain the **Bot Token**, follow these steps:
    - The **username** must be unique and should end with "bot" (e.g., `YourBotName_bot`).
 4. After the bot is created, BotFather will provide a **Bot Token**. Save this token for later use.
 
-### 3. Enable Bot Privacy (Disable Group Privacy)
+### 2. Enable Bot Privacy (Disable Group Privacy)
 
 Telegram has a privacy setting for bots that prevents them from reading messages in groups unless they are mentioned directly, or the admin has configured the bot to run in **No Privacy Mode**. To allow the bot to read all messages, follow these steps:
 
@@ -102,27 +92,12 @@ Telegram has a privacy setting for bots that prevents them from reading messages
 
 This will allow the bot to read all messages in the group, not just the ones where it is mentioned directly.
 
-### 4. Add the Bot to a Group
+### 3. Add the Bot to a Group
 
 If your bot will operate in a group, follow these steps to add it:
 
 1. Add the bot to the desired Telegram group.
 2. Promote the bot to **Admin** in the group to ensure it has the necessary permissions to read and modify messages.
-
----
-
-### Example Configuration
-
-Once you have the **API ID**, **API Hash**, and **Bot Token**, replace the placeholders in your code:
-
-```python
-BOT_TOKEN = "your_bot_token_here"  # Replace with your bot token
-```
-
-### Supported affiliate services
-- Amazon
-- Awin (this can work for Aliexpress)
-- Admitad (this can work for Aliexpress)
 
 ### Exclude Certain Users from Link Modification
 
@@ -148,7 +123,6 @@ ALIEXPRESS_DISCOUNT_CODES = """💰2$ off on purchases over 20$:【IFPTKOH】
 You can also customize the bot's response messages and translate them into different languages. To do this, you can modify the message strings in the code. For example:
 
 ```python
-# Messages used by the bot
 MSG_AFFILIATE_LINK_MODIFIED = "Here is the modified link with our affiliate program:"
 MSG_REPLY_PROVIDED_BY_USER = "Reply provided by"
 MSG_ALIEXPRESS_DISCOUNT = "💥 Special AliExpress discount codes:\n\n"
