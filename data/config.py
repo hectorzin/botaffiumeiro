@@ -9,6 +9,9 @@ EXCLUDED_USERS = [
     "danimart1991",
 ]
 
+# Logging Level (DEBUG, INFO, WARN, ERROR, CRITICAL)
+LOG_LEVEL = "INFO"
+
 
 # -------------------------------- MESSAGES --------------------------------- #
 
