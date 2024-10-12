@@ -49,8 +49,10 @@ ADMITAD_ADVERTISERS = {
     "giftmio.com": "93fd4vbk6c873a1e3014d68450d763",
 }
 
-
 # -------------------------------- ALIEXPRESS ------------------------------- #
+ALIEXPRESS_APP_KEY = ""  # Replace with your AliExpress API key
+ALIEXPRESS_APP_SECRET = "" # Replace with your AliExpress API secret
+ALIEXPRESS_TRACKING_ID = ""     # Replace with your AliExpress tracking ID
 
 # AliExpress discount codes
 ALIEXPRESS_DISCOUNT_CODES = """💰2$ off for purchases over 20$:【IFPTKOH】
