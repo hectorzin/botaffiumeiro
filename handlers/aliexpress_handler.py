@@ -1,45 +1,68 @@
-import re
+import logging
 import httpx
-from data.config import ALIEXPRESS_DISCOUNT_CODES, MSG_ALIEXPRESS_DISCOUNT, AWIN_ADVERTISERS, ADMITAD_ADVERTISERS
+import re
 
-# Pattern to detect long AliExpress links
+from data.config import (
+    ALIEXPRESS_DISCOUNT_CODES,
+    MSG_ALIEXPRESS_DISCOUNT,
+    AWIN_ADVERTISERS,
+    ADMITAD_ADVERTISERS,
+)
+
 ALIEXPRESS_URL_PATTERN = r"(https?://(?:[a-z]{2,3}\.)?aliexpress\.[a-z]{2,3}(?:\.[a-z]{2})?/(?:[\w\d\-\./?=&%]+))"
-
-# Pattern to detect short AliExpress links
 ALIEXPRESS_SHORT_URL_PATTERN = r"https?://s\.click\.aliexpress\.com/e/[\w\d_]+"
+
+logger = logging.getLogger(__name__)
+
 
 async def expand_aliexpress_short_link(short_url):
     """Expands a short AliExpress link into its full URL by following redirects."""
+    logger.info(f"Try expanding shortened URL: {short_url}")
     try:
         async with httpx.AsyncClient(follow_redirects=True) as client:
             response = await client.get(short_url)
-            return str(response.url) if response.status_code == 200 else short_url
+            expanded_url = (
+                str(response.url) if response.status_code == 200 else short_url
+            )
+            logger.debug(f"Expanded URL {short_url} to full link: {response.url}")
+            return expanded_url
     except Exception as e:
-        print(f"Error expanding short URL {short_url}: {e}")
+        logger.error(f"Error expanding short URL {short_url}: {e}")
         return short_url
+
 
 async def handle_aliexpress_links(message) -> bool:
     """Handles both long and short AliExpress links in the message."""
-    # Detect both long and short AliExpress links
+    logger.info(f"{message.message_id}: Handling AliExpress links in the message...")
+
     aliexpress_links = re.findall(ALIEXPRESS_URL_PATTERN, message.text)
     aliexpress_short_links = re.findall(ALIEXPRESS_SHORT_URL_PATTERN, message.text)
-
-    # Combine both short and long links into a single list
     all_aliexpress_links = aliexpress_links + aliexpress_short_links
 
-    # If there are any AliExpress links in the message
     if all_aliexpress_links:
-        # Check if aliexpress.com is in AWIN_ADVERTISERS or ADMITAD_ADVERTISERS
-        if "aliexpress.com" in AWIN_ADVERTISERS or "aliexpress.com" in ADMITAD_ADVERTISERS:
-            # If it's in either list, do nothing because the other handlers will process it
+        logger.info(
+            f"{message.message_id}: Found {len(all_aliexpress_links)} AliExpress links. Processing..."
+        )
+        if (
+            "aliexpress.com" in AWIN_ADVERTISERS
+            or "aliexpress.com" in ADMITAD_ADVERTISERS
+        ):
+            logger.info(
+                f"{message.message_id}: AliExpress links found in advertisers. Skipping processing."
+            )
             return False
 
-        # If not in any advertiser list, send the discount codes
+        logger.info(
+            f"{message.message_id}: No advertiser found for AliExpress. Sending discount codes."
+        )
         await message.chat.send_message(
             f"{MSG_ALIEXPRESS_DISCOUNT}{ALIEXPRESS_DISCOUNT_CODES}",
-            reply_to_message_id=message.message_id
+            reply_to_message_id=message.message_id,
+        )
+        logger.info(
+            f"{message.message_id}: Sent modified message with affiliate links."
         )
         return True
 
-    # Return False if no AliExpress links were found
+    logger.info(f"{message.message_id}: No AliExpress links found in the message.")
     return False
