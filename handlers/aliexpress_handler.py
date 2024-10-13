@@ -2,7 +2,7 @@ import logging
 import httpx
 import re
 
-from config import (
+from data.config import (
     ALIEXPRESS_DISCOUNT_CODES,
     ALIEXPRESS_APP_KEY,
     MSG_ALIEXPRESS_DISCOUNT,
@@ -29,7 +29,6 @@ async def expand_aliexpress_short_link(short_url):
     except Exception as e:
         logger.error(f"Error expanding short URL {short_url}: {e}")
         return short_url
-
 
 async def handle_aliexpress_links(message) -> bool:
     # Check if discount codes and message are not empty before proceeding
