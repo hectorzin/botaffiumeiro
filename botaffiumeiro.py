@@ -5,6 +5,7 @@ from telegram import Update
 from telegram.ext import Application, MessageHandler, filters
 
 from handlers.amazon_handler import handle_amazon_links
+from handlers.aliexpress_api_handler import handle_aliexpress_api_links
 from handlers.aliexpress_handler import handle_aliexpress_links
 from handlers.awin_handler import handle_awin_links
 from handlers.admitad_handler import handle_admitad_links
