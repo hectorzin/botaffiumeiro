@@ -1,7 +1,7 @@
 import logging
 
 from data.config import LOG_LEVEL, BOT_TOKEN, EXCLUDED_USERS
-from telegram import Update
+from telegram import Update, User
 from telegram.ext import Application, MessageHandler, filters
 
 from handlers.amazon_handler import handle_amazon_links
@@ -17,15 +17,14 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def is_user_excluded(update: Update) -> bool:
+def is_user_excluded(user: User) -> bool:
     """Checks if the user is in the list of excluded users."""
 
-    user_id = update.effective_user.id
-    username = update.effective_user.username
+    user_id = user.id
+    username = user.username
+    logger.debug(f"Checking if user {username} (ID: {user_id}) is excluded.")
     excluded = user_id in EXCLUDED_USERS or (username and username in EXCLUDED_USERS)
-    logger.debug(
-        f"{update.update_id}: Update from user {username} (ID: {user_id}) is excluded: {excluded}"
-    )
+    logger.debug(f"User {username} (ID: {user_id}) is excluded: {excluded}")
     return excluded
 
 
@@ -36,13 +35,19 @@ async def modify_link(update: Update, context) -> None:
 
     if not update.message or not update.message.text:
         logger.info(
-            f"{update.update_id}: Update with a message with no text. Skipping."
+            f"{update.update_id}: Update with a message without text. Skipping."
+        )
+        return
+    
+    if not update.effective_user:
+        logger.info(
+            f"{update.update_id}: Update without user. Skipping."
         )
         return
 
-    if is_user_excluded(update):
+    if is_user_excluded(update.effective_user):
         logger.info(
-            f"{update.update_id}: Update with a message from excluded user ({update.effective_user.username}). Skipping."
+            f"{update.update_id}: Update with a message from excluded user {update.effective_user.username} (ID: {update.effective_user.id}). Skipping."
         )
         return
 
