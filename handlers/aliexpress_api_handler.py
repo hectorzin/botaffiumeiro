@@ -69,6 +69,10 @@ async def convert_to_aliexpress_affiliate(source_url):
 
 async def handle_aliexpress_api_links(message):
     """Handles AliExpress links and converts them using the Aliexpress API."""
+    if not ALIEXPRESS_APP_KEY:
+        logger.info("AliExpress API key is not set. Skipping processing.")
+        return False
+
     logger.info(f"{message.message_id}: Handling AliExpress links in the message...")
 
     new_text = message.text
