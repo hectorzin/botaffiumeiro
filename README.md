@@ -7,8 +7,8 @@ botaffiumeiro is a Telegram bot that detects Amazon, Aliexpress and other links 
 
 ## Features:
 
-- **Short and long link detection**: The bot detects both full URLs and short links, such as _amzn.to_ and _amzn.eu_.
-- **Affiliate link modification**:
+- **Short and long link detection**: The bot detects both full URLs and short links, such as *amzn.to* and *amzn.eu*.
+- **Affiliate link modification**: 
   - If the link already contains an affiliate ID, it will replace it with your own.
   - If no affiliate ID is present, the bot automatically adds your personalized affiliate ID.
 - **User exclusion**: You can specify certain users to be excluded from link modifications, allowing them to share links without alteration.
@@ -35,9 +35,9 @@ $ docker create \
   ghcr.io/hectorzin/botaffiumeiro
 ```
 
-#### 2. Modify .env file
+#### 2. Modify config.py file
 
-Modify the `/path/to/host/data/.env` file with your settings.
+Modify the `/path/to/host/data/config.py` file with your settings.
 
 #### 3. Run the container
 
@@ -106,29 +106,23 @@ If your bot will operate in a group, follow these steps to add it:
 1. Add the bot to the desired Telegram group.
 2. Promote the bot to **Admin** in the group to ensure it has the necessary permissions to read and modify messages.
 
-### Affiliate platforms
-
-Affiliate platforms like Awin or Admitad allow you to be affiliated with multiple online stores. In these cases, the configuration is done using pairs of domain names and affiliate platform IDs in the format domain:id and separated by commas for each of the different stores, as shown in the example
-
-```
-AWIN_ADVERTISERS=pccomponentes.com:20982,leroymerlin.es:20598,aliexpress.com:11640
-ADMITAD_ADVERTISERS=giftmio.com:93fd4vbk6c873a1e3014d68450d763
-```
-
 ### Exclude Certain Users from Link Modification
 
 You can exclude certain users from having their Amazon links modified by the bot. You can do this by defining a list of usernames or Telegram user IDs.
 
 ```
-EXCLUDED_USERS=username1,username2,123456789  # Replace with the usernames or Telegram IDs of excluded users
+EXCLUDED_USERS = ["username1", "username2", 123456789]  # Replace with the usernames or Telegram IDs of excluded users
 ```
 
 ### AliExpress Discount Codes
 
 When the bot detects an AliExpress link, it will automatically reply to the message with the pre-configured discount codes. You can modify these discount codes as needed.
-Use (\n for a new line)
+
 ```
-ALIEXPRESS_DISCOUNT_CODES = """💰2$ off on purchases over 20$:【IFPTKOH】\n💰5$ off on purchases over 50$:【IFPT35D】\n💰25$ off on purchases over 200$:【IFPQDMH】\n💰50$ off on purchases over 400$:【IFP5RIN】"""
+ALIEXPRESS_DISCOUNT_CODES = """💰2$ off on purchases over 20$:【IFPTKOH】
+💰5$ off on purchases over 50$:【IFPT35D】
+💰25$ off on purchases over 200$:【IFPQDMH】
+💰50$ off on purchases over 400$:【IFP5RIN】"""
 ```
 
 ### Customizing the Bot
@@ -145,19 +139,3 @@ By changing these variables, you can personalize how the bot interacts with user
 
 1. Translate the bot's messages into any language.
 2. Adjust the messaging style to fit your preferences.
-
-## Development
-
-We usually use _Visual Studio Code_ to develop the project.
-
-- Install _Python >= 3.10_
-- Configure Python on _Visual Studio Code_.
-- Clone or Import the project into _Visual Studio Code_.
-- Once import, modify the `data/config.py` file with your Test settings.
-- Open `botaffiumeiro.py`.
-- Run the code (better with a _Virtual Environment_).
-- Profit.
-
-### Testing
-
-For testing you could directly run test with _Visual Studio Code Testing_ tab. Or installing _pytest_ with `pip install pytest` and then run the test with `python -m pytest tests/`.
