@@ -7,6 +7,7 @@ from config import (
     AMAZON_AFFILIATE_ID,
     MSG_AFFILIATE_LINK_MODIFIED,
     MSG_REPLY_PROVIDED_BY_USER,
+    DELETE_MESSAGES,
 )
 
 AMAZON_URL_PATTERN = r"(https?://(?:www\.)?(amazon\.[a-z]{2,3}(?:\.[a-z]{2})?|amzn\.to|amzn\.eu)/[\w\d\-\./?=&%]+)"
@@ -80,10 +81,16 @@ async def handle_amazon_links(message) -> bool:
         await message.delete()
         logger.info(f"{message.message_id}: Original message deleted.")
 
-        await message.chat.send_message(text=polite_message)
-        logger.info(
-            f"{message.message_id}: Sent modified message with affiliate links."
-        )
+        if DELETE_MESSAGES:
+            # remove original message and creates a new one
+            await message.delete()
+            await message.chat.send_message(text=polite_message)
+            logger.info(f"{message.message_id}: Original message deleted annd sent modified message with affiliate links.")
+        else:
+            # Answers the original message
+            reply_to_message_id = message.message_id
+            await message.chat.send_message(text=polite_message, reply_to_message_id=reply_to_message_id)
+            logger.info(f"{message.message_id}: Replied to message with affiliate links.")
 
         return True
 

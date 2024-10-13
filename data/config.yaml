@@ -3,6 +3,9 @@
 # Telegram settings
 telegram:
   bot_token: "your_bot_token_here"
+  # if true, the original message will be deleted and changed by a new message
+  # if false, the original message will be replied by the new message
+  delete_messages: True
   excluded_users:
     - "HectorziN"
     - "danimart1991"
