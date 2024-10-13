@@ -4,6 +4,7 @@ import re
 
 from data.config import (
     ALIEXPRESS_DISCOUNT_CODES,
+    ALIEXPRESS_APP_KEY,
     MSG_ALIEXPRESS_DISCOUNT,
     AWIN_ADVERTISERS,
     ADMITAD_ADVERTISERS,
@@ -13,7 +14,6 @@ ALIEXPRESS_URL_PATTERN = r"(https?://(?:[a-z]{2,3}\.)?aliexpress\.[a-z]{2,3}(?:\
 ALIEXPRESS_SHORT_URL_PATTERN = r"https?://s\.click\.aliexpress\.com/e/[\w\d_]+"
 
 logger = logging.getLogger(__name__)
-
 
 async def expand_aliexpress_short_link(short_url):
     """Expands a short AliExpress link into its full URL by following redirects."""
@@ -30,8 +30,14 @@ async def expand_aliexpress_short_link(short_url):
         logger.error(f"Error expanding short URL {short_url}: {e}")
         return short_url
 
-
 async def handle_aliexpress_links(message) -> bool:
+    # Check if discount codes and message are not empty before proceeding
+    if not MSG_ALIEXPRESS_DISCOUNT or not ALIEXPRESS_DISCOUNT_CODES:
+        logger.info(
+            f"{message.message_id}: Discount message or codes are empty. Skipping reply."
+        )
+        return True  # Exit the function if both variables are empty
+
     """Handles both long and short AliExpress links in the message."""
     logger.info(f"{message.message_id}: Handling AliExpress links in the message...")
 
@@ -46,6 +52,7 @@ async def handle_aliexpress_links(message) -> bool:
         if (
             "aliexpress.com" in AWIN_ADVERTISERS
             or "aliexpress.com" in ADMITAD_ADVERTISERS
+            or ALIEXPRESS_APP_KEY != ""
         ):
             logger.info(
                 f"{message.message_id}: AliExpress links found in advertisers. Skipping processing."

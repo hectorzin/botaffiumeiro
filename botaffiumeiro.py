@@ -5,6 +5,7 @@ from telegram import Update, User
 from telegram.ext import Application, MessageHandler, filters
 
 from handlers.amazon_handler import handle_amazon_links
+from handlers.aliexpress_api_handler import handle_aliexpress_api_links
 from handlers.aliexpress_handler import handle_aliexpress_links
 from handlers.awin_handler import handle_awin_links
 from handlers.admitad_handler import handle_admitad_links
@@ -60,6 +61,7 @@ async def modify_link(update: Update, context) -> None:
     await handle_amazon_links(message)
     await handle_awin_links(message)
     await handle_admitad_links(message)
+    await handle_aliexpress_api_links(message)
     await handle_aliexpress_links(message)
 
     logger.info(f"{update.update_id}: Update processed.")
