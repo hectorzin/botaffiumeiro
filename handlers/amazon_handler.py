@@ -3,7 +3,7 @@ import re
 import requests
 
 from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
-from config import (
+from data.config import (
     AMAZON_AFFILIATE_ID,
     MSG_AFFILIATE_LINK_MODIFIED,
     MSG_REPLY_PROVIDED_BY_USER,
