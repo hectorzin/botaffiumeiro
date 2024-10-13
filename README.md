@@ -7,8 +7,8 @@ botaffiumeiro is a Telegram bot that detects Amazon, Aliexpress and other links 
 
 ## Features:
 
-- **Short and long link detection**: The bot detects both full URLs and short links, such as *amzn.to* and *amzn.eu*.
-- **Affiliate link modification**: 
+- **Short and long link detection**: The bot detects both full URLs and short links, such as _amzn.to_ and _amzn.eu_.
+- **Affiliate link modification**:
   - If the link already contains an affiliate ID, it will replace it with your own.
   - If no affiliate ID is present, the bot automatically adds your personalized affiliate ID.
 - **User exclusion**: You can specify certain users to be excluded from link modifications, allowing them to share links without alteration.
@@ -139,3 +139,19 @@ By changing these variables, you can personalize how the bot interacts with user
 
 1. Translate the bot's messages into any language.
 2. Adjust the messaging style to fit your preferences.
+
+## Development
+
+We usually use _Visual Studio Code_ to develop the project.
+
+- Install _Python >= 3.10_
+- Configure Python on _Visual Studio Code_.
+- Clone or Import the project into _Visual Studio Code_.
+- Once import, modify the `data/config.py` file with your Test settings.
+- Open `botaffiumeiro.py`.
+- Run the code (better with a _Virtual Environment_).
+- Profit.
+
+### Testing
+
+For testing you could directly run test with _Visual Studio Code Testing_ tab. Or installing _pytest_ with `pip install pytest` and then run the test with `python -m pytest tests/`.
