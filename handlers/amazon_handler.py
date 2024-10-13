@@ -78,9 +78,6 @@ async def handle_amazon_links(message) -> bool:
         user_username = message.from_user.username
         polite_message = f"{MSG_REPLY_PROVIDED_BY_USER} @{user_username if user_username else user_first_name}:\n\n{new_text}\n\n{MSG_AFFILIATE_LINK_MODIFIED}"
 
-        await message.delete()
-        logger.info(f"{message.message_id}: Original message deleted.")
-
         if DELETE_MESSAGES:
             # remove original message and creates a new one
             await message.delete()
