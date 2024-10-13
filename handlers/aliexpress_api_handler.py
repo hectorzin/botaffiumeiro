@@ -5,9 +5,16 @@ import hmac
 import hashlib
 import requests
 from urllib.parse import urlencode
-from handlers.aliexpress_handler import expand_aliexpress_short_link, ALIEXPRESS_SHORT_URL_PATTERN 
-from data.config import ALIEXPRESS_APP_KEY, ALIEXPRESS_APP_SECRET, ALIEXPRESS_TRACKING_ID, MSG_REPLY_PROVIDED_BY_USER, MSG_AFFILIATE_LINK_MODIFIED, MSG_ALIEXPRESS_DISCOUNT, ALIEXPRESS_DISCOUNT_CODES
-from handlers.aliexpress_handler import ALIEXPRESS_URL_PATTERN, expand_aliexpress_short_link
+from handlers.aliexpress_handler import expand_aliexpress_short_link, ALIEXPRESS_URL_PATTERN, ALIEXPRESS_SHORT_URL_PATTERN 
+from data.config import (
+    ALIEXPRESS_APP_KEY,
+    ALIEXPRESS_APP_SECRET,
+    ALIEXPRESS_TRACKING_ID,
+    MSG_REPLY_PROVIDED_BY_USER,
+    MSG_AFFILIATE_LINK_MODIFIED,
+    MSG_ALIEXPRESS_DISCOUNT,
+    ALIEXPRESS_DISCOUNT_CODES
+)
 
 # Initialize logger
 logger = logging.getLogger(__name__)
@@ -69,6 +76,10 @@ async def convert_to_aliexpress_affiliate(source_url):
 
 async def handle_aliexpress_api_links(message):
     """Handles AliExpress links and converts them using the Aliexpress API."""
+    if not ALIEXPRESS_APP_KEY:
+        logger.info("AliExpress API key is not set. Skipping processing.")
+        return False
+
     logger.info(f"{message.message_id}: Handling AliExpress links in the message...")
 
     new_text = message.text
