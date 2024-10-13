@@ -30,6 +30,7 @@ async def expand_aliexpress_short_link(short_url):
         logger.error(f"Error expanding short URL {short_url}: {e}")
         return short_url
 
+
 async def handle_aliexpress_links(message) -> bool:
     # Check if discount codes and message are not empty before proceeding
     if not MSG_ALIEXPRESS_DISCOUNT or not ALIEXPRESS_DISCOUNT_CODES:

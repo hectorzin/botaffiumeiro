@@ -11,13 +11,22 @@ from handlers.awin_handler import handle_awin_links
 from handlers.admitad_handler import handle_admitad_links
 
 
-async def is_user_excluded(update: Update) -> bool:
+logging.basicConfig(
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    level=LOG_LEVEL,
+)
+logger = logging.getLogger(__name__)
+
+
+def is_user_excluded(update: Update) -> bool:
     """Checks if the user is in the list of excluded users."""
 
     user_id = update.effective_user.id
     username = update.effective_user.username
     excluded = user_id in EXCLUDED_USERS or (username and username in EXCLUDED_USERS)
-    logger.debug(f"{update.update_id}: Update from user {username} (ID: {user_id}) is excluded: {excluded}")
+    logger.debug(
+        f"{update.update_id}: Update from user {username} (ID: {user_id}) is excluded: {excluded}"
+    )
     return excluded
 
 
@@ -27,10 +36,12 @@ async def modify_link(update: Update, context) -> None:
     logger.info(f"Received new update (ID: {update.update_id}).")
 
     if not update.message or not update.message.text:
-        logger.info(f"{update.update_id}: Update with a message with no text. Skipping.")
+        logger.info(
+            f"{update.update_id}: Update with a message with no text. Skipping."
+        )
         return
 
-    if await is_user_excluded(update):
+    if is_user_excluded(update):
         logger.info(
             f"{update.update_id}: Update with a message from excluded user ({update.effective_user.username}). Skipping."
         )
@@ -38,7 +49,9 @@ async def modify_link(update: Update, context) -> None:
 
     message = update.message
 
-    logger.info(f"{update.update_id}: Processing update message (ID: {update.message.message_id})...")
+    logger.info(
+        f"{update.update_id}: Processing update message (ID: {update.message.message_id})..."
+    )
 
     await handle_amazon_links(message)
     await handle_awin_links(message)
@@ -64,11 +77,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    logging.basicConfig(
-        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-        level=LOG_LEVEL,
-    )
-
-    logger = logging.getLogger(__name__)
-
     main()
