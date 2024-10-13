@@ -2,7 +2,7 @@ import logging
 import httpx
 import re
 
-from data.config import (
+from config import (
     ALIEXPRESS_DISCOUNT_CODES,
     ALIEXPRESS_APP_KEY,
     MSG_ALIEXPRESS_DISCOUNT,

@@ -6,7 +6,7 @@ from handlers.aliexpress_handler import (
     expand_aliexpress_short_link,
     ALIEXPRESS_SHORT_URL_PATTERN,
 )
-from data.config import (
+from config import (
     AWIN_PUBLISHER_ID,
     AWIN_ADVERTISERS,
     MSG_AFFILIATE_LINK_MODIFIED,
