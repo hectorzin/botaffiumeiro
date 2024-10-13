@@ -6,7 +6,7 @@ from handlers.aliexpress_handler import (
     expand_aliexpress_short_link,
     ALIEXPRESS_SHORT_URL_PATTERN,
 )
-from config import (
+from data.config import (
     AWIN_PUBLISHER_ID,
     AWIN_ADVERTISERS,
     MSG_AFFILIATE_LINK_MODIFIED,
@@ -86,7 +86,7 @@ async def handle_awin_links(message) -> bool:
 
     if awin_links:
         logger.info(
-            f"{message.message_id}: Found {len(awin_affiliate_links)} Awin links. Processing..."
+            f"{message.message_id}: Found {len(admitad_links)} Awin links. Processing..."
         )
         for link, store_domain in awin_links:
             affiliate_link = convert_to_awin_affiliate_link(link, store_domain)
@@ -99,7 +99,7 @@ async def handle_awin_links(message) -> bool:
 
     if awin_affiliate_links:
         logger.info(
-            f"{message.message_id}: Found {len(awin_affiliate_links)} Awin affiliate links. Processing..."
+            f"{message.message_id}: Found {len(admitad_affiliate_links)} Awin affiliate links. Processing..."
         )
         for link in awin_affiliate_links:
             modified_link = modify_existing_awin_link(link)
