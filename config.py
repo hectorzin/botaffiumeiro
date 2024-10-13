@@ -7,6 +7,7 @@ with open(CONFIG_PATH, 'r', encoding='utf-8') as file:
 
 # Telegram settings
 BOT_TOKEN = config_data.get('telegram', {}).get('bot_token', None)  # None if not set
+DELETE_MESSAGES = config_data.get('telegram', {}).get('delete_messages', True)
 EXCLUDED_USERS = config_data.get('telegram', {}).get('excluded_users', [])
 
 # Messages

@@ -12,6 +12,7 @@ from config import (
     MSG_AFFILIATE_LINK_MODIFIED,
     MSG_REPLY_PROVIDED_BY_USER,
     ALIEXPRESS_DISCOUNT_CODES,
+    DELETE_MESSAGES,
 )
 
 AWIN_URL_PATTERN = r"(https?://(?:[\w\-]+\.)?({})/[\w\d\-\./?=&%]+)".format(
@@ -109,15 +110,20 @@ async def handle_awin_links(message) -> bool:
             message.reply_to_message.message_id if message.reply_to_message else None
         )
         polite_message = f"{MSG_REPLY_PROVIDED_BY_USER} @{message.from_user.username}:\n\n{new_text}\n\n{MSG_AFFILIATE_LINK_MODIFIED}"
-        await message.delete()
-        logger.info(f"{message.message_id}: Original message deleted.")
+        if DELETE_MESSAGES:
+            # Deletes the original message and creates a new one
+            await message.delete()
+            await message.chat.send_message(
+                text=polite_message, reply_to_message_id=reply_to_message_id
+            )
+            logger.info(f"{message.message_id}: Original message deleted annd sent modified message with affiliate links.")
+        else:
+            # Replies to the original message without deleting it
+            await message.chat.send_message(
+                text=polite_message, reply_to_message_id=message.message_id
+            )
+            logger.info(f"{message.message_id}: Replied to the original message with affiliate links.")
 
-        await message.chat.send_message(
-            text=polite_message, reply_to_message_id=reply_to_message_id
-        )
-        logger.info(
-            f"{message.message_id}: Sent modified message with affiliate links."
-        )
         return True
 
     logger.info(
