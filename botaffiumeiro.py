@@ -1,6 +1,6 @@
 import logging
 
-from data.config import LOG_LEVEL, BOT_TOKEN, EXCLUDED_USERS
+from config import LOG_LEVEL, BOT_TOKEN, EXCLUDED_USERS
 from telegram import Update, User
 from telegram.ext import Application, MessageHandler, filters
 

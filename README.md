@@ -37,7 +37,7 @@ $ docker create \
 
 #### 2. Modify config.py file
 
-Modify the `/path/to/host/data/config.py` file with your settings.
+Modify the `/path/to/host/data/config.yaml` file with your settings.
 
 #### 3. Run the container
 
@@ -111,7 +111,11 @@ If your bot will operate in a group, follow these steps to add it:
 You can exclude certain users from having their Amazon links modified by the bot. You can do this by defining a list of usernames or Telegram user IDs.
 
 ```
-EXCLUDED_USERS = ["username1", "username2", 123456789]  # Replace with the usernames or Telegram IDs of excluded users
+telegram:
+  excluded_users:
+    - "username1"
+    - "username2"
+    - 123456789
 ```
 
 ### AliExpress Discount Codes
@@ -119,20 +123,23 @@ EXCLUDED_USERS = ["username1", "username2", 123456789]  # Replace with the usern
 When the bot detects an AliExpress link, it will automatically reply to the message with the pre-configured discount codes. You can modify these discount codes as needed.
 
 ```
-ALIEXPRESS_DISCOUNT_CODES = """💰2$ off on purchases over 20$:【IFPTKOH】
-💰5$ off on purchases over 50$:【IFPT35D】
-💰25$ off on purchases over 200$:【IFPQDMH】
-💰50$ off on purchases over 400$:【IFP5RIN】"""
+aliexpress:
+  discount_codes: |
+    💥 AliExpress discount codes:
+    💰2$ off for purchases over 20$:【IFPTKOH】
+    💰5$ off for purchases over 50$:【IFPT35D】
+    💰25$ off for purchases over 200$:【IFPQDMH】
+    💰50$ off for purchases over 400$:【IFP5RIN】
 ```
 
-### Customizing the Bot
+### Customizing and/or translating the Bot
 
 You can also customize the bot's response messages and translate them into different languages. To do this, you can modify the message strings in the code. For example:
 
-```python
-MSG_AFFILIATE_LINK_MODIFIED = "Here is the modified link with our affiliate program:"
-MSG_REPLY_PROVIDED_BY_USER = "Reply provided by"
-MSG_ALIEXPRESS_DISCOUNT = "💥 Special AliExpress discount codes:\n\n"
+```
+messages:
+  affiliate_link_modified: "Here is the modified link with our affiliate program:"
+  reply_provided_by_user: "Reply provided by"
 ```
 
 By changing these variables, you can personalize how the bot interacts with users. This makes it easy to:

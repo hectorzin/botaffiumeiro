@@ -2,10 +2,9 @@ import logging
 import httpx
 import re
 
-from data.config import (
+from config import (
     ALIEXPRESS_DISCOUNT_CODES,
     ALIEXPRESS_APP_KEY,
-    MSG_ALIEXPRESS_DISCOUNT,
     AWIN_ADVERTISERS,
     ADMITAD_ADVERTISERS,
 )
@@ -32,7 +31,7 @@ async def expand_aliexpress_short_link(short_url):
 
 async def handle_aliexpress_links(message) -> bool:
     # Check if discount codes and message are not empty before proceeding
-    if not MSG_ALIEXPRESS_DISCOUNT or not ALIEXPRESS_DISCOUNT_CODES:
+    if not ALIEXPRESS_DISCOUNT_CODES:
         logger.info(
             f"{message.message_id}: Discount message or codes are empty. Skipping reply."
         )
@@ -63,7 +62,7 @@ async def handle_aliexpress_links(message) -> bool:
             f"{message.message_id}: No advertiser found for AliExpress. Sending discount codes."
         )
         await message.chat.send_message(
-            f"{MSG_ALIEXPRESS_DISCOUNT}{ALIEXPRESS_DISCOUNT_CODES}",
+            f"{ALIEXPRESS_DISCOUNT_CODES}",
             reply_to_message_id=message.message_id,
         )
         logger.info(
