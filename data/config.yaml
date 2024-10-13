@@ -1,0 +1,51 @@
+# ------------------------------ CONFIGURATION ------------------------------ #
+
+# Telegram settings
+telegram:
+  bot_token: "your_bot_token_here"
+  excluded_users:
+    - "HectorziN"
+    - "danimart1991"
+
+# -------------------------------- MESSAGES --------------------------------- #
+
+messages:
+  affiliate_link_modified: "Here is the modified link with our affiliate program:"
+  reply_provided_by_user: "Reply provided by"
+
+# ---------------------------------- AMAZON --------------------------------- #
+
+amazon:
+  affiliate_id: "botaffiumeiro_cofee-21"
+
+# ----------------------------------- AWIN ---------------------------------- #
+
+awin:
+  publisher_id: "1639881"
+  advertisers:
+    aliexpress.com: "11640"
+    pccomponentes.com: "20982"
+    leroymerlin.es: "20598"
+
+# --------------------------------- ADMITAD --------------------------------- #
+
+admitad:
+  publisher_id: "2306205"
+  advertisers:
+    giftmio.com: "93fd4vbk6c873a1e3014d68450d763"
+
+# -------------------------------- ALIEXPRESS ------------------------------- #
+
+aliexpress:
+  app_key: ""  # Replace with your AliExpress API key
+  app_secret: ""  # Replace with your AliExpress API secret
+  tracking_id: ""  # Replace with your AliExpress tracking ID
+  discount_codes: |
+    💥 AliExpress discount codes:  
+    💰2$ off for purchases over 20$:【IFPTKOH】
+    💰5$ off for purchases over 50$:【IFPT35D】
+    💰25$ off for purchases over 200$:【IFPQDMH】
+    💰50$ off for purchases over 400$:【IFP5RIN】
+
+# ---------------------------------- GENERAL -------------------------------- #
+log_level: "INFO"

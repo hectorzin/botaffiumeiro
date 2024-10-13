@@ -6,13 +6,12 @@ import hashlib
 import requests
 from urllib.parse import urlencode
 from handlers.aliexpress_handler import expand_aliexpress_short_link, ALIEXPRESS_URL_PATTERN, ALIEXPRESS_SHORT_URL_PATTERN 
-from data.config import (
+from config import (
     ALIEXPRESS_APP_KEY,
     ALIEXPRESS_APP_SECRET,
     ALIEXPRESS_TRACKING_ID,
     MSG_REPLY_PROVIDED_BY_USER,
     MSG_AFFILIATE_LINK_MODIFIED,
-    MSG_ALIEXPRESS_DISCOUNT,
     ALIEXPRESS_DISCOUNT_CODES
 )
 
@@ -102,7 +101,7 @@ async def handle_aliexpress_api_links(message):
         if affiliate_link:
             new_text = new_text.replace(link, affiliate_link)
 
-    new_text += f"\n\n{MSG_ALIEXPRESS_DISCOUNT}{ALIEXPRESS_DISCOUNT_CODES}"
+    new_text += f"\n\n{ALIEXPRESS_DISCOUNT_CODES}"
     logger.debug(f"{message.message_id}: Appended AliExpress discount codes.")
 
     if new_text != message.text:

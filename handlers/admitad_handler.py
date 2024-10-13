@@ -6,12 +6,11 @@ from handlers.aliexpress_handler import (
     expand_aliexpress_short_link,
     ALIEXPRESS_SHORT_URL_PATTERN,
 )
-from data.config import (
+from config import (
     ADMITAD_PUBLISHER_ID,
     ADMITAD_ADVERTISERS,
     MSG_AFFILIATE_LINK_MODIFIED,
     MSG_REPLY_PROVIDED_BY_USER,
-    MSG_ALIEXPRESS_DISCOUNT,
     ALIEXPRESS_DISCOUNT_CODES,
 )
 
@@ -98,7 +97,7 @@ async def handle_admitad_links(message) -> bool:
             affiliate_link = convert_to_admitad_affiliate_link(link, store_domain)
             new_text = new_text.replace(link, affiliate_link)
             if "aliexpress" in store_domain:
-                new_text += f"\n\n{MSG_ALIEXPRESS_DISCOUNT}{ALIEXPRESS_DISCOUNT_CODES}"
+                new_text += f"\n\n{ALIEXPRESS_DISCOUNT_CODES}"
                 logger.debug(
                     f"{message.message_id}: Appended AliExpress discount codes."
                 )
