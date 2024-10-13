@@ -6,7 +6,7 @@ import hashlib
 import requests
 from urllib.parse import urlencode
 from handlers.aliexpress_handler import expand_aliexpress_short_link, ALIEXPRESS_SHORT_URL_PATTERN 
-from data.config import ALIEXPRESS_APP_KEY, ALIEXPRESS_APP_SECRET, ALIEXPRESS_TRACKING_ID, MSG_REPLY_PROVIDED_BY_USER, MSG_AFFILIATE_LINK_MODIFIED, MSG_ALIEXPRESS_DISCOUNT, ALIEXPRESS_DISCOUNT_CODES
+from config import ALIEXPRESS_APP_KEY, ALIEXPRESS_APP_SECRET, ALIEXPRESS_TRACKING_ID, MSG_REPLY_PROVIDED_BY_USER, MSG_AFFILIATE_LINK_MODIFIED, MSG_ALIEXPRESS_DISCOUNT, ALIEXPRESS_DISCOUNT_CODES
 from handlers.aliexpress_handler import ALIEXPRESS_URL_PATTERN, expand_aliexpress_short_link
 
 # Initialize logger
