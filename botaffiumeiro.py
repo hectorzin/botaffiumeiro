@@ -4,11 +4,11 @@ from config import LOG_LEVEL, BOT_TOKEN, EXCLUDED_USERS
 from telegram import Update, User
 from telegram.ext import Application, MessageHandler, filters
 
-from handlers.admitad_handler import handle_admitad_links
+from handlers.admitad_handler import AdmitadHandler
 from handlers.aliexpress_api_handler import handle_aliexpress_api_links
 from handlers.aliexpress_handler import handle_aliexpress_links
 from handlers.amazon_handler import AmazonHandler
-from handlers.awin_handler import handle_awin_links
+from handlers.awin_handler import AwinHandler
 
 
 logging.basicConfig(
@@ -34,8 +34,8 @@ async def process_link_handlers(message) -> None:
     logger.info(f"Processing link handlers for message ID: {message.message_id}...")
 
     await AmazonHandler().handle_links(message)
-    await handle_awin_links(message)
-    await handle_admitad_links(message)
+    await AwinHandler().handle_links(message)
+    await AdmitadHandler().handle_links(message)
     await handle_aliexpress_api_links(message)
     await handle_aliexpress_links(message)
 

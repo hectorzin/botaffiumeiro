@@ -16,7 +16,7 @@ class AmazonHandler(BaseHandler):
         if not AMAZON_AFFILIATE_ID:
             self.logger.info("Amazon affiliate ID is not set. Skipping processing.")
             return False
-    
+
         self.logger.info(
             f"{message.message_id}: Handling Amazon links in the message..."
         )

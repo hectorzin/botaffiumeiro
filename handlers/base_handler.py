@@ -1,5 +1,6 @@
 import logging
 import requests
+import re
 
 from abc import ABC, abstractmethod
 from telegram import Message
@@ -8,8 +9,10 @@ from config import (
     MSG_AFFILIATE_LINK_MODIFIED,
     MSG_REPLY_PROVIDED_BY_USER,
     DELETE_MESSAGES,
+    ALIEXPRESS_DISCOUNT_CODES,
 )
 
+ALIEXPRESS_SHORT_URL_PATTERN = r"https?://s\.click\.aliexpress\.com/e/[\w\d_]+"
 
 class BaseHandler(ABC):
     def __init__(self):
@@ -46,7 +49,39 @@ class BaseHandler(ABC):
         
         return url
 
-    def generate_affiliate_url(self, original_url: str, format_template: str, affiliate_tag: str, affiliate_id: str) -> str:
+    def _expand_short_links_from_message(self, message_text: str, url_pattern: str, short_domains: list) -> str:
+        """
+        Expands shortened URLs in a message using a specified pattern and list of short domains.
+
+        Args:
+            message_text (str): The text of the message to search for short links.
+            url_pattern (str): The regular expression pattern to search for short links.
+            short_domains (list): A list of domains to check for short links.
+
+        Returns:
+            str: The message text with expanded URLs.
+        """
+        new_text = message_text
+        short_links = re.findall(url_pattern, message_text)
+
+        if short_links:
+            self.logger.info(f"Found {len(short_links)} short links. Processing...")
+
+            for short_link in short_links:
+                full_link = self._expand_shortened_url_from_list(short_link, short_domains)
+                new_text = new_text.replace(short_link, full_link)
+
+        return new_text
+
+    def _expand_aliexpress_links_from_message(self, message_text: str) -> str:
+        new_text = self.expand_short_links(
+            message_text=message_text,
+            url_pattern=ALIEXPRESS_SHORT_URL_PATTERN,
+            short_domains=["s.click.aliexpress.com"]
+        )
+        return new_text
+
+    def _generate_affiliate_url(self, original_url: str, format_template: str, affiliate_tag: str, affiliate_id: str) -> str:
         """
         Converts a product URL into an affiliate link based on the provided format template.
 
@@ -96,7 +131,7 @@ class BaseHandler(ABC):
 
         return affiliate_url
 
-    async def process_message(self, message, new_text: str):
+    async def _process_message(self, message, new_text: str):
         """
         Send a polite affiliate message, either by deleting the original message or replying to it.
 
@@ -130,6 +165,68 @@ class BaseHandler(ABC):
             self.logger.info(
                 f"{message.message_id}: Replied to message with affiliate links."
             )
+
+    def _process_store_affiliate_links(
+        self,
+        message,
+        publisher_id: str,
+        advertisers: dict,
+        url_pattern: str,
+        affiliate_pattern: str,
+        format_template: str,
+        affiliate_tag: str,
+    ) -> bool:
+        """Generic method to handle affiliate links for different platforms."""
+
+        if not publisher_id:
+            self.logger.info(f"{message.message_id}: Affiliate ID is not set. Skipping processing.")
+            return False
+
+        new_text = self._expand_aliexpress_links_from_message(message.text)
+
+        # Find regular store links and affiliate links
+        store_links = re.findall(url_pattern, new_text)
+        affiliate_links = re.findall(affiliate_pattern, new_text)
+
+        if affiliate_links:
+            self.logger.info(f"{message.message_id}: Found {len(affiliate_links)} affiliate links. Processing...")
+            for link in affiliate_links:
+                if len(store_links) == 0:
+                    return False
+                modified_link = self.generate_affiliate_url(
+                    link,
+                    format_template="{full_url}",
+                    affiliate_tag=affiliate_tag,
+                    affiliate_id=publisher_id,
+                )
+                new_text = new_text.replace(link, modified_link)
+
+        elif store_links:
+            self.logger.info(f"{message.message_id}: Found {len(store_links)} store links. Processing...")
+            for link, store_domain in store_links:
+                advertiser_id = advertisers.get(store_domain)
+                if not advertiser_id:
+                    continue
+
+                affiliate_link = self.generate_affiliate_url(
+                    link,
+                    format_template=format_template.format(advertiser_id=advertiser_id),
+                    affiliate_tag=affiliate_tag,
+                    affiliate_id=publisher_id,
+                )
+                new_text = new_text.replace(link, affiliate_link)
+
+                if "aliexpress" in store_domain and ALIEXPRESS_DISCOUNT_CODES:
+                    new_text += f"\n\n{ALIEXPRESS_DISCOUNT_CODES}"
+                    self.logger.debug(f"{message.message_id}: Appended AliExpress discount codes.")
+
+        if new_text != message.text:
+            self._process_message(message, new_text)
+            return True
+
+        self.logger.info(f"{message.message_id}: No links found in the message.")
+        return False
+
 
     @abstractmethod
     async def handle_links(self, message: Message) -> bool:
