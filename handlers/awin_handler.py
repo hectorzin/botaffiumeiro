@@ -15,9 +15,6 @@ from config import (
     DELETE_MESSAGES,
 )
 
-AWIN_URL_PATTERN = r"(https?://(?:[\w\-]+\.)?({})/[\w\d\-\./?=&%]+)".format(
-    "|".join([domain.replace(".", r"\.") for domain in AWIN_ADVERTISERS.keys()])
-)
 AWIN_AFFILIATE_PATTERN = (
     r"(https?://(?:[\w\-]+\.)?awin1\.com/cread\.php\?[\w\d\-\./?=&%]+)"
 )
@@ -69,6 +66,10 @@ def modify_existing_awin_link(url):
 
 async def handle_awin_links(message) -> bool:
     """Handles Awin-managed store links in the message."""
+    if not AWIN_PUBLISHER_ID:
+        logger.info("Awin affiliate ID is not set. Skipping processing.")
+        return False
+
     logger.info(f"{message.message_id}: Handling Awin links in the message...")
 
     short_links = re.findall(ALIEXPRESS_SHORT_URL_PATTERN, message.text)
@@ -81,10 +82,23 @@ async def handle_awin_links(message) -> bool:
             full_link = await expand_aliexpress_short_link(short_link)
             new_text = new_text.replace(short_link, full_link)
 
+    AWIN_URL_PATTERN = r"(https?://(?:[\w\-]+\.)?({})/[\w\d\-\./?=&%]+)".format(
+        "|".join([domain.replace(".", r"\.") for domain in AWIN_ADVERTISERS.keys()])
+    )
+
     awin_links = re.findall(AWIN_URL_PATTERN, new_text)
     awin_affiliate_links = re.findall(AWIN_AFFILIATE_PATTERN, new_text)
 
-    if awin_links:
+    if awin_affiliate_links:
+        logger.info(
+            f"{message.message_id}: Found {len(awin_affiliate_links)} Awin affiliate links. Processing..."
+        )
+        for link in awin_affiliate_links:
+            if len(awin_links) == 0:
+                return False         
+            modified_link = modify_existing_awin_link(link)
+            new_text = new_text.replace(link, modified_link)
+    elif awin_links:
         logger.info(
             f"{message.message_id}: Found {len(awin_affiliate_links)} Awin links. Processing..."
         )
@@ -97,20 +111,12 @@ async def handle_awin_links(message) -> bool:
                     f"{message.message_id}: Appended AliExpress discount codes."
                 )
 
-    if awin_affiliate_links:
-        logger.info(
-            f"{message.message_id}: Found {len(awin_affiliate_links)} Awin affiliate links. Processing..."
-        )
-        for link in awin_affiliate_links:
-            modified_link = modify_existing_awin_link(link)
-            new_text = new_text.replace(link, modified_link)
-
     if new_text != message.text:
-        reply_to_message_id = (
-            message.reply_to_message.message_id if message.reply_to_message else None
-        )
         polite_message = f"{MSG_REPLY_PROVIDED_BY_USER} @{message.from_user.username}:\n\n{new_text}\n\n{MSG_AFFILIATE_LINK_MODIFIED}"
         if DELETE_MESSAGES:
+            reply_to_message_id = (
+                message.reply_to_message.message_id if message.reply_to_message else None
+            )
             # Deletes the original message and creates a new one
             await message.delete()
             await message.chat.send_message(

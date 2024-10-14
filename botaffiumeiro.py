@@ -28,6 +28,19 @@ def is_user_excluded(user: User) -> bool:
     logger.debug(f"User {username} (ID: {user_id}) is excluded: {excluded}")
     return excluded
 
+async def process_link_handlers(message) -> None:
+    """Process all link handlers for Amazon, Awin, Admitad, and AliExpress."""
+
+    logger.info(f"Processing link handlers for message ID: {message.message_id}...")
+
+    await handle_amazon_links(message)
+    await handle_awin_links(message)
+    await handle_admitad_links(message)
+    await handle_aliexpress_api_links(message)
+    await handle_aliexpress_links(message)
+
+    logger.info(f"Finished processing link handlers for message ID: {message.message_id}.")
+
 
 async def modify_link(update: Update, context) -> None:
     """Modifies Amazon, AliExpress, Awin, and Admitad links in messages."""
@@ -58,11 +71,7 @@ async def modify_link(update: Update, context) -> None:
         f"{update.update_id}: Processing update message (ID: {update.message.message_id})..."
     )
 
-    await handle_amazon_links(message)
-    await handle_awin_links(message)
-    await handle_admitad_links(message)
-    await handle_aliexpress_api_links(message)
-    await handle_aliexpress_links(message)
+    await process_link_handlers(message)
 
     logger.info(f"{update.update_id}: Update processed.")
 

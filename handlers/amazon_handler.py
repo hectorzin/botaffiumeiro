@@ -36,6 +36,11 @@ def convert_to_affiliate_link(url):
     parsed_url = urlparse(url)
     query_params = parse_qs(parsed_url.query)
 
+    # Remove unwanted Amazon parameters (like 'ref', 'social_share', etc.)
+    unwanted_params = ['ref', 'ref_', 'social_share', 'starsLeft', 'skipTwisterOG']
+    for param in unwanted_params:
+        query_params.pop(param, None)
+
     query_params.pop("tag", None)
     query_params["tag"] = [AMAZON_AFFILIATE_ID]
 
@@ -57,6 +62,10 @@ def convert_to_affiliate_link(url):
 
 async def handle_amazon_links(message) -> bool:
     """Handles Amazon links in the message."""
+    if not AMAZON_AFFILIATE_ID:
+        logger.info("Amazon affiliate ID is not set. Skipping processing.")
+        return False
+
     logger.info(f"{message.message_id}: Handling Amazon links in the message...")
     amazon_links = re.findall(AMAZON_URL_PATTERN, message.text)
 
@@ -78,18 +87,20 @@ async def handle_amazon_links(message) -> bool:
         user_username = message.from_user.username
         polite_message = f"{MSG_REPLY_PROVIDED_BY_USER} @{user_username if user_username else user_first_name}:\n\n{new_text}\n\n{MSG_AFFILIATE_LINK_MODIFIED}"
 
-        await message.delete()
-        logger.info(f"{message.message_id}: Original message deleted.")
-
         if DELETE_MESSAGES:
+            reply_to_message_id = (
+                message.reply_to_message.message_id if message.reply_to_message else None
+            )
             # remove original message and creates a new one
             await message.delete()
-            await message.chat.send_message(text=polite_message)
+            await message.chat.send_message(
+                text=polite_message, reply_to_message_id=reply_to_message_id
+            )
             logger.info(f"{message.message_id}: Original message deleted annd sent modified message with affiliate links.")
         else:
             # Answers the original message
             reply_to_message_id = message.message_id
-            await message.chat.send_message(text=polite_message, reply_to_message_id=reply_to_message_id)
+            await message.chat.send_message(text=polite_message, reply_to_message_id=message.message_id)
             logger.info(f"{message.message_id}: Replied to message with affiliate links.")
 
         return True
