@@ -4,6 +4,11 @@ import requests
 from abc import ABC, abstractmethod
 from telegram import Message
 from urllib.parse import ParseResult,urlparse,parse_qs,urlencode
+from config import (
+    MSG_AFFILIATE_LINK_MODIFIED,
+    MSG_REPLY_PROVIDED_BY_USER,
+    DELETE_MESSAGES,
+)
 
 
 class BaseHandler(ABC):
@@ -90,6 +95,41 @@ class BaseHandler(ABC):
                 affiliate_url += f"&{new_query}"
 
         return affiliate_url
+
+    async def process_message(self, message, new_text: str):
+        """
+        Send a polite affiliate message, either by deleting the original message or replying to it.
+
+        Args:
+            message (telegram.Message): The message to modify.
+            new_text (str): The modified text with affiliate links.
+        """
+        # Get user information
+        user_first_name = message.from_user.first_name
+        user_username = message.from_user.username
+        polite_message = f"{MSG_REPLY_PROVIDED_BY_USER} @{user_username if user_username else user_first_name}:\n\n{new_text}\n\n{MSG_AFFILIATE_LINK_MODIFIED}"
+
+        if DELETE_MESSAGES:
+            # Delete original message and send a new one
+            reply_to_message_id = (
+                message.reply_to_message.message_id if message.reply_to_message else None
+            )
+            await message.delete()
+            await message.chat.send_message(
+                text=polite_message, reply_to_message_id=reply_to_message_id
+            )
+            self.logger.info(
+                f"{message.message_id}: Original message deleted and sent modified message with affiliate links."
+            )
+        else:
+            # Reply to the original message
+            reply_to_message_id = message.message_id
+            await message.chat.send_message(
+                text=polite_message, reply_to_message_id=reply_to_message_id
+            )
+            self.logger.info(
+                f"{message.message_id}: Replied to message with affiliate links."
+            )
 
     @abstractmethod
     async def handle_links(self, message: Message) -> bool:

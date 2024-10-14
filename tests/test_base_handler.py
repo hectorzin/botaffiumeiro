@@ -1,7 +1,11 @@
 import unittest
-from unittest.mock import MagicMock
+from unittest.mock import AsyncMock,patch
 from urllib.parse import unquote
 from handlers.base_handler import BaseHandler 
+from config import (
+    MSG_AFFILIATE_LINK_MODIFIED,
+    MSG_REPLY_PROVIDED_BY_USER,
+)
 
 class TestHandler(BaseHandler):
     def handle_links(self, message):
@@ -115,6 +119,147 @@ class TestGenerateAffiliateUrl(unittest.TestCase):
 
         self.assertEqual(affiliate_url, expected_url)
 
+class TestProcessMessage(unittest.TestCase):
+
+    def setUp(self):
+        """Set up the TestHandler instance."""
+        self.handler = TestHandler()  # Create an instance of the concrete subclass
+
+    @patch('config.DELETE_MESSAGES', True)
+    async def test_send_message_and_delete_original(self):
+        """Test when DELETE_MESSAGES is True, the original message should be deleted and a new one sent."""
+        mock_message = AsyncMock()
+        mock_message.from_user.first_name = "John"
+        mock_message.from_user.username = "john_doe"
+        mock_message.message_id = 100
+        mock_message.text = "Original message"
+
+        new_text = "This is the modified affiliate message"
+        
+        await self.handler.process_message(mock_message, new_text)
+
+        expected_message = (
+            f"{MSG_REPLY_PROVIDED_BY_USER} @john_doe:\n\n"
+            f"{new_text}\n\n"
+            f"{MSG_AFFILIATE_LINK_MODIFIED}"
+        )
+
+        # Check that the original message was deleted
+        mock_message.delete.assert_called_once()
+        # Check that a new message was sent
+        mock_message.chat.send_message.assert_called_once_with(text=expected_message)
+
+    @patch('config.DELETE_MESSAGES', False)
+    async def test_send_message_without_delete(self):
+        """Test when DELETE_MESSAGES is False, the original message should not be deleted, and the bot replies to it."""
+        mock_message = AsyncMock()
+        mock_message.from_user.first_name = "John"
+        mock_message.from_user.username = "john_doe"
+        mock_message.message_id = 100
+        mock_message.text = "Original message"
+
+        new_text = "This is the modified affiliate message"
+        
+        await self.handler.process_message(mock_message, new_text)
+
+        expected_message = (
+            f"{MSG_REPLY_PROVIDED_BY_USER} @john_doe:\n\n"
+            f"{new_text}\n\n"
+            f"{MSG_AFFILIATE_LINK_MODIFIED}"
+        )
+
+        # Check that the original message was not deleted
+        mock_message.delete.assert_not_called()
+        # Check that the message is sent as a reply to the original message
+        mock_message.chat.send_message.assert_called_once_with(
+            text=expected_message, 
+            reply_to_message_id=mock_message.message_id
+        )
+
+    @patch('config.DELETE_MESSAGES', True)
+    async def test_send_message_is_reply_and_delete(self):
+        """Test when DELETE_MESSAGES is True, and the original message is a reply to another message."""
+        mock_message = AsyncMock()
+        mock_message.from_user.first_name = "Jane"
+        mock_message.from_user.username = "jane_doe"
+        mock_message.message_id = 101
+        mock_message.text = "Original message"
+        mock_message.reply_to_message = AsyncMock()
+        mock_message.reply_to_message.message_id = 50  # Replying to message ID 50
+
+        new_text = "This is the modified affiliate message"
+        
+        await self.handler.process_message(mock_message, new_text)
+
+        expected_message = (
+            f"{MSG_REPLY_PROVIDED_BY_USER} @jane_doe:\n\n"
+            f"{new_text}\n\n"
+            f"{MSG_AFFILIATE_LINK_MODIFIED}"
+        )
+
+        # Check that the original message was deleted
+        mock_message.delete.assert_called_once()
+        # Check that the new message replies to the same message the original one was replying to
+        mock_message.chat.send_message.assert_called_once_with(
+            text=expected_message, 
+            reply_to_message_id=mock_message.reply_to_message.message_id
+        )
+
+    @patch('config.DELETE_MESSAGES', False)
+    async def test_send_message_is_reply_without_delete(self):
+        """Test when DELETE_MESSAGES is False, and the original message is a reply to another message."""
+        mock_message = AsyncMock()
+        mock_message.from_user.first_name = "Jane"
+        mock_message.from_user.username = "jane_doe"
+        mock_message.message_id = 101
+        mock_message.text = "Original message"
+        mock_message.reply_to_message = AsyncMock()
+        mock_message.reply_to_message.message_id = 50  # Replying to message ID 50
+
+        new_text = "This is the modified affiliate message"
+        
+        await self.handler.process_message(mock_message, new_text)
+
+        expected_message = (
+            f"{MSG_REPLY_PROVIDED_BY_USER} @jane_doe:\n\n"
+            f"{new_text}\n\n"
+            f"{MSG_AFFILIATE_LINK_MODIFIED}"
+        )
+
+        # Check that the original message was not deleted
+        mock_message.delete.assert_not_called()
+        # Check that the new message is sent as a reply to the original message
+        mock_message.chat.send_message.assert_called_once_with(
+            text=expected_message, 
+            reply_to_message_id=mock_message.message_id
+        )
+
+    @patch('config.DELETE_MESSAGES', True)
+    async def test_send_message_without_username(self):
+        """Test when the user has no username, use the first name instead."""
+        mock_message = AsyncMock()
+        mock_message.from_user.first_name = "Jane"
+        mock_message.from_user.username = None
+        mock_message.message_id = 102
+        mock_message.text = "Original message"
+        mock_message.reply_to_message = None  # Not replying to any message
+
+        new_text = "This is the modified affiliate message"
+        
+        await self.handler.process_message(mock_message, new_text)
+
+        expected_message = (
+            f"{MSG_REPLY_PROVIDED_BY_USER} @Jane:\n\n"
+            f"{new_text}\n\n"
+            f"{MSG_AFFILIATE_LINK_MODIFIED}"
+        )
+
+        # Check that the original message was deleted
+        mock_message.delete.assert_called_once()
+        # Check that the new message is sent without replying
+        mock_message.chat.send_message.assert_called_once_with(
+            text=expected_message
+        )
 
 if __name__ == '__main__':
     unittest.main()

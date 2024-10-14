@@ -52,26 +52,7 @@ class AmazonHandler(BaseHandler):
                 )
                 new_text = new_text.replace(link, affiliate_link)
 
-            user_first_name = message.from_user.first_name
-            user_username = message.from_user.username
-            polite_message = f"{MSG_REPLY_PROVIDED_BY_USER} @{user_username if user_username else user_first_name}:\n\n{new_text}\n\n{MSG_AFFILIATE_LINK_MODIFIED}"
-
-            if DELETE_MESSAGES:
-                # remove original message and creates a new one
-                await message.delete()
-                await message.chat.send_message(text=polite_message)
-                self.logger.info(
-                    f"{message.message_id}: Original message deleted annd sent modified message with affiliate links."
-                )
-            else:
-                # Answers the original message
-                reply_to_message_id = message.message_id
-                await message.chat.send_message(
-                    text=polite_message, reply_to_message_id=reply_to_message_id
-                )
-                self.logger.info(
-                    f"{message.message_id}: Replied to message with affiliate links."
-                )
+            self.process_message(message,new_text)
 
             return True
 
