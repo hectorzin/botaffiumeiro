@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import AsyncMock, patch, ANY
-from handlers.amazon_handler import handle_amazon_links
+from handlers.amazon_handler import AmazonHandler
 from config import MSG_REPLY_PROVIDED_BY_USER, MSG_AFFILIATE_LINK_MODIFIED
 
 class TestHandleAmazonLinks(unittest.IsolatedAsyncioTestCase):
@@ -19,7 +19,7 @@ class TestHandleAmazonLinks(unittest.IsolatedAsyncioTestCase):
         mock_message.message_id = 1
         mock_message.from_user.username = "testuser"
         
-        await handle_amazon_links(mock_message)
+        await AmazonHandler().handle_links(mock_message)
 
         mock_expand.assert_called_with("https://amzn.to/shortlink")
         mock_convert.assert_called_with("https://www.amazon.com/dp/B08N5WRWNW")
@@ -40,7 +40,7 @@ class TestHandleAmazonLinks(unittest.IsolatedAsyncioTestCase):
         mock_message.message_id = 1
         mock_message.from_user.username = "testuser"
         
-        await handle_amazon_links(mock_message)
+        await AmazonHandler().handle_links(mock_message)
 
         mock_expand.assert_called_with("https://amzn.to/shortlink")
         mock_convert.assert_called_with("https://www.amazon.com/dp/B08N5WRWNW")
@@ -62,7 +62,7 @@ class TestHandleAmazonLinks(unittest.IsolatedAsyncioTestCase):
         mock_message.message_id = 2
         mock_message.from_user.username = "testuser2"
         
-        await handle_amazon_links(mock_message)
+        await AmazonHandler().handle_links(mock_message)
 
         mock_convert.assert_called_with("https://www.amazon.com/dp/B08N5WRWNW")
         mock_message.delete.assert_not_called()
@@ -81,7 +81,7 @@ class TestHandleAmazonLinks(unittest.IsolatedAsyncioTestCase):
         mock_message.message_id = 2
         mock_message.from_user.username = "testuser2"
         
-        await handle_amazon_links(mock_message)
+        await AmazonHandler().handle_links(mock_message)
 
         mock_convert.assert_called_with("https://www.amazon.com/dp/B08N5WRWNW")
         mock_message.delete.assert_called_once()
@@ -97,7 +97,7 @@ class TestHandleAmazonLinks(unittest.IsolatedAsyncioTestCase):
         mock_message.message_id = 3
         mock_message.from_user.username = "testuser3"
         
-        await handle_amazon_links(mock_message)
+        await AmazonHandler().handle_links(mock_message)
 
         mock_convert.assert_called_with("https://www.amazon.com/dp/B08N5WRWNW?tag=another_affiliate")
         mock_message.delete.assert_called_once()
@@ -110,7 +110,7 @@ class TestHandleAmazonLinks(unittest.IsolatedAsyncioTestCase):
         mock_message.message_id = 4
         mock_message.from_user.username = "testuser4"
         
-        result = await handle_amazon_links(mock_message)
+        result = await AmazonHandler().handle_links(mock_message)
 
         mock_message.delete.assert_not_called()
         mock_message.chat.send_message.assert_not_called()
@@ -126,7 +126,7 @@ class TestHandleAmazonLinks(unittest.IsolatedAsyncioTestCase):
         mock_message.from_user.username = "testuser"
         
         # Call the function
-        await handle_amazon_links(mock_message)
+        await AmazonHandler().handle_links(mock_message)
 
         # Construct expected message using the MSG_REPLY_PROVIDED_BY_USER and MSG_AFFILIATE_LINK_MODIFIED
         expected_message = (
@@ -153,7 +153,7 @@ class TestHandleAmazonLinks(unittest.IsolatedAsyncioTestCase):
         mock_message.message_id = 1
         mock_message.from_user.username = "testuser"
 
-        await handle_amazon_links(mock_message)
+        await AmazonHandler().handle_links(mock_message)
 
         expected_message = (
             f"{MSG_REPLY_PROVIDED_BY_USER} @testuser:\n\n"
@@ -178,7 +178,7 @@ class TestHandleAmazonLinks(unittest.IsolatedAsyncioTestCase):
         mock_message.message_id = 1
         mock_message.from_user.username = "testuser"
 
-        await handle_amazon_links(mock_message)
+        await AmazonHandler().handle_links(mock_message)
 
         expected_message = (
             f"{MSG_REPLY_PROVIDED_BY_USER} @testuser:\n\n"
@@ -202,7 +202,7 @@ class TestHandleAmazonLinks(unittest.IsolatedAsyncioTestCase):
         mock_message.message_id = 2
         mock_message.from_user.username = "testuser2"
 
-        await handle_amazon_links(mock_message)
+        await AmazonHandler().handle_links(mock_message)
 
         expected_message = (
             f"{MSG_REPLY_PROVIDED_BY_USER} @testuser2:\n\n"
@@ -225,7 +225,7 @@ class TestHandleAmazonLinks(unittest.IsolatedAsyncioTestCase):
         mock_message.message_id = 2
         mock_message.from_user.username = "testuser2"
 
-        await handle_amazon_links(mock_message)
+        await AmazonHandler().handle_links(mock_message)
 
         expected_message = (
             f"{MSG_REPLY_PROVIDED_BY_USER} @testuser2:\n\n"
@@ -248,7 +248,7 @@ class TestHandleAmazonLinks(unittest.IsolatedAsyncioTestCase):
         mock_message.message_id = 3
         mock_message.from_user.username = "testuser3"
 
-        await handle_amazon_links(mock_message)
+        await AmazonHandler().handle_links(mock_message)
 
         expected_message = (
             f"{MSG_REPLY_PROVIDED_BY_USER} @testuser3:\n\n"
@@ -271,7 +271,7 @@ class TestHandleAmazonLinks(unittest.IsolatedAsyncioTestCase):
         mock_message.message_id = 3
         mock_message.from_user.username = "testuser3"
 
-        await handle_amazon_links(mock_message)
+        await AmazonHandler().handle_links(mock_message)
 
         expected_message = (
             f"{MSG_REPLY_PROVIDED_BY_USER} @testuser3:\n\n"
@@ -294,7 +294,7 @@ class TestHandleAmazonLinks(unittest.IsolatedAsyncioTestCase):
         mock_message.from_user.username = "testuser4"
 
         # Ejecutar la función
-        result = await handle_amazon_links(mock_message)
+        result = await AmazonHandler().handle_links(mock_message)
 
         # Asegurarse de que no se haya hecho ninguna modificación ni acción en el mensaje
         mock_message.delete.assert_not_called()
