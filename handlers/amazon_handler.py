@@ -13,6 +13,10 @@ class AmazonHandler(BaseHandler):
 
     async def handle_links(self, message: Message) -> bool:
         """Handles Amazon links in the message."""
+        if not AMAZON_AFFILIATE_ID:
+            self.logger.info("Amazon affiliate ID is not set. Skipping processing.")
+            return False
+    
         self.logger.info(
             f"{message.message_id}: Handling Amazon links in the message..."
         )
