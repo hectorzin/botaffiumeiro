@@ -4,11 +4,11 @@ from config import LOG_LEVEL, BOT_TOKEN, EXCLUDED_USERS
 from telegram import Update, User
 from telegram.ext import Application, MessageHandler, filters
 
-from handlers.amazon_handler import handle_amazon_links
+from handlers.admitad_handler import handle_admitad_links
 from handlers.aliexpress_api_handler import handle_aliexpress_api_links
 from handlers.aliexpress_handler import handle_aliexpress_links
+from handlers.amazon_handler import AmazonHandler
 from handlers.awin_handler import handle_awin_links
-from handlers.admitad_handler import handle_admitad_links
 
 
 logging.basicConfig(
@@ -39,11 +39,9 @@ async def modify_link(update: Update, context) -> None:
             f"{update.update_id}: Update with a message without text. Skipping."
         )
         return
-    
+
     if not update.effective_user:
-        logger.info(
-            f"{update.update_id}: Update without user. Skipping."
-        )
+        logger.info(f"{update.update_id}: Update without user. Skipping.")
         return
 
     if is_user_excluded(update.effective_user):
@@ -58,7 +56,7 @@ async def modify_link(update: Update, context) -> None:
         f"{update.update_id}: Processing update message (ID: {update.message.message_id})..."
     )
 
-    await handle_amazon_links(message)
+    await AmazonHandler().handle_links(message)
     await handle_awin_links(message)
     await handle_admitad_links(message)
     await handle_aliexpress_api_links(message)
