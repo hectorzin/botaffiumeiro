@@ -17,15 +17,6 @@ class AmazonHandler(BaseHandler):
     def __init__(self):
         super().__init__()
 
-    def _expand_shortened_url(self, url):
-        """Expands shortened URLs like amzn.to or amzn.eu by following redirects."""
-        self.logger.info(f"Try expanding shortened URL: {url}")
-        parsed_url = urlparse(url)
-        if "amzn.to" in parsed_url.netloc or "amzn.eu" in parsed_url.netloc:
-            url = super()._expand_shortened_url(parsed_url)
-        return url
-
-
     async def handle_links(self, message: Message) -> bool:
         """Handles Amazon links in the message."""
         self.logger.info(
