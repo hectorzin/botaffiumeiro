@@ -25,29 +25,6 @@ class AmazonHandler(BaseHandler):
             url = super()._expand_shortened_url(parsed_url)
         return url
 
-    def _convert_to_affiliate_link(self, url):
-        """Convert an Amazon link to an affiliate link."""
-        self.logger.info(f"Converting URL to affiliate link: {url}")
-        parsed_url = urlparse(url)
-        query_params = parse_qs(parsed_url.query)
-
-        query_params.pop("tag", None)
-        query_params["tag"] = [AMAZON_AFFILIATE_ID]
-
-        new_query = urlencode(query_params, doseq=True)
-        new_url = urlunparse(
-            (
-                parsed_url.scheme,
-                parsed_url.netloc,
-                parsed_url.path,
-                parsed_url.params,
-                new_query,
-                parsed_url.fragment,
-            )
-        )
-        self.logger.info(f"Converted URL {url} to affiliate link: {new_url}")
-
-        return new_url
 
     async def handle_links(self, message: Message) -> bool:
         """Handles Amazon links in the message."""
@@ -66,8 +43,13 @@ class AmazonHandler(BaseHandler):
                 if isinstance(link, tuple):
                     link = link[0]
 
-                expanded_link = self._expand_shortened_url(link)
-                affiliate_link = self._convert_to_affiliate_link(expanded_link)
+                expanded_link = self._expand_shortened_url_from_list(link, ["amzn.to", "amzn.eu"])
+                affiliate_link = self.generate_affiliate_url(
+                    expanded_link,
+                    format_template="{domain}{path_before_query}?{affiliate_tag}={affiliate_id}",
+                    affiliate_tag="tag",
+                    affiliate_id=AMAZON_AFFILIATE_ID
+                )
                 new_text = new_text.replace(link, affiliate_link)
 
             user_first_name = message.from_user.first_name
