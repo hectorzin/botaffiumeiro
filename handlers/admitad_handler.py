@@ -15,9 +15,6 @@ from config import (
     DELETE_MESSAGES,
 )
 
-ADMITAD_URL_PATTERN = r"(https?://(?:[\w\-]+\.)?({})/[\w\d\-\./?=&%]+)".format(
-    "|".join([domain.replace(".", r"\.") for domain in ADMITAD_ADVERTISERS.keys()])
-)
 ADMITAD_AFFILIATE_PATTERN = (
     r"(https?://(?:[\w\-]+\.)?ad\.admitad\.com/g/[\w\d]+/[\w\d]+/[\w\d\-\./?=&%]+)"
 )
@@ -75,6 +72,10 @@ def modify_existing_admitad_link(url):
 
 async def handle_admitad_links(message) -> bool:
     """Handles Admitad-managed store links in the message."""
+    if not ADMITAD_PUBLISHER_ID:
+        logger.info("Awin affiliate ID is not set. Skipping processing.")
+        return False
+
     logger.info(f"{message.message_id}: Handling Admitad links in the message...")
 
     short_links = re.findall(ALIEXPRESS_SHORT_URL_PATTERN, message.text)
@@ -87,10 +88,23 @@ async def handle_admitad_links(message) -> bool:
             full_link = await expand_aliexpress_short_link(short_link)
             new_text = new_text.replace(short_link, full_link)
 
+    ADMITAD_URL_PATTERN = r"(https?://(?:[\w\-]+\.)?({})/[\w\d\-\./?=&%]+)".format(
+        "|".join([domain.replace(".", r"\.") for domain in ADMITAD_ADVERTISERS.keys()])
+    )
+
     admitad_links = re.findall(ADMITAD_URL_PATTERN, new_text)
     admitad_affiliate_links = re.findall(ADMITAD_AFFILIATE_PATTERN, new_text)
 
-    if admitad_links:
+    if admitad_affiliate_links:
+        logger.info(
+            f"{message.message_id}: Found {len(admitad_affiliate_links)} Admitad affiliate links. Processing..."
+        )
+        for link in admitad_affiliate_links:
+            if len(admitad_links) == 0:
+                return False         
+            modified_link = modify_existing_admitad_link(link)
+            new_text = new_text.replace(link, modified_link)
+    elif admitad_links:
         logger.info(
             f"{message.message_id}: Found {len(admitad_links)} Admitad links. Processing..."
         )
@@ -103,21 +117,13 @@ async def handle_admitad_links(message) -> bool:
                     f"{message.message_id}: Appended AliExpress discount codes."
                 )
 
-    if admitad_affiliate_links:
-        logger.info(
-            f"{message.message_id}: Found {len(admitad_affiliate_links)} Admitad affiliate links. Processing..."
-        )
-        for link in admitad_affiliate_links:
-            modified_link = modify_existing_admitad_link(link)
-            new_text = new_text.replace(link, modified_link)
-
     if new_text != message.text:
-        reply_to_message_id = (
-            message.reply_to_message.message_id if message.reply_to_message else None
-        )
         polite_message = f"{MSG_REPLY_PROVIDED_BY_USER} @{message.from_user.username}:\n\n{new_text}\n\n{MSG_AFFILIATE_LINK_MODIFIED}"
 
         if DELETE_MESSAGES:
+            reply_to_message_id = (
+                message.reply_to_message.message_id if message.reply_to_message else None
+            )
             # Deletes the original message and creates a new one
             await message.delete()
             await message.chat.send_message(

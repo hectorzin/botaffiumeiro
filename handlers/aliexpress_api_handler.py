@@ -107,8 +107,7 @@ async def handle_aliexpress_api_links(message):
 
     if new_text != message.text:
         reply_to_message_id = message.reply_to_message.message_id if message.reply_to_message else None
-        polite_message = f"{MSG_REPLY_PROVIDED_BY_USER} @{message.from_user.username}:\n\n{new_text}\n\n{MSG_AFFILIATE_LINK_MODIFIED}"
-
+        polite_message = f"{MSG_REPLY_PROVIDED_BY_USER} @{message.from_user.username}:\n\n{MSG_AFFILIATE_LINK_MODIFIED}\n\n{new_text}"
         if DELETE_MESSAGES:
             # Deletes the original message and creates a new one
             await message.delete()
