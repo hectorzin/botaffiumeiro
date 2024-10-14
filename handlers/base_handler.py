@@ -45,7 +45,7 @@ class BaseHandler(ABC):
         # Check if the domain is in the list of provided domains
         if any(domain in parsed_url.netloc for domain in domains):
             # Call the superclass method to expand the URL
-            url = self._expand_shortened_url(parsed_url)
+            url = self._expand_shortened_url(url)
         
         return url
 

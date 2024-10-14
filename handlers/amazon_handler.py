@@ -35,7 +35,7 @@ class AmazonHandler(BaseHandler):
                 expanded_link = self._expand_shortened_url_from_list(
                     link, ["amzn.to", "amzn.eu"]
                 )
-                affiliate_link = self.generate_affiliate_url(
+                affiliate_link = self._generate_affiliate_url(
                     expanded_link,
                     format_template="{domain}{path_before_query}?{affiliate_tag}={affiliate_id}",
                     affiliate_tag="tag",
@@ -43,7 +43,7 @@ class AmazonHandler(BaseHandler):
                 )
                 new_text = new_text.replace(link, affiliate_link)
 
-            self.process_message(message, new_text)
+            self._process_message(message, new_text)
 
             return True
 
