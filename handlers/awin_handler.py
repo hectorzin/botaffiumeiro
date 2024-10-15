@@ -7,7 +7,7 @@ from config import (
 )
 
 AWIN_AFFILIATE_PATTERN = (
-    r"(https?://(?:[\w\-]+\.)?awin1\.com/cread\.php\?[\w\d\-\./?=&%]+)"
+    r"(https?://(?:[\w\-]+\.)?awin1\.com/cread\.php\?[\w\d\-\./?=&%:]+)"
 )
 
 class AwinHandler(BaseHandler):
@@ -20,7 +20,7 @@ class AwinHandler(BaseHandler):
         AWIN_URL_PATTERN = r"(https?://(?:[\w\-]+\.)?({})/[\w\d\-\./?=&%]+)".format(
             "|".join([domain.replace(".", r"\.") for domain in AWIN_ADVERTISERS.keys()])
         )
-        return self._process_affiliate_links(
+        return self._process_store_affiliate_links(
             message=message,
             publisher_id=AWIN_PUBLISHER_ID,
             advertisers=AWIN_ADVERTISERS,

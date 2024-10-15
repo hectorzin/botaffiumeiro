@@ -20,7 +20,7 @@ class TestGenerateAffiliateUrl(unittest.TestCase):
     def test_amazon_affiliate_url(self):
         """Test Amazon affiliate link generation with a simple format."""
         original_url = "https://www.amazon.com/dp/B08N5WRWNW"
-        affiliate_url = self.handler.generate_affiliate_url(
+        affiliate_url = self.handler._generate_affiliate_url(
             original_url,
             format_template="{domain}{path_before_query}?{affiliate_tag}={affiliate_id}",
             affiliate_tag="tag",
@@ -32,7 +32,7 @@ class TestGenerateAffiliateUrl(unittest.TestCase):
     def test_admitad_affiliate_url_with_store_id(self):
         """Test Admitad affiliate link generation with store ID and affiliate ID."""
         original_url = "https://www.some-admitad-store.com/product"
-        affiliate_url = self.handler.generate_affiliate_url(
+        affiliate_url = self.handler._generate_affiliate_url(
             original_url,
             format_template="{domain}?store_id=12345&{affiliate_tag}={affiliate_id}",
             affiliate_tag="aff_id",
@@ -44,7 +44,7 @@ class TestGenerateAffiliateUrl(unittest.TestCase):
     def test_url_with_existing_affiliate_tag_overwrite(self):
         """Test overwriting an existing affiliate tag in the URL."""
         original_url = "https://www.amazon.com/dp/B08N5WRWNW?tag=old-affiliate"
-        affiliate_url = self.handler.generate_affiliate_url(
+        affiliate_url = self.handler._generate_affiliate_url(
             original_url,
             format_template="{domain}{path_before_query}?{affiliate_tag}={affiliate_id}",
             affiliate_tag="tag",
@@ -53,22 +53,46 @@ class TestGenerateAffiliateUrl(unittest.TestCase):
         expected_url = "https://www.amazon.com/dp/B08N5WRWNW?tag=new-affiliate"
         self.assertEqual(affiliate_url, expected_url)
 
-    def test_no_affiliate_tag_in_template(self):
+    def test_no_affiliate_tag_in_template_and_affiliate_tag(self):
         """Test that the query string is appended properly if the template does not include the affiliate tag placeholders."""
         original_url = "https://www.amazon.com/dp/B08N5WRWNW"
-        affiliate_url = self.handler.generate_affiliate_url(
+        affiliate_url = self.handler._generate_affiliate_url(
+            original_url,
+            format_template="{domain}{path_before_query}",
+            affiliate_tag="tag",
+            affiliate_id="affiliate-21",
+        )
+        expected_url = "https://www.amazon.com/dp/B08N5WRWNW?tag=affiliate-21"
+        self.assertEqual(affiliate_url, expected_url)
+
+    def test_no_affiliate_tag_in_template_and_affiliate_tag_with_url_with_query(self):
+        """Test that the query string is appended properly if the template does not include the affiliate tag placeholders."""
+        original_url = "https://www.amazon.com/dp/B08N5WRWNW?item=5"
+        affiliate_url = self.handler._generate_affiliate_url(
             original_url,
             format_template="{domain}{path_before_query}",
             affiliate_tag="tag",
             affiliate_id="affiliate-21"
         )
-        expected_url = "https://www.amazon.com/dp/B08N5WRWNW?tag=affiliate-21"
+        expected_url = "https://www.amazon.com/dp/B08N5WRWNW?item=5&tag=affiliate-21"
+        self.assertEqual(affiliate_url, expected_url)
+
+    def test_no_affiliate_tag_in_template_and_not_affiliate_tag(self):
+        """Test that the query string is appended properly if the template does not include the affiliate tag id."""
+        original_url = "https://www.amazon.com/dp/B08N5WRWNW"
+        affiliate_url = self.handler._generate_affiliate_url(
+            original_url,
+            format_template="{domain}{path_before_query}",
+            affiliate_tag=None,
+            affiliate_id="affiliate-21"
+        )
+        expected_url = "https://www.amazon.com/dp/B08N5WRWNW"
         self.assertEqual(affiliate_url, expected_url)
 
     def test_url_with_empty_query(self):
         """Test URL without query parameters should add affiliate tag."""
         original_url = "https://www.amazon.com/dp/B08N5WRWNW"
-        affiliate_url = self.handler.generate_affiliate_url(
+        affiliate_url = self.handler._generate_affiliate_url(
             original_url,
             format_template="{domain}{path_before_query}?{affiliate_tag}={affiliate_id}",
             affiliate_tag="tag",
@@ -80,7 +104,7 @@ class TestGenerateAffiliateUrl(unittest.TestCase):
     def test_url_with_complex_path(self):
         """Test URL with complex path (multiple slashes and query params) should generate correctly."""
         original_url = "https://www.example.com/store/sub-store/product/12345?color=red"
-        affiliate_url = self.handler.generate_affiliate_url(
+        affiliate_url = self.handler._generate_affiliate_url(
             original_url,
             format_template="{domain}{path_before_query}?{affiliate_tag}={affiliate_id}",
             affiliate_tag="aff_id",
@@ -92,7 +116,7 @@ class TestGenerateAffiliateUrl(unittest.TestCase):
     def test_affiliate_in_path(self):
         """Test affiliate ID being inserted into a path before the query string."""
         original_url = "https://www.example.com/product/12345"
-        affiliate_url = self.handler.generate_affiliate_url(
+        affiliate_url = self.handler._generate_affiliate_url(
             original_url,
             format_template="{domain}/{affiliate_tag}/{affiliate_id}{path_before_query}",
             affiliate_tag="aff_id",
@@ -110,7 +134,7 @@ class TestGenerateAffiliateUrl(unittest.TestCase):
 
         expected_url = "https://www.awin1.com/cread.php?awinmid=12345&awinaffid=affiliate-21&ued=https://www.example.com/product/12345"
 
-        affiliate_url = self.handler.generate_affiliate_url(
+        affiliate_url = self.handler._generate_affiliate_url(
             original_url=original_url,
             format_template=format_template,
             affiliate_tag=affiliate_tag,
@@ -118,6 +142,64 @@ class TestGenerateAffiliateUrl(unittest.TestCase):
         )
 
         self.assertEqual(affiliate_url, expected_url)
+
+    def test_affiliate_and_advertiser_id_update(self):
+        """Test that both affiliate_id and advertiser_id are updated correctly in the URL."""
+
+        original_url = "https://www.example.com/product?tag=old_affiliate_id&advertiser_id=old_advertiser_id"
+        format_template = "{domain}{path_before_query}?{affiliate_tag}={affiliate_id}&advertiser_id={advertiser_id}"
+
+        # Call the method with new affiliate_id and advertiser_id
+        updated_url = self.handler._generate_affiliate_url(
+            original_url=original_url,
+            format_template=format_template,
+            affiliate_tag="tag",
+            affiliate_id="new_affiliate_id",
+            advertiser_id="new_advertiser_id"
+        )
+
+        # Expected URL after updating the affiliate and advertiser IDs
+        expected_url = "https://www.example.com/product?tag=new_affiliate_id&advertiser_id=new_advertiser_id"
+
+        # Assert that the updated URL matches the expected URL
+        self.assertEqual(updated_url, expected_url)
+
+    def test_affiliate_link_with_advertiser(self):
+        """Test affiliate link generation with an advertiser ID."""
+        original_url = "https://example.com/product/123"
+        format_template = "{domain}{path_before_query}?{affiliate_tag}={affiliate_id}&advertiser_id={advertiser_id}"
+        affiliate_tag = "tag"
+        affiliate_id = "my_affiliate"
+        advertiser_id = "12345"
+
+        expected_url = "https://example.com/product/123?tag=my_affiliate&advertiser_id=12345"
+
+        result = self.handler._generate_affiliate_url(
+            original_url,
+            format_template,
+            affiliate_tag,
+            affiliate_id,
+            advertiser_id
+        )
+        self.assertEqual(result, expected_url)
+
+    def test_affiliate_link_with_url_param_replacement(self):
+        """Test affiliate link generation with dynamic replacement of {url} in the format template."""
+        original_url = "https://source.com/product?url=https://example.com/product/123"
+        format_template = "https://destino.com?url={url}&{affiliate_tag}={affiliate_id}"
+        affiliate_tag = "tag"
+        affiliate_id = "my_affiliate"
+
+        expected_url = "https://destino.com?url=https://example.com/product/123&tag=my_affiliate"
+
+        result = self.handler._generate_affiliate_url(
+            original_url,
+            format_template,
+            affiliate_tag,
+            affiliate_id
+        )
+        self.assertEqual(result, expected_url)
+
 
 class TestProcessMessage(unittest.TestCase):
 
@@ -261,5 +343,6 @@ class TestProcessMessage(unittest.TestCase):
             text=expected_message
         )
 
+ 
 if __name__ == '__main__':
     unittest.main()

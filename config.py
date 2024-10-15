@@ -29,7 +29,7 @@ ADMITAD_ADVERTISERS = config_data.get('admitad', {}).get('advertisers', {})
 ALIEXPRESS_APP_KEY = config_data.get('aliexpress', {}).get('app_key', None)
 ALIEXPRESS_APP_SECRET = config_data.get('aliexpress', {}).get('app_secret', None)
 ALIEXPRESS_TRACKING_ID = config_data.get('aliexpress', {}).get('tracking_id', None)
-ALIEXPRESS_DISCOUNT_CODES = config_data.get('aliexpress', {}).get('discount_codes', 'No discount codes available')
+ALIEXPRESS_DISCOUNT_CODES = config_data.get('aliexpress', {}).get('discount_codes', None)
 
 # Logging Level
 LOG_LEVEL = config_data.get('log_level', 'INFO')

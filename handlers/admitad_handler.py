@@ -7,7 +7,7 @@ from config import (
 )
 
 ADMITAD_AFFILIATE_PATTERN = (
-    r"(https?://(?:[\w\-]+\.)?ad\.admitad\.com/g/[\w\d]+/[\w\d]+/[\w\d\-\./?=&%]+)"
+    r"(https?://(?:[\w\-]+\.)?wextap\.com/g/[\w\d\-\._]+/?.*)"
 )
 
 class AdmitadHandler(BaseHandler):
@@ -20,12 +20,12 @@ class AdmitadHandler(BaseHandler):
         ADMITAD_URL_PATTERN = r"(https?://(?:[\w\-]+\.)?({})/[\w\d\-\./?=&%]+)".format(
             "|".join([domain.replace(".", r"\.") for domain in ADMITAD_ADVERTISERS.keys()])
         )
-        return self._process_affiliate_links(
+        return self._process_store_affiliate_links(
             message=message,
             publisher_id=ADMITAD_PUBLISHER_ID,
             advertisers=ADMITAD_ADVERTISERS,
             url_pattern=ADMITAD_URL_PATTERN,
             affiliate_pattern=ADMITAD_AFFILIATE_PATTERN,
-            format_template="https://ad.admitad.com/g/{advertiser_id}/{affiliate_id}/?ulp={full_url}",
-            affiliate_tag="subid",
+            format_template="https://wextap.com/g/{advertiser_id}/?ulp={full_url}",
+            affiliate_tag=None,
         )
