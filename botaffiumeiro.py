@@ -5,8 +5,8 @@ from telegram import Update, User
 from telegram.ext import Application, MessageHandler, filters
 
 from handlers.admitad_handler import AdmitadHandler
-from handlers.aliexpress_api_handler import handle_aliexpress_api_links
-from handlers.aliexpress_handler import handle_aliexpress_links
+from handlers.aliexpress_api_handler import AliexpressAPIHandler
+from handlers.aliexpress_handler import AliexpressHandler
 from handlers.amazon_handler import AmazonHandler
 from handlers.awin_handler import AwinHandler
 

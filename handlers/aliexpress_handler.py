@@ -13,7 +13,7 @@ from config import (
 
 ALIEXPRESS_URL_PATTERN = r"(https?://(?:[a-z]{2,3}\.)?aliexpress\.[a-z]{2,3}(?:\.[a-z]{2})?/(?:[\w\d\-\./?=&%]+))"
 
-class AliexpressAPIHandler(BaseHandler):
+class AliexpressHandler(BaseHandler):
     def __init__(self):
         super().__init__()
 

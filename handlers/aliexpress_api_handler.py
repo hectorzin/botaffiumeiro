@@ -103,30 +103,20 @@ class AliexpressAPIHandler(BaseHandler):
             f"{message.message_id}: Handling AliExpress links in the message..."
         )
 
-        new_text = message.text
+        new_text=self._expand_aliexpress_links_from_message(message.text)
+
         aliexpress_links = re.findall(ALIEXPRESS_URL_PATTERN, new_text)
-        aliexpress_short_links = re.findall(ALIEXPRESS_SHORT_URL_PATTERN, new_text)
 
-        all_aliexpress_links = aliexpress_links + aliexpress_short_links
-
-        if not all_aliexpress_links:
+        if not aliexpress_links:
             self.logger.info(
                 f"{message.message_id}: No AliExpress links found in the message."
             )
             return False
 
         self.logger.info(
-            f"{message.message_id}: Found {len(all_aliexpress_links)} AliExpress links. Processing..."
+            f"{message.message_id}: Found {len(aliexpress_links)} AliExpress links. Processing..."
         )
-        for link in all_aliexpress_links:
-            if "s.click.aliexpress" in link:
-                link = self._expand_shortened_url_from_list(
-                    link, ["s.click.aliexpress.com"]
-                )
-                self.logger.info(
-                    f"{message.message_id}: Expanded short AliExpress link: {link}"
-                )
-
+        for link in aliexpress_links:
             affiliate_link = await self._convert_to_aliexpress_affiliate(link)
             if affiliate_link:
                 new_text = new_text.replace(link, affiliate_link)

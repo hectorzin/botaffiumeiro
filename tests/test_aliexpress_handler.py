@@ -1,7 +1,12 @@
 import unittest
 from unittest.mock import AsyncMock, patch
-from handlers.aliexpress_handler import handle_aliexpress_links, expand_aliexpress_short_link
+from handlers.base_handler import BaseHandler
+from handlers.aliexpress_handler import AliexpressHandler
 from config import ALIEXPRESS_DISCOUNT_CODES
+
+class TestHandler(BaseHandler):
+    def handle_links(self, message):
+        pass
 
 class TestHandleAliExpressLinks(unittest.IsolatedAsyncioTestCase):
 
@@ -16,7 +21,7 @@ class TestHandleAliExpressLinks(unittest.IsolatedAsyncioTestCase):
         mock_message.message_id = 1
         mock_message.from_user.username = "testuser"
 
-        await handle_aliexpress_links(mock_message)
+        result = await AliexpressHandler().handle_links(mock_message)
 
         # Check that the message with discount codes is sent
         mock_message.chat.send_message.assert_called_once_with(
@@ -35,7 +40,7 @@ class TestHandleAliExpressLinks(unittest.IsolatedAsyncioTestCase):
         mock_message.message_id = 1
         mock_message.from_user.username = "testuser"
 
-        result = await handle_aliexpress_links(mock_message)
+        result = await AliexpressHandler().handle_links(mock_message)
 
         # Ensure no message is sent and the function returns False
         mock_message.chat.send_message.assert_not_called()
@@ -52,7 +57,7 @@ class TestHandleAliExpressLinks(unittest.IsolatedAsyncioTestCase):
         mock_message.message_id = 1
         mock_message.from_user.username = "testuser"
 
-        result = await handle_aliexpress_links(mock_message)
+        result = await AliexpressHandler().handle_links(mock_message)
 
         # Ensure no message is sent and the function returns False
         mock_message.chat.send_message.assert_not_called()
@@ -69,7 +74,7 @@ class TestHandleAliExpressLinks(unittest.IsolatedAsyncioTestCase):
         mock_message.message_id = 2
         mock_message.from_user.username = "testuser2"
 
-        await handle_aliexpress_links(mock_message)
+        result = await AliexpressHandler().handle_links(mock_message)
 
         # Ensure message is sent with discount codes
         mock_message.chat.send_message.assert_called_once_with(
@@ -88,7 +93,7 @@ class TestHandleAliExpressLinks(unittest.IsolatedAsyncioTestCase):
         mock_message.message_id = 3
         mock_message.from_user.username = "testuser3"
 
-        result = await handle_aliexpress_links(mock_message)
+        result = await AliexpressHandler().handle_links(mock_message)
 
         # Ensure no message is sent and the function returns True
         mock_message.chat.send_message.assert_not_called()
@@ -102,7 +107,7 @@ class TestHandleAliExpressLinks(unittest.IsolatedAsyncioTestCase):
         mock_message.message_id = 4
         mock_message.from_user.username = "testuser4"
 
-        result = await handle_aliexpress_links(mock_message)
+        result = await AliexpressHandler().handle_links(mock_message)
 
         # Ensure no message is sent and the function returns False
         mock_message.chat.send_message.assert_not_called()
