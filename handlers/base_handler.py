@@ -189,7 +189,7 @@ class BaseHandler(ABC):
                 f"{message.message_id}: Replied to message with affiliate links."
             )
 
-    def _process_store_affiliate_links(
+    async def _process_store_affiliate_links(
         self,
         message,
         publisher_id: str,
@@ -284,7 +284,7 @@ class BaseHandler(ABC):
                     )
 
         if new_text != message.text:
-            self._process_message(message, new_text)
+            await self._process_message(message, new_text)
             return True
 
         self.logger.info(f"{message.message_id}: No links found in the message.")

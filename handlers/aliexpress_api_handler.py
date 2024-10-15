@@ -125,7 +125,7 @@ class AliexpressAPIHandler(BaseHandler):
         self.logger.debug(f"{message.message_id}: Appended AliExpress discount codes.")
 
         if new_text != message.text:
-            self._process_message(message, new_text)
+            await self._process_message(message, new_text)
             return True
 
         self.logger.info(f"{message.message_id}: No modifications made to the message.")
