@@ -3,7 +3,7 @@ from telegram import Message
 from handlers.base_handler import BaseHandler
 from config import ADMITAD_PUBLISHER_ID, ADMITAD_ADVERTISERS
 
-ADMITAD_AFFILIATE_PATTERN = r"(https?://(?:[\w\-]+\.)?wextap\.com/g/[\w\d\-\._]+/?.*)"
+ADMITAD_AFFILIATE_PATTERN = r"(https?://(?:[\w\-]+\.)?wextap\.com/g/[a-zA-Z0-9\-\._~:/?#\[\]@!$&'()*+,;=%]+/?.*)"
 
 
 class AdmitadHandler(BaseHandler):
@@ -14,7 +14,7 @@ class AdmitadHandler(BaseHandler):
     async def handle_links(self, message: Message) -> bool:
         """Handles Admitad-managed store links in the message."""
 
-        admitad_url_pattern = r"(https?://(?:[\w\-]+\.)?({})/[\w\d\-\./?=&%]+)".format(
+        admitad_url_pattern = r"(https?://(?:[\w\-]+\.)?({})/[a-zA-Z0-9\-\._~:/?#\[\]@!$&'()*+,;=%]+)".format(
             "|".join([k.replace(".", r"\.") for k in ADMITAD_ADVERTISERS.keys()])
         )
         return await self._process_store_affiliate_links(

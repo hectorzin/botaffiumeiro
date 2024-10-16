@@ -6,9 +6,7 @@ from config import (
 )
 from handlers.base_handler import BaseHandler
 
-AWIN_AFFILIATE_PATTERN = (
-    r"(https?://(?:[\w\-]+\.)?awin1\.com/cread\.php\?[\w\d\-\./?=&%:]+)"
-)
+AWIN_AFFILIATE_PATTERN = r"(https?://(?:[\w\-]+\.)?awin1\.com/cread\.php\?[a-zA-Z0-9\-\._~:/?#\[\]@!$&'()*+,;=%]+)"
 
 
 class AwinHandler(BaseHandler):
@@ -17,9 +15,10 @@ class AwinHandler(BaseHandler):
 
     async def handle_links(self, message: Message) -> bool:
         """Handles Awin-managed store links in the message."""
-        awin_url_pattern = r"(https?://(?:[\w\-]+\.)?({})/[\w\d\-\./?=&%]+)".format(
+        awin_url_pattern = r"(https?://(?:[\w\-]+\.)?({})/[a-zA-Z0-9\-\._~:/?#\[\]@!$&'()*+,;=%]+)".format(
             "|".join([k.replace(".", r"\.") for k in AWIN_ADVERTISERS.keys()])
         )
+        
         return await self._process_store_affiliate_links(
             message=message,
             publisher_id=AWIN_PUBLISHER_ID,
