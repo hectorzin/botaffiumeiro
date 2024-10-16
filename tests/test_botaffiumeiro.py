@@ -1,13 +1,13 @@
 import unittest
 
-from botaffiumeiro import is_user_excluded, modify_link
 from datetime import datetime
 from telegram import Update, User, Message, Chat
 from unittest.mock import AsyncMock, patch
 
+from botaffiumeiro import is_user_excluded, modify_link
 
-class TestBotHandlers(unittest.IsolatedAsyncioTestCase):
 
+class TestIsUserExcluded(unittest.TestCase):
     @patch("botaffiumeiro.EXCLUDED_USERS", [12345, "excluded_user"])
     def test_is_user_excluded_in_list(self):
         user = User(
@@ -46,17 +46,13 @@ class TestBotHandlers(unittest.IsolatedAsyncioTestCase):
 
         self.assertTrue(result)
 
+
+class TestModifyLink(unittest.IsolatedAsyncioTestCase):
     @patch("botaffiumeiro.is_user_excluded")
-    @patch("botaffiumeiro.handle_amazon_links", new_callable=AsyncMock)
-    @patch("botaffiumeiro.handle_awin_links", new_callable=AsyncMock)
-    @patch("botaffiumeiro.handle_admitad_links", new_callable=AsyncMock)
-    @patch("botaffiumeiro.handle_aliexpress_links", new_callable=AsyncMock)
+    @patch("botaffiumeiro.process_link_handlers", new_callable=AsyncMock)
     async def test_modify_link_without_message(
         self,
-        mock_handle_aliexpress_links,
-        mock_handle_admitad_links,
-        mock_handle_awin_links,
-        mock_handle_amazon_links,
+        mock_process_link_handlers,
         mock_is_user_excluded,
     ):
         update = Update(update_id=1)
@@ -65,22 +61,13 @@ class TestBotHandlers(unittest.IsolatedAsyncioTestCase):
         await modify_link(update, context)
 
         mock_is_user_excluded.assert_not_called()
-        mock_handle_amazon_links.assert_not_called()
-        mock_handle_awin_links.assert_not_called()
-        mock_handle_admitad_links.assert_not_called()
-        mock_handle_aliexpress_links.assert_not_called()
+        mock_process_link_handlers.assert_not_called()
 
     @patch("botaffiumeiro.is_user_excluded")
-    @patch("botaffiumeiro.handle_amazon_links", new_callable=AsyncMock)
-    @patch("botaffiumeiro.handle_awin_links", new_callable=AsyncMock)
-    @patch("botaffiumeiro.handle_admitad_links", new_callable=AsyncMock)
-    @patch("botaffiumeiro.handle_aliexpress_links", new_callable=AsyncMock)
+    @patch("botaffiumeiro.process_link_handlers", new_callable=AsyncMock)
     async def test_modify_link_message_without_text(
         self,
-        mock_handle_aliexpress_links,
-        mock_handle_admitad_links,
-        mock_handle_awin_links,
-        mock_handle_amazon_links,
+        mock_process_link_handlers,
         mock_is_user_excluded,
     ):
         update = Update(
@@ -97,22 +84,13 @@ class TestBotHandlers(unittest.IsolatedAsyncioTestCase):
         await modify_link(update, context)
 
         mock_is_user_excluded.assert_not_called()
-        mock_handle_amazon_links.assert_not_called()
-        mock_handle_awin_links.assert_not_called()
-        mock_handle_admitad_links.assert_not_called()
-        mock_handle_aliexpress_links.assert_not_called()
+        mock_process_link_handlers.assert_not_called()
 
     @patch("botaffiumeiro.is_user_excluded", return_value=True)
-    @patch("botaffiumeiro.handle_amazon_links", new_callable=AsyncMock)
-    @patch("botaffiumeiro.handle_awin_links", new_callable=AsyncMock)
-    @patch("botaffiumeiro.handle_admitad_links", new_callable=AsyncMock)
-    @patch("botaffiumeiro.handle_aliexpress_links", new_callable=AsyncMock)
+    @patch("botaffiumeiro.process_link_handlers", new_callable=AsyncMock)
     async def test_modify_link_excluded_user(
         self,
-        mock_handle_aliexpress_links,
-        mock_handle_admitad_links,
-        mock_handle_awin_links,
-        mock_handle_amazon_links,
+        mock_process_link_handlers,
         mock_is_user_excluded,
     ):
         update = Update(
@@ -130,22 +108,13 @@ class TestBotHandlers(unittest.IsolatedAsyncioTestCase):
         await modify_link(update, context)
 
         mock_is_user_excluded.assert_called_once()
-        mock_handle_amazon_links.assert_not_called()
-        mock_handle_awin_links.assert_not_called()
-        mock_handle_admitad_links.assert_not_called()
-        mock_handle_aliexpress_links.assert_not_called()
+        mock_process_link_handlers.assert_not_called()
 
     @patch("botaffiumeiro.is_user_excluded", return_value=False)
-    @patch("botaffiumeiro.handle_amazon_links", new_callable=AsyncMock)
-    @patch("botaffiumeiro.handle_awin_links", new_callable=AsyncMock)
-    @patch("botaffiumeiro.handle_admitad_links", new_callable=AsyncMock)
-    @patch("botaffiumeiro.handle_aliexpress_links", new_callable=AsyncMock)
+    @patch("botaffiumeiro.process_link_handlers", new_callable=AsyncMock)
     async def test_modify_link_included_user(
         self,
-        mock_handle_aliexpress_links,
-        mock_handle_admitad_links,
-        mock_handle_awin_links,
-        mock_handle_amazon_links,
+        mock_process_link_handlers,
         mock_is_user_excluded,
     ):
         update = Update(
@@ -163,22 +132,13 @@ class TestBotHandlers(unittest.IsolatedAsyncioTestCase):
         await modify_link(update, context)
 
         mock_is_user_excluded.assert_called_once()
-        mock_handle_amazon_links.assert_called_once()
-        mock_handle_awin_links.assert_called_once()
-        mock_handle_admitad_links.assert_called_once()
-        mock_handle_aliexpress_links.assert_called_once()
+        mock_process_link_handlers.assert_called_once()
 
     @patch("botaffiumeiro.is_user_excluded")
-    @patch("botaffiumeiro.handle_amazon_links", new_callable=AsyncMock)
-    @patch("botaffiumeiro.handle_awin_links", new_callable=AsyncMock)
-    @patch("botaffiumeiro.handle_admitad_links", new_callable=AsyncMock)
-    @patch("botaffiumeiro.handle_aliexpress_links", new_callable=AsyncMock)
+    @patch("botaffiumeiro.process_link_handlers", new_callable=AsyncMock)
     async def test_modify_link_without_user(
         self,
-        mock_handle_aliexpress_links,
-        mock_handle_admitad_links,
-        mock_handle_awin_links,
-        mock_handle_amazon_links,
+        mock_process_link_handlers,
         mock_is_user_excluded,
     ):
         update = Update(
@@ -195,7 +155,4 @@ class TestBotHandlers(unittest.IsolatedAsyncioTestCase):
         await modify_link(update, context)
 
         mock_is_user_excluded.asset_not_called()
-        mock_handle_amazon_links.assert_not_called()
-        mock_handle_awin_links.assert_not_called()
-        mock_handle_admitad_links.assert_not_called()
-        mock_handle_aliexpress_links.assert_not_called()
+        mock_process_link_handlers.assert_not_called()
