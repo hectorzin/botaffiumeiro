@@ -5,7 +5,7 @@ from telegram import Message
 from config import AMAZON_AFFILIATE_ID
 from handlers.base_handler import BaseHandler
 
-AMAZON_URL_PATTERN = r"(https?://(?:www\.)?(amazon\.[a-z]{2,3}(?:\.[a-z]{2})?|amzn\.to|amzn\.eu)/[\w\d\-\./?=&%+]+)"
+AMAZON_URL_PATTERN = r"(https?://(?:www\.)?(amazon\.[a-z]{2,3}(?:\.[a-z]{2})?|amzn\.to|amzn\.eu)/[a-zA-Z0-9\-\._~:/?#\[\]@!$&'()*+,;=%]+)"
 
 
 class AmazonHandler(BaseHandler):

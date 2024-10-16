@@ -11,7 +11,7 @@ from config import (
 from handlers.base_handler import BaseHandler, ALIEXPRESS_SHORT_URL_PATTERN
 
 
-ALIEXPRESS_URL_PATTERN = r"(https?://(?:[a-z]{2,3}\.)?aliexpress\.[a-z]{2,3}(?:\.[a-z]{2})?/(?:[\w\d\-\./?=&%]+))"
+ALIEXPRESS_URL_PATTERN = r"(https?://(?:[a-z]{2,3}\.)?aliexpress\.[a-z]{2,3}(?:\.[a-z]{2})?/[a-zA-Z0-9\-\._~:/?#\[\]@!$&'()*+,;=%]+)"
 
 
 class AliexpressHandler(BaseHandler):
