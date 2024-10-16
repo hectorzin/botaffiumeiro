@@ -1,8 +1,6 @@
-from handlers.base_handler import BaseHandler,ALIEXPRESS_SHORT_URL_PATTERN
-from telegram import Message
-import logging
-import httpx
 import re
+
+from telegram import Message
 
 from config import (
     ALIEXPRESS_DISCOUNT_CODES,
@@ -10,23 +8,28 @@ from config import (
     AWIN_ADVERTISERS,
     ADMITAD_ADVERTISERS,
 )
+from handlers.base_handler import BaseHandler, ALIEXPRESS_SHORT_URL_PATTERN
+
 
 ALIEXPRESS_URL_PATTERN = r"(https?://(?:[a-z]{2,3}\.)?aliexpress\.[a-z]{2,3}(?:\.[a-z]{2})?/(?:[\w\d\-\./?=&%]+))"
+
 
 class AliexpressHandler(BaseHandler):
     def __init__(self):
         super().__init__()
 
     async def handle_links(self, message: Message) -> bool:
+        """Handles both long and short AliExpress links in the message."""
         # Check if discount codes and message are not empty before proceeding
         if not ALIEXPRESS_DISCOUNT_CODES:
             self.logger.info(
                 f"{message.message_id}: Discount message or codes are empty. Skipping reply."
             )
-            return True  # Exit the function if both variables are empty
+            return True
 
-        """Handles both long and short AliExpress links in the message."""
-        self.logger.info(f"{message.message_id}: Handling AliExpress links in the message...")
+        self.logger.info(
+            f"{message.message_id}: Handling AliExpress links in the message..."
+        )
 
         aliexpress_links = re.findall(ALIEXPRESS_URL_PATTERN, message.text)
         aliexpress_short_links = re.findall(ALIEXPRESS_SHORT_URL_PATTERN, message.text)
@@ -58,5 +61,7 @@ class AliexpressHandler(BaseHandler):
             )
             return True
 
-        self.logger.info(f"{message.message_id}: No AliExpress links found in the message.")
+        self.logger.info(
+            f"{message.message_id}: No AliExpress links found in the message."
+        )
         return False

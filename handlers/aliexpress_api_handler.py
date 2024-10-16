@@ -1,14 +1,11 @@
-from handlers.base_handler import BaseHandler
-from telegram import Message
-import re
-import time
 import hmac
 import hashlib
+import re
 import requests
-from handlers.aliexpress_handler import (
-    ALIEXPRESS_URL_PATTERN,
-    ALIEXPRESS_SHORT_URL_PATTERN,
-)
+import time
+
+from telegram import Message
+
 from config import (
     ALIEXPRESS_APP_KEY,
     ALIEXPRESS_APP_SECRET,
@@ -16,6 +13,9 @@ from config import (
     ALIEXPRESS_DISCOUNT_CODES,
     ALIEXPRESS_DISCOUNT_CODES,
 )
+from handlers.base_handler import BaseHandler
+from handlers.aliexpress_handler import ALIEXPRESS_URL_PATTERN
+
 
 # API endpoint for generating affiliate links
 ALIEXPRESS_API_URL = "https://api-sg.aliexpress.com/sync"
@@ -25,7 +25,6 @@ class AliexpressAPIHandler(BaseHandler):
     def __init__(self):
         super().__init__()
 
-    # Function to generate HMAC-SHA256 signature
     def _generate_signature(self, secret, params):
         """Generates HMAC-SHA256 signature."""
         self.logger.info("Generating HMAC-SHA256 signature for API request.")
@@ -103,7 +102,7 @@ class AliexpressAPIHandler(BaseHandler):
             f"{message.message_id}: Handling AliExpress links in the message..."
         )
 
-        new_text=self._expand_aliexpress_links_from_message(message.text)
+        new_text = self._expand_aliexpress_links_from_message(message.text)
 
         aliexpress_links = re.findall(ALIEXPRESS_URL_PATTERN, new_text)
 

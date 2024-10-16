@@ -1,15 +1,19 @@
 import unittest
-from unittest.mock import AsyncMock,patch
+
+from unittest.mock import AsyncMock, patch
 from urllib.parse import unquote
-from handlers.base_handler import BaseHandler 
+
+from handlers.base_handler import BaseHandler
 from config import (
     MSG_AFFILIATE_LINK_MODIFIED,
     MSG_REPLY_PROVIDED_BY_USER,
 )
 
+
 class TestHandler(BaseHandler):
-    def handle_links(self, message):
-        pass  # This method is not relevant for the test of generate_affiliate_url
+    def handle_links(self, _):
+        pass
+
 
 class TestGenerateAffiliateUrl(unittest.TestCase):
 
@@ -24,7 +28,7 @@ class TestGenerateAffiliateUrl(unittest.TestCase):
             original_url,
             format_template="{domain}{path_before_query}?{affiliate_tag}={affiliate_id}",
             affiliate_tag="tag",
-            affiliate_id="affiliate-21"
+            affiliate_id="affiliate-21",
         )
         expected_url = "https://www.amazon.com/dp/B08N5WRWNW?tag=affiliate-21"
         self.assertEqual(affiliate_url, expected_url)
@@ -36,9 +40,11 @@ class TestGenerateAffiliateUrl(unittest.TestCase):
             original_url,
             format_template="{domain}?store_id=12345&{affiliate_tag}={affiliate_id}",
             affiliate_tag="aff_id",
-            affiliate_id="admitad-21"
+            affiliate_id="admitad-21",
         )
-        expected_url = "https://www.some-admitad-store.com?store_id=12345&aff_id=admitad-21"
+        expected_url = (
+            "https://www.some-admitad-store.com?store_id=12345&aff_id=admitad-21"
+        )
         self.assertEqual(affiliate_url, expected_url)
 
     def test_url_with_existing_affiliate_tag_overwrite(self):
@@ -48,7 +54,7 @@ class TestGenerateAffiliateUrl(unittest.TestCase):
             original_url,
             format_template="{domain}{path_before_query}?{affiliate_tag}={affiliate_id}",
             affiliate_tag="tag",
-            affiliate_id="new-affiliate"
+            affiliate_id="new-affiliate",
         )
         expected_url = "https://www.amazon.com/dp/B08N5WRWNW?tag=new-affiliate"
         self.assertEqual(affiliate_url, expected_url)
@@ -72,7 +78,7 @@ class TestGenerateAffiliateUrl(unittest.TestCase):
             original_url,
             format_template="{domain}{path_before_query}",
             affiliate_tag="tag",
-            affiliate_id="affiliate-21"
+            affiliate_id="affiliate-21",
         )
         expected_url = "https://www.amazon.com/dp/B08N5WRWNW?item=5&tag=affiliate-21"
         self.assertEqual(affiliate_url, expected_url)
@@ -84,7 +90,7 @@ class TestGenerateAffiliateUrl(unittest.TestCase):
             original_url,
             format_template="{domain}{path_before_query}",
             affiliate_tag=None,
-            affiliate_id="affiliate-21"
+            affiliate_id="affiliate-21",
         )
         expected_url = "https://www.amazon.com/dp/B08N5WRWNW"
         self.assertEqual(affiliate_url, expected_url)
@@ -96,7 +102,7 @@ class TestGenerateAffiliateUrl(unittest.TestCase):
             original_url,
             format_template="{domain}{path_before_query}?{affiliate_tag}={affiliate_id}",
             affiliate_tag="tag",
-            affiliate_id="affiliate-21"
+            affiliate_id="affiliate-21",
         )
         expected_url = "https://www.amazon.com/dp/B08N5WRWNW?tag=affiliate-21"
         self.assertEqual(affiliate_url, expected_url)
@@ -108,9 +114,11 @@ class TestGenerateAffiliateUrl(unittest.TestCase):
             original_url,
             format_template="{domain}{path_before_query}?{affiliate_tag}={affiliate_id}",
             affiliate_tag="aff_id",
-            affiliate_id="affiliate-99"
+            affiliate_id="affiliate-99",
         )
-        expected_url = "https://www.example.com/store/sub-store/product/12345?aff_id=affiliate-99"
+        expected_url = (
+            "https://www.example.com/store/sub-store/product/12345?aff_id=affiliate-99"
+        )
         self.assertEqual(unquote(affiliate_url), expected_url)
 
     def test_affiliate_in_path(self):
@@ -120,7 +128,7 @@ class TestGenerateAffiliateUrl(unittest.TestCase):
             original_url,
             format_template="{domain}/{affiliate_tag}/{affiliate_id}{path_before_query}",
             affiliate_tag="aff_id",
-            affiliate_id="my_affiliate"
+            affiliate_id="my_affiliate",
         )
         expected_url = "https://www.example.com/aff_id/my_affiliate/product/12345"
         self.assertEqual(affiliate_url, expected_url)
@@ -155,7 +163,7 @@ class TestGenerateAffiliateUrl(unittest.TestCase):
             format_template=format_template,
             affiliate_tag="tag",
             affiliate_id="new_affiliate_id",
-            advertiser_id="new_advertiser_id"
+            advertiser_id="new_advertiser_id",
         )
 
         # Expected URL after updating the affiliate and advertiser IDs
@@ -172,14 +180,12 @@ class TestGenerateAffiliateUrl(unittest.TestCase):
         affiliate_id = "my_affiliate"
         advertiser_id = "12345"
 
-        expected_url = "https://example.com/product/123?tag=my_affiliate&advertiser_id=12345"
+        expected_url = (
+            "https://example.com/product/123?tag=my_affiliate&advertiser_id=12345"
+        )
 
         result = self.handler._generate_affiliate_url(
-            original_url,
-            format_template,
-            affiliate_tag,
-            affiliate_id,
-            advertiser_id
+            original_url, format_template, affiliate_tag, affiliate_id, advertiser_id
         )
         self.assertEqual(result, expected_url)
 
@@ -190,13 +196,12 @@ class TestGenerateAffiliateUrl(unittest.TestCase):
         affiliate_tag = "tag"
         affiliate_id = "my_affiliate"
 
-        expected_url = "https://destino.com?url=https://example.com/product/123&tag=my_affiliate"
+        expected_url = (
+            "https://destino.com?url=https://example.com/product/123&tag=my_affiliate"
+        )
 
         result = self.handler._generate_affiliate_url(
-            original_url,
-            format_template,
-            affiliate_tag,
-            affiliate_id
+            original_url, format_template, affiliate_tag, affiliate_id
         )
         self.assertEqual(result, expected_url)
 
@@ -207,7 +212,7 @@ class TestProcessMessage(unittest.TestCase):
         """Set up the TestHandler instance."""
         self.handler = TestHandler()  # Create an instance of the concrete subclass
 
-    @patch('config.DELETE_MESSAGES', True)
+    @patch("config.DELETE_MESSAGES", True)
     async def test_send_message_and_delete_original(self):
         """Test when DELETE_MESSAGES is True, the original message should be deleted and a new one sent."""
         mock_message = AsyncMock()
@@ -217,7 +222,7 @@ class TestProcessMessage(unittest.TestCase):
         mock_message.text = "Original message"
 
         new_text = "This is the modified affiliate message"
-        
+
         await self.handler.process_message(mock_message, new_text)
 
         expected_message = (
@@ -231,7 +236,7 @@ class TestProcessMessage(unittest.TestCase):
         # Check that a new message was sent
         mock_message.chat.send_message.assert_called_once_with(text=expected_message)
 
-    @patch('config.DELETE_MESSAGES', False)
+    @patch("config.DELETE_MESSAGES", False)
     async def test_send_message_without_delete(self):
         """Test when DELETE_MESSAGES is False, the original message should not be deleted, and the bot replies to it."""
         mock_message = AsyncMock()
@@ -241,7 +246,7 @@ class TestProcessMessage(unittest.TestCase):
         mock_message.text = "Original message"
 
         new_text = "This is the modified affiliate message"
-        
+
         await self.handler.process_message(mock_message, new_text)
 
         expected_message = (
@@ -254,11 +259,10 @@ class TestProcessMessage(unittest.TestCase):
         mock_message.delete.assert_not_called()
         # Check that the message is sent as a reply to the original message
         mock_message.chat.send_message.assert_called_once_with(
-            text=expected_message, 
-            reply_to_message_id=mock_message.message_id
+            text=expected_message, reply_to_message_id=mock_message.message_id
         )
 
-    @patch('config.DELETE_MESSAGES', True)
+    @patch("config.DELETE_MESSAGES", True)
     async def test_send_message_is_reply_and_delete(self):
         """Test when DELETE_MESSAGES is True, and the original message is a reply to another message."""
         mock_message = AsyncMock()
@@ -270,7 +274,7 @@ class TestProcessMessage(unittest.TestCase):
         mock_message.reply_to_message.message_id = 50  # Replying to message ID 50
 
         new_text = "This is the modified affiliate message"
-        
+
         await self.handler.process_message(mock_message, new_text)
 
         expected_message = (
@@ -283,11 +287,11 @@ class TestProcessMessage(unittest.TestCase):
         mock_message.delete.assert_called_once()
         # Check that the new message replies to the same message the original one was replying to
         mock_message.chat.send_message.assert_called_once_with(
-            text=expected_message, 
-            reply_to_message_id=mock_message.reply_to_message.message_id
+            text=expected_message,
+            reply_to_message_id=mock_message.reply_to_message.message_id,
         )
 
-    @patch('config.DELETE_MESSAGES', False)
+    @patch("config.DELETE_MESSAGES", False)
     async def test_send_message_is_reply_without_delete(self):
         """Test when DELETE_MESSAGES is False, and the original message is a reply to another message."""
         mock_message = AsyncMock()
@@ -299,7 +303,7 @@ class TestProcessMessage(unittest.TestCase):
         mock_message.reply_to_message.message_id = 50  # Replying to message ID 50
 
         new_text = "This is the modified affiliate message"
-        
+
         await self.handler.process_message(mock_message, new_text)
 
         expected_message = (
@@ -312,11 +316,10 @@ class TestProcessMessage(unittest.TestCase):
         mock_message.delete.assert_not_called()
         # Check that the new message is sent as a reply to the original message
         mock_message.chat.send_message.assert_called_once_with(
-            text=expected_message, 
-            reply_to_message_id=mock_message.message_id
+            text=expected_message, reply_to_message_id=mock_message.message_id
         )
 
-    @patch('config.DELETE_MESSAGES', True)
+    @patch("config.DELETE_MESSAGES", True)
     async def test_send_message_without_username(self):
         """Test when the user has no username, use the first name instead."""
         mock_message = AsyncMock()
@@ -327,7 +330,7 @@ class TestProcessMessage(unittest.TestCase):
         mock_message.reply_to_message = None  # Not replying to any message
 
         new_text = "This is the modified affiliate message"
-        
+
         await self.handler.process_message(mock_message, new_text)
 
         expected_message = (
@@ -339,10 +342,8 @@ class TestProcessMessage(unittest.TestCase):
         # Check that the original message was deleted
         mock_message.delete.assert_called_once()
         # Check that the new message is sent without replying
-        mock_message.chat.send_message.assert_called_once_with(
-            text=expected_message
-        )
+        mock_message.chat.send_message.assert_called_once_with(text=expected_message)
 
- 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

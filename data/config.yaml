@@ -1,6 +1,5 @@
 # ------------------------------ CONFIGURATION ------------------------------ #
 
-# Telegram settings
 telegram:
   bot_token: "your_bot_token_here"
   # if true, the original message will be deleted and changed by a new message
@@ -40,9 +39,9 @@ admitad:
 # -------------------------------- ALIEXPRESS ------------------------------- #
 
 aliexpress:
-  app_key: ""  # Replace with your AliExpress API key
-  app_secret: ""  # Replace with your AliExpress API secret
-  tracking_id: ""  # Replace with your AliExpress tracking ID
+  app_key: "" # Replace with your AliExpress API key
+  app_secret: "" # Replace with your AliExpress API secret
+  tracking_id: "" # Replace with your AliExpress tracking ID
   discount_codes: |
     💥 AliExpress discount codes:  
     💰2$ off for purchases over 20$:【IFPTKOH】
@@ -51,4 +50,5 @@ aliexpress:
     💰50$ off for purchases over 400$:【IFP5RIN】
 
 # ---------------------------------- GENERAL -------------------------------- #
+
 log_level: "INFO"

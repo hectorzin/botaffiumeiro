@@ -5,6 +5,7 @@ import re
 from abc import ABC, abstractmethod
 from telegram import Message
 from urllib.parse import ParseResult, urlparse, parse_qs, urlencode
+
 from config import (
     MSG_AFFILIATE_LINK_MODIFIED,
     MSG_REPLY_PROVIDED_BY_USER,
@@ -131,7 +132,9 @@ class BaseHandler(ABC):
         # Substitute any placeholders {param_name} in the format_template with actual values from query_params
         for param_name, values in query_params.items():
             if f"{{{param_name}}}" in format_template:
-                format_template = format_template.replace(f"{{{param_name}}}", values[0])
+                format_template = format_template.replace(
+                    f"{{{param_name}}}", values[0]
+                )
 
         # Format the output using the provided format_template
         affiliate_url = format_template.format(
@@ -151,7 +154,7 @@ class BaseHandler(ABC):
                 affiliate_url += f"&{new_query}"
 
         return affiliate_url
-    
+
     async def _process_message(self, message, new_text: str):
         """
         Send a polite affiliate message, either by deleting the original message or replying to it.
@@ -234,7 +237,7 @@ class BaseHandler(ABC):
                     original_url = None
                     for key, value in query_params.items():
                         # Assuming that a URL parameter will have 'http' in its value (to detect full URLs)
-                        if value and 'http' in value[0]:
+                        if value and "http" in value[0]:
                             url_param_key = key  # This is the tag (e.g., 'ulp')
                             original_url = value[0]  # The full URL
 

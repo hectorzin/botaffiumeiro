@@ -1,9 +1,10 @@
 import unittest
 
-from botaffiumeiro import is_user_excluded, modify_link
 from datetime import datetime
 from telegram import Update, User, Message, Chat
 from unittest.mock import AsyncMock, patch
+
+from botaffiumeiro import is_user_excluded, modify_link
 
 
 class TestIsUserExcluded(unittest.TestCase):
