@@ -1,0 +1,47 @@
+configuration:
+  bot_token:
+    name: "Token del Bot de Telegram"
+    description: "Tu token de bot de Telegram obtenido de BotFather."
+  delete_messages:
+    name: "Eliminar Mensajes"
+    description: "Si es Verdadero, el mensaje original será eliminado y reemplazado con uno nuevo. Si es Falso, el mensaje original recibirá una respuesta."
+  excluded_users:
+    name: "Usuarios Excluidos"
+    description: "Lista de usuarios que serán excluidos de la modificación de enlaces (Formato: - id: usuario)."
+  msg_affiliate_link_modified:
+    name: "Mensaje de Enlace de Afiliado Modificado"
+    description: "Mensaje que se mostrará cuando un enlace de afiliado haya sido modificado."
+  msg_reply_provided_by_user:
+    name: "Mensaje de Respuesta Proporcionada por el Usuario"
+    description: "Mensaje para indicar quién proporcionó la respuesta con el enlace de afiliado."
+  amazon_affiliate_id:
+    name: "ID de Afiliado de Amazon"
+    description: "Tu ID de afiliado de Amazon utilizado para modificar los enlaces de Amazon."
+  aliexpress_app_key:
+    name: "Clave de la App de AliExpress"
+    description: "Tu clave de la App de AliExpress utilizada para solicitudes API."
+  aliexpress_app_secret:
+    name: "Secreto de la App de AliExpress"
+    description: "El secreto de tu App de AliExpress utilizado para firmar las solicitudes API."
+  aliexpress_tracking_id:
+    name: "ID de Seguimiento de AliExpress"
+    description: "Tu ID de seguimiento de AliExpress para rastrear afiliados."
+  aliexpress_discount_codes:
+    name: "Códigos de Descuento de AliExpress"
+    description: "Lista de líneas con códigos de descuento para compras en AliExpress (Formato: - line: texto)."
+  awin_publisher_id:
+    name: "ID de Publicador de Awin"
+    description: "Tu ID de publicador de Awin para gestionar enlaces de afiliados en tiendas de Awin."
+  awin_adversiters:
+    name: "Anunciantes de Awin"
+    description: "Lista de anunciantes de Awin y sus IDs (formato: - domain: DOMINIO y id: ID)."
+  admitad_publisher_id:
+    name: "ID de Publicador de Admitad"
+    description: "Tu ID de publicador de Admitad para gestionar enlaces de afiliados en tiendas de Admitad."
+  admitad_adversiters:
+    name: "Anunciantes de Admitad"
+    description: "Lista de anunciantes de Admitad y sus IDs de campaña (formato: - domain: DOMINIO y id: ID)."
+  log_level:
+  name: "Nivel de Log"
+  description: "Configura el nivel de registro (DEBUG, INFO, WARN, ERROR, CRITICAL)."
+
