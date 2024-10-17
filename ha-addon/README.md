@@ -8,10 +8,8 @@ The add-on supports multiple configuration options that allow you to manage how 
 Below is a breakdown of all the available configuration fields, including examples for list-based fields.
 
 ### 1. Telegram Settings
-**bot_token**: Your Telegram bot token obtained from BotFather. This is required to use the bot.
-
+**bot_token**: Your Telegram bot token obtained from BotFather. This is required to use the bot. For information about creating a bot with BotFather look at the BotAffiumeiro repository:  https://github.com/hectorzin/botaffiumeiro
 **delete_messages**: Whether to delete the original Telegram message or simply reply with the modified message.
-
 **excluded_users**: List of Telegram users whose messages should not be modified by the bot. This is useful for excluding admins or users whose messages should remain unchanged. It is a list of user objects with the following structure:
 
 ```
@@ -70,3 +68,6 @@ Below is a breakdown of all the available configuration fields, including exampl
 
 ### 7. LOG
 **log_level**: Set the logging level for the bot. Options include: DEBUG, INFO, WARN, ERROR, and CRITICAL.
+
+## More information
+For more information look at the Botafumeiro repository https://github.com/hectorzin/botaffiumeiro
