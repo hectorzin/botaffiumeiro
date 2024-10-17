@@ -20,6 +20,7 @@ Below is a breakdown of all the available configuration fields, including exampl
   - id: "Username1"
   - id: "Username2"
   ```
+**NOTE**: If you want to leave the list empty you must write []
 
 ### 2. Message settings
 
@@ -42,6 +43,7 @@ Below is a breakdown of all the available configuration fields, including exampl
   - line: "💥 2$ off for purchases over 20$: 【CODE1】"
   - line: "💰 5$ off for purchases over 50$: 【CODE2】"
   ```
+**NOTE**: If you want to leave the list empty you must write []
 
 ### 5. Awin Settings
 
@@ -54,6 +56,7 @@ Below is a breakdown of all the available configuration fields, including exampl
   - domain: "store2.com"
     id: "advertiser_id_2"
   ```
+**NOTE**: If you want to leave the list empty you must write []
 
 ### 6. Admitad Settings
 
@@ -66,6 +69,7 @@ Below is a breakdown of all the available configuration fields, including exampl
   - domain: "store2.com"
     id: "campaign_id_2"
   ```
+**NOTE**: If you want to leave the list empty you must write []
 
 ### 7. LOG
 
