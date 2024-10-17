@@ -1,7 +1,7 @@
-FROM python:3.9-slim
+# Use an official Python runtime as a parent image
+FROM python:3.12-alpine
 
 # Install necessary dependencies
-RUN apt-get update && apt-get install -y git
 RUN apt-get update && apt-get install -y git jq
 
 # Clone the Botaffiumeiro repository
