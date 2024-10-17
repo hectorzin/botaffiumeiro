@@ -13,6 +13,7 @@ botaffiumeiro is a Telegram bot that detects Amazon, Aliexpress and other links 
   - If no affiliate ID is present, the bot automatically adds your personalized affiliate ID.
 - **User exclusion**: You can specify certain users to be excluded from link modifications, allowing them to share links without alteration.
 - **AliExpress discount codes**: When AliExpress links are detected, the bot automatically adds current discount codes to the message.
+- **Aliowing to delete message or not**: When AliExpress links are detected, the bot automatically adds current discount codes to the message.
 
 ### Supported platforms:
 
@@ -83,6 +84,7 @@ To obtain the **Bot Token**, follow these steps:
    - The **bot name** can be anything.
    - The **username** must be unique and should end with "bot" (e.g., `YourBotName_bot`).
 4. After the bot is created, BotFather will provide a **Bot Token**. Save this token for later use.
+5. If you want the bot deletes other user messages (see delete_messages parameter), you must add the bot as a group administrator
 
 ### 2. Enable Bot Privacy (Disable Group Privacy)
 
