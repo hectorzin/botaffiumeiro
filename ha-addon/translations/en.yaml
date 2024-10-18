@@ -1,0 +1,46 @@
+configuration:
+  bot_token:
+    name: "Telegram Bot Token"
+    description: "Your Telegram bot token obtained from BotFather."
+  delete_messages:
+    name: "Delete Messages"
+    description: "If True, the original message will be deleted and replaced with a new one. If False, the original message will be replied to."
+  excluded_users:
+    name: "Excluded Users"
+    description: "List of users to be excluded from link modification (Format: - id: user)."
+  msg_affiliate_link_modified:
+    name: "Affiliate Link Modified Message"
+    description: "Message to display when an affiliate link has been modified."
+  msg_reply_provided_by_user:
+    name: "Reply Provided by User Message"
+    description: "Message to indicate who provided the reply with the affiliate link."
+  amazon_affiliate_id:
+    name: "Amazon Affiliate ID"
+    description: "Your Amazon Affiliate ID used to modify Amazon links."
+  aliexpress_app_key:
+    name: "AliExpress App Key"
+    description: "Your AliExpress App Key used for API requests."
+  aliexpress_app_secret:
+    name: "AliExpress App Secret"
+    description: "Your AliExpress App Secret used to sign API requests."
+  aliexpress_tracking_id:
+    name: "AliExpress Tracking ID"
+    description: "Your AliExpress Tracking ID for affiliate tracking."
+  aliexpress_discount_codes:
+    name: "AliExpress Discount Codes"
+    description: "List of lines for discount codes for AliExpress purchases (Format: - line: text)."
+  awin_publisher_id:
+    name: "Awin Publisher ID"
+    description: "Your Awin Publisher ID for managing affiliate links of Awin stores."
+  awin_adversiters:
+    name: "Awin Advertisers"
+    description: "List of Awin advertisers and their IDs (format: - domain: DOMAIN and id: ID)."
+  admitad_publisher_id:
+    name: "Admitad Publisher ID"
+    description: "Your Admitad Publisher ID for managing affiliate links of Admitad stores."
+  admitad_adversiters:
+    name: "Admitad Advertisers"
+    description: "List of Admitad advertisers and their campaign IDs (format: - domain: DOMAIN and id: ID)."
+log_level:
+  name: "Log Level"
+  description: "Set the logging level for the bot (DEBUG, INFO, WARN, ERROR, CRITICAL)."

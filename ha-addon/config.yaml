@@ -1,0 +1,67 @@
+name: "Botaffiumeiro"
+version: "1.0.0"
+slug: "botaffiumeiro"
+description: "Modify Telegram links with affiliate links"
+url: "https://github.com/hectorzin/botaffiumeiro/tree/main/ha-addon"
+init: false
+arch:
+  - aarch64
+  - amd64
+  - armhf
+  - armv7
+  - i386
+startup: services
+options:
+  bot_token: ""
+  delete_messages: true
+  excluded_users:
+    - id: "HectorziN"
+    - id: "danimart1991"
+  msg_affiliate_link_modified: "Here is the modified link with our affiliate program:"
+  msg_reply_provided_by_user: "Reply provided by"
+  amazon_affiliate_id: "botaffiumeiro_cofee-21"
+  aliexpress_app_key: ""
+  aliexpress_app_secret: ""
+  aliexpress_tracking_id: ""
+  aliexpress_discount_codes: 
+   - line: "💥 Códigos de descuento de AliExpress:"
+   - line: "💰2$ off for purchases over 20$:【IFPTKOH】"
+   - line: "💰5$ off for purchases over 50$:【IFPT35D】"
+   - line: "💰25$ off for purchases over 200$:【IFPQDMH】"
+   - line: "💰50$ off for purchases over 400$:【IFP5RIN】"
+  awin_publisher_id: "1639881"
+  awin_adversiters:
+    - domain: aliexpress.com
+      id: "11640"
+    - domain: pccomponentes.com
+      id: "20982"
+    - domain: leroymerlin.es
+      id: "20598"
+  admitad_publisher_id: "2306205"
+  admitad_adversiters:
+    - domain: giftmio.com
+      id: 93fd4vbk6c873a1e3014d68450d763
+  log_level: INFO
+schema:
+  bot_token: str
+  delete_messages: bool?
+  excluded_users:
+    - id: str?
+  msg_affiliate_link_modified: str?
+  msg_reply_provided_by_user: str?
+  amazon_affiliate_id: str?
+  aliexpress_app_key: str?
+  aliexpress_app_secret: str?
+  aliexpress_tracking_id: str?
+  aliexpress_discount_codes:
+    - line: str?
+  awin_publisher_id: str?
+  awin_adversiters:
+    - domain: str?
+      id: str?
+  admitad_publisher_id: str?
+  admitad_adversiters:
+    - domain: str?
+      id: str?
+  log_level: list(DEBUG|INFO|WARN|ERROR|CRITICAL)
+

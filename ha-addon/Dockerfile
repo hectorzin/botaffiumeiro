@@ -6,6 +6,7 @@ RUN apk update && apk add --no-cache \
     git \
     jq \
     bash
+
 # Clone the Botaffiumeiro repository
 RUN git clone https://github.com/hectorzin/botaffiumeiro.git /botaffiumeiro
 
