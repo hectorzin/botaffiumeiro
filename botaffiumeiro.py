@@ -16,6 +16,11 @@ logging.basicConfig(
     level=LOG_LEVEL,
 )
 logger = logging.getLogger(__name__)
+logging.getLogger("httpx").setLevel(
+    logger.getEffectiveLevel() + 10
+    if logger.getEffectiveLevel() < logging.CRITICAL
+    else logging.CRITICAL
+)
 
 
 def is_user_excluded(user: User) -> bool:
@@ -28,6 +33,7 @@ def is_user_excluded(user: User) -> bool:
     logger.debug(f"User {username} (ID: {user_id}) is excluded: {excluded}")
     return excluded
 
+
 async def process_link_handlers(message) -> None:
     """Process all link handlers for Amazon, Awin, Admitad, and AliExpress."""
 
@@ -39,7 +45,9 @@ async def process_link_handlers(message) -> None:
     await AliexpressAPIHandler().handle_links(message)
     await AliexpressHandler().handle_links(message)
 
-    logger.info(f"Finished processing link handlers for message ID: {message.message_id}.")
+    logger.info(
+        f"Finished processing link handlers for message ID: {message.message_id}."
+    )
 
 
 async def modify_link(update: Update, context) -> None:
