@@ -1,0 +1,53 @@
+users:
+  - id: HectorziN
+    percentage: 50
+    configuration:
+      amazon:
+        amazon.es: botaffiumeiro_cofee-21
+        amazon.com: hectorzindomo-20
+        amazon.com.au: hectorzindomo-22
+        amazon.co.uk: hectorzindomo-21
+        amazon.fr: hectorzindo0d-21
+        amazon.it: hectorzindo04-21
+        amazon.de: hectorzindo0e-21
+
+      awin:
+        publisher_id: "1639881"
+        advertisers:
+          aliexpress.com: "11640"
+          pccomponentes.com: "20982"
+          leroymerlin.es: "20598"
+      admitad:
+        publisher_id: "2306205"
+        advertisers:
+          giftmio.com: "93fd4vbk6c873a1e3014d68450d763"
+      aliexpress:
+        discount_codes: |
+          💥 AliExpress discount codes:  
+          💰2$ off for purchases over 20$:【IFPTKOH】
+          💰5$ off for purchases over 50$:【IFPT35D】
+          💰25$ off for purchases over 200$:【IFPQDMH】
+          💰50$ off for purchases over 400$:【IFP5RIN】
+          
+  - id: Dani
+    percentage: 50
+    configuration:
+      amazon:
+        amazon.es: dani-21
+      awin:
+        publisher_id: "9999999"
+        advertisers:
+          aliexpress.com: "99999"
+          pccomponentes.com: "88888"
+          leroymerlin.es: "77777"
+      admitad:
+        publisher_id: "4444444"
+        advertisers:
+          giftmio.com: "999999999999999999999999999999"
+      aliexpress:
+        discount_codes: |
+          💥 AliExpress discount codes:  
+          💰2$ off for purchases over 20$:【AAAAAA】
+          💰5$ off for purchases over 50$:【BBBBBB】
+          💰25$ off for purchases over 200$:【CCCCCC】
+          💰50$ off for purchases over 400$:【DDDDDD】

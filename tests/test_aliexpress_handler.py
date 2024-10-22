@@ -6,22 +6,11 @@ from handlers.base_handler import BaseHandler
 from handlers.aliexpress_handler import AliexpressHandler
 
 
-class TestHandler(BaseHandler):
-    def handle_links(self, _):
-        pass
-
-
 class TestHandleAliExpressLinks(unittest.IsolatedAsyncioTestCase):
 
-    @patch(
-        "handlers.aliexpress_handler.ALIEXPRESS_DISCOUNT_CODES",
-        "💥 AliExpress discount codes: 💰 5% off!",
-    )
-    @patch("handlers.aliexpress_handler.AWIN_ADVERTISERS", {})
-    @patch("handlers.aliexpress_handler.ADMITAD_ADVERTISERS", {})
-    @patch("handlers.aliexpress_handler.ALIEXPRESS_APP_KEY", "")
     async def test_aliexpress_links_without_affiliate(self):
         """Test AliExpress links when they are not in the advertiser list and APP_KEY is empty."""
+
         mock_message = AsyncMock()
         mock_message.text = (
             "Check this out: https://www.aliexpress.com/item/1005002958205071.html"
@@ -29,7 +18,23 @@ class TestHandleAliExpressLinks(unittest.IsolatedAsyncioTestCase):
         mock_message.message_id = 1
         mock_message.from_user.username = "testuser"
 
-        await AliexpressHandler().handle_links(mock_message)
+        handler = AliexpressHandler()
+        mock_selected_users = {
+            "aliexpress.com": {
+                "aliexpress": {
+                    "discount_codes": "💥 AliExpress discount codes: 💰 5% off!",
+                    "app_key": "",
+                    "app_secret": None,
+                    "tracking_id": None,
+                }
+            }
+        }
+        context = {
+            "message": mock_message,
+            "modified_message": mock_message.text,
+            "selected_users": mock_selected_users
+        }
+        result = await handler.handle_links(context)
 
         # Check that the message with discount codes is sent
         mock_message.chat.send_message.assert_called_once_with(
@@ -37,17 +42,9 @@ class TestHandleAliExpressLinks(unittest.IsolatedAsyncioTestCase):
             reply_to_message_id=mock_message.message_id,
         )
 
-    @patch(
-        "handlers.aliexpress_handler.ALIEXPRESS_DISCOUNT_CODES",
-        "💥 AliExpress discount codes: 💰 5% off!",
-    )
-    @patch(
-        "handlers.aliexpress_handler.AWIN_ADVERTISERS", {"aliexpress.com": "some_id"}
-    )
-    @patch("handlers.aliexpress_handler.ADMITAD_ADVERTISERS", {})
-    @patch("handlers.aliexpress_handler.ALIEXPRESS_APP_KEY", "")
     async def test_aliexpress_in_awin_advertisers(self):
         """Test that no action is taken when AliExpress is in the Awin advertisers list."""
+
         mock_message = AsyncMock()
         mock_message.text = (
             "Check this out: https://www.aliexpress.com/item/1005002958205071.html"
@@ -55,21 +52,34 @@ class TestHandleAliExpressLinks(unittest.IsolatedAsyncioTestCase):
         mock_message.message_id = 1
         mock_message.from_user.username = "testuser"
 
-        result = await AliexpressHandler().handle_links(mock_message)
+        handler = AliexpressHandler()
+        mock_selected_users = {
+            "aliexpress.com": {
+                "aliexpress": {
+                    "discount_codes": "💥 AliExpress discount codes: 💰 5% off!",
+                    "app_key": "",
+                    "app_secret": None,
+                    "tracking_id": None,
+                },
+                "awin": {
+                    "advertisers": {"aliexpress.com": "some_id"},
+                },
+            }
+        }
+        context = {
+            "message": mock_message,
+            "modified_message": mock_message.text,
+            "selected_users": mock_selected_users
+        }
+        result = await handler.handle_links(context)
 
         # Ensure no message is sent and the function returns False
         mock_message.chat.send_message.assert_not_called()
         self.assertFalse(result)
 
-    @patch(
-        "handlers.aliexpress_handler.ALIEXPRESS_DISCOUNT_CODES",
-        "💥 AliExpress discount codes: 💰 5% off!",
-    )
-    @patch("handlers.aliexpress_handler.AWIN_ADVERTISERS", {})
-    @patch("handlers.aliexpress_handler.ADMITAD_ADVERTISERS", {})
-    @patch("handlers.aliexpress_handler.ALIEXPRESS_APP_KEY", "some_app_key")
     async def test_aliexpress_with_app_key(self):
         """Test that no action is taken when AliExpress APP_KEY is configured."""
+
         mock_message = AsyncMock()
         mock_message.text = (
             "Check this out: https://www.aliexpress.com/item/1005002958205071.html"
@@ -77,42 +87,31 @@ class TestHandleAliExpressLinks(unittest.IsolatedAsyncioTestCase):
         mock_message.message_id = 1
         mock_message.from_user.username = "testuser"
 
-        result = await AliexpressHandler().handle_links(mock_message)
+        handler = AliexpressHandler()
+        mock_selected_users = {
+            "aliexpress.com": {
+                "aliexpress": {
+                    "discount_codes": "💥 AliExpress discount codes: 💰 5% off!",
+                    "app_key": "some_app_key",
+                    "app_secret": None,
+                    "tracking_id": None,
+                }
+            }
+        }
+        context = {
+            "message": mock_message,
+            "modified_message": mock_message.text,
+            "selected_users": mock_selected_users
+        }
+        result = await handler.handle_links(context)
 
         # Ensure no message is sent and the function returns False
         mock_message.chat.send_message.assert_not_called()
         self.assertFalse(result)
 
-    @patch(
-        "handlers.aliexpress_handler.ALIEXPRESS_DISCOUNT_CODES",
-        "💥 AliExpress discount codes: 💰 5% off!",
-    )
-    @patch("handlers.aliexpress_handler.AWIN_ADVERTISERS", {})
-    @patch("handlers.aliexpress_handler.ADMITAD_ADVERTISERS", {})
-    @patch("handlers.aliexpress_handler.ALIEXPRESS_APP_KEY", "")
-    async def test_aliexpress_short_link(self):
-        """Test AliExpress short links and check that the short link is expanded."""
-        mock_message = AsyncMock()
-        mock_message.text = (
-            "Check this out: https://s.click.aliexpress.com/e/_shortLink"
-        )
-        mock_message.message_id = 2
-        mock_message.from_user.username = "testuser2"
-
-        await AliexpressHandler().handle_links(mock_message)
-
-        # Ensure message is sent with discount codes
-        mock_message.chat.send_message.assert_called_once_with(
-            "💥 AliExpress discount codes: 💰 5% off!",
-            reply_to_message_id=mock_message.message_id,
-        )
-
-    @patch("handlers.aliexpress_handler.ALIEXPRESS_DISCOUNT_CODES", "")
-    @patch("handlers.aliexpress_handler.AWIN_ADVERTISERS", {})
-    @patch("handlers.aliexpress_handler.ADMITAD_ADVERTISERS", {})
-    @patch("handlers.aliexpress_handler.ALIEXPRESS_APP_KEY", "")
     async def test_no_discount_codes(self):
         """Test that no action is taken when ALIEXPRESS_DISCOUNT_CODES is empty."""
+
         mock_message = AsyncMock()
         mock_message.text = (
             "Check this out: https://www.aliexpress.com/item/1005002958205071.html"
@@ -120,24 +119,51 @@ class TestHandleAliExpressLinks(unittest.IsolatedAsyncioTestCase):
         mock_message.message_id = 3
         mock_message.from_user.username = "testuser3"
 
-        result = await AliexpressHandler().handle_links(mock_message)
+        handler = AliexpressHandler()
+        mock_selected_users = {
+            "aliexpress.com": {
+                "discount_codes": "",
+                "app_key": "",
+                "app_secret": None,
+                "tracking_id": None,
+            }
+        }
+        context = {
+            "message": mock_message,
+            "modified_message": mock_message.text,
+            "selected_users": mock_selected_users
+        }
+        result = await handler.handle_links(context)
 
         # Ensure no message is sent and the function returns True
         mock_message.chat.send_message.assert_not_called()
         self.assertTrue(result)
 
-    @patch(
-        "handlers.aliexpress_handler.ALIEXPRESS_DISCOUNT_CODES",
-        "💥 AliExpress discount codes: 💰 5% off!",
-    )
     async def test_no_aliexpress_links(self):
         """Test that no action is taken when no AliExpress links are present in the message."""
+
         mock_message = AsyncMock()
         mock_message.text = "This is a random message without AliExpress links."
         mock_message.message_id = 4
         mock_message.from_user.username = "testuser4"
 
-        result = await AliexpressHandler().handle_links(mock_message)
+        handler = AliexpressHandler()
+        mock_selected_users = {
+            "aliexpress.com": {
+                "aliexpress": {
+                    "discount_codes": "💥 AliExpress discount codes: 💰 5% off!",
+                    "app_key": "",
+                    "app_secret": None,
+                    "tracking_id": None,
+                }
+            }
+        }
+        context = {
+            "message": mock_message,
+            "modified_message": mock_message.text,
+            "selected_users": mock_selected_users
+        }
+        result = await handler.handle_links(context)
 
         # Ensure no message is sent and the function returns False
         mock_message.chat.send_message.assert_not_called()

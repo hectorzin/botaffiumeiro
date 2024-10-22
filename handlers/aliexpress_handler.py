@@ -1,27 +1,23 @@
 import re
 
 from telegram import Message
+from handlers.base_handler import BaseHandler,PATTERN_URL_QUERY
 
-from config import (
-    ALIEXPRESS_DISCOUNT_CODES,
-    ALIEXPRESS_APP_KEY,
-    AWIN_ADVERTISERS,
-    ADMITAD_ADVERTISERS,
-)
-from handlers.base_handler import BaseHandler, ALIEXPRESS_SHORT_URL_PATTERN
-
-
-ALIEXPRESS_URL_PATTERN = r"(https?://(?:[a-z]{2,3}\.)?aliexpress\.[a-z]{2,3}(?:\.[a-z]{2})?/[a-zA-Z0-9\-\._~:/?#\[\]@!$&'()*+,;=%]+)"
-
+ALIEXPRESS_PATTERN=r"(https?://(?:[a-z]{2,3}\.)?aliexpress\.[a-z]{2,3}(?:\.[a-z]{2,3})?"+PATTERN_URL_QUERY+")"
 
 class AliexpressHandler(BaseHandler):
     def __init__(self):
         super().__init__()
 
-    async def handle_links(self, message: Message) -> bool:
+    async def handle_links(self, context) -> bool:
         """Handles both long and short AliExpress links in the message."""
+        message, modified_text, self.selected_users = self._unpack_context(context)
+        # Extraemos self.selected_users.get("aliexpress.com", {}) a una variable
+        aliexpress_data = self.selected_users.get("aliexpress.com", {})
+
         # Check if discount codes and message are not empty before proceeding
-        if not ALIEXPRESS_DISCOUNT_CODES:
+        aliexpress_discount_codes = aliexpress_data.get("aliexpress", {}).get("discount_codes", None)
+        if not aliexpress_discount_codes:
             self.logger.info(
                 f"{message.message_id}: Discount message or codes are empty. Skipping reply."
             )
@@ -31,18 +27,16 @@ class AliexpressHandler(BaseHandler):
             f"{message.message_id}: Handling AliExpress links in the message..."
         )
 
-        aliexpress_links = re.findall(ALIEXPRESS_URL_PATTERN, message.text)
-        aliexpress_short_links = re.findall(ALIEXPRESS_SHORT_URL_PATTERN, message.text)
-        all_aliexpress_links = aliexpress_links + aliexpress_short_links
+        aliexpress_links = re.findall(ALIEXPRESS_PATTERN, modified_text)
 
-        if all_aliexpress_links:
+        if aliexpress_links:
             self.logger.info(
-                f"{message.message_id}: Found {len(all_aliexpress_links)} AliExpress links. Processing..."
+                f"{message.message_id}: Found {len(aliexpress_links)} AliExpress links. Processing..."
             )
             if (
-                "aliexpress.com" in AWIN_ADVERTISERS
-                or "aliexpress.com" in ADMITAD_ADVERTISERS
-                or ALIEXPRESS_APP_KEY != ""
+                "aliexpress.com" in aliexpress_data.get("awin", {}).get("advertisers", {})
+                or "aliexpress.com" in aliexpress_data.get("admitad", {}).get("advertisers", {})
+                or aliexpress_data.get("aliexpress", {}).get("app_key", "")
             ):
                 self.logger.info(
                     f"{message.message_id}: AliExpress links found in advertisers. Skipping processing."
@@ -53,12 +47,14 @@ class AliexpressHandler(BaseHandler):
                 f"{message.message_id}: No advertiser found for AliExpress. Sending discount codes."
             )
             await message.chat.send_message(
-                f"{ALIEXPRESS_DISCOUNT_CODES}",
+                f"{aliexpress_discount_codes}",
                 reply_to_message_id=message.message_id,
             )
             self.logger.info(
                 f"{message.message_id}: Sent modified message with affiliate links."
             )
+            user = aliexpress_data.get("user", {})
+            self.logger.info(f"User chosen: {user}")
             return True
 
         self.logger.info(

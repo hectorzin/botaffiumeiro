@@ -1,9 +1,8 @@
 import unittest
 
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock, Mock, patch
 from urllib.parse import unquote
-
-from handlers.base_handler import BaseHandler
+from handlers.base_handler import BaseHandler, PATTERN_AFFILIATE_URL_QUERY
 from config import (
     MSG_AFFILIATE_LINK_MODIFIED,
     MSG_REPLY_PROVIDED_BY_USER,
@@ -11,7 +10,7 @@ from config import (
 
 
 class TestHandler(BaseHandler):
-    def handle_links(self, _):
+    def handle_links(self):
         pass
 
 
@@ -19,7 +18,7 @@ class TestGenerateAffiliateUrl(unittest.TestCase):
 
     def setUp(self):
         """Set up the TestHandler instance."""
-        self.handler = TestHandler()  # Create an instance of the concrete subclass
+        self.handler = TestHandler()
 
     def test_amazon_affiliate_url(self):
         """Test Amazon affiliate link generation with a simple format."""
@@ -210,7 +209,8 @@ class TestProcessMessage(unittest.TestCase):
 
     def setUp(self):
         """Set up the TestHandler instance."""
-        self.handler = TestHandler()  # Create an instance of the concrete subclass
+        selected_users = {"amazon": {"affiliate_id": "affiliate-21"}}
+        self.handler = TestHandler()  # Pasar selected_users al crear la instancia
 
     @patch("config.DELETE_MESSAGES", True)
     async def test_send_message_and_delete_original(self):
@@ -343,6 +343,120 @@ class TestProcessMessage(unittest.TestCase):
         mock_message.delete.assert_called_once()
         # Check that the new message is sent without replying
         mock_message.chat.send_message.assert_called_once_with(text=expected_message)
+
+
+class TestBuildAffiliateUrlPattern(unittest.TestCase):
+
+    def test_admitad_url_pattern(self):
+        """
+        Test: Verify that admitad_url_pattern is correctly generated from multiple users' domains.
+        """
+        base_handler = TestHandler()
+        base_handler.selected_users = {
+            "example.com": {
+                "admitad": {
+                    "advertisers": {
+                        "example1.com": "12345",
+                        "example2.com": "67890",
+                    }
+                }
+            }
+        }
+        # Generate Admitad URL pattern
+        admitad_url_pattern = base_handler._build_affiliate_url_pattern(
+            "admitad"
+        )
+
+        # The expected regex should match example1.com, example2.com, and example3.com
+        # The order is not known
+        expected_pattern1 = (
+            r"(https?://(?:[\w\-]+\.)?(example1\.com|example2\.com)"
+            + PATTERN_AFFILIATE_URL_QUERY
+            + ")"
+        )
+        expected_pattern2 = (
+            r"(https?://(?:[\w\-]+\.)?(example2\.com|example1\.com)"
+            + PATTERN_AFFILIATE_URL_QUERY
+            + ")"
+        )
+        self.assertTrue(
+            admitad_url_pattern == expected_pattern1
+            or admitad_url_pattern == expected_pattern2,
+            f"Pattern '{admitad_url_pattern}' does not match either of the expected patterns",
+        )
+
+    def test_admitad_no_domains(self):
+        """
+        Test: Verify that None is returned when no Admitad advertisers exist across users.
+        """
+        base_handler = TestHandler()
+        # Generate Admitad URL pattern (should return None as no advertisers are set)
+        base_handler.selected_users = {
+            "example3.com": {
+                "admitad": {"advertisers": {}},
+                "awin": {"advertisers": {"example3.com": "affiliate-id-3"}},
+            }
+        }
+
+        admitad_url_pattern = base_handler._build_affiliate_url_pattern(
+            "admitad"
+        )
+        self.assertIsNone(admitad_url_pattern)
+
+    def test_awin_url_pattern(self):
+        """
+        Test: Verify that awin_url_pattern is correctly generated from multiple users' domains.
+        """
+        # Generate Awin URL pattern
+        base_handler = TestHandler()
+        base_handler.selected_users = {
+            "example3.com": {
+                "admitad": {
+                    "advertisers": {
+                        "example1.com": "affiliate-id-1",
+                        "example2.com": "affiliate-id-2",
+                    }
+                },
+                "awin": {
+                    "advertisers": {
+                        "example3.com": "affiliate-id-3",
+                        "example4.com": "affiliate-id-4",
+                    }
+                },
+            }
+        }
+
+        awin_url_pattern = base_handler._build_affiliate_url_pattern("awin")
+
+        # The expected regex should match example3.com and example4.com
+        expected_pattern1 = (
+            r"(https?://(?:[\w\-]+\.)?(example3\.com|example4\.com)"
+            + PATTERN_AFFILIATE_URL_QUERY
+            + ")"
+        )
+        expected_pattern2 = (
+            r"(https?://(?:[\w\-]+\.)?(example4\.com|example3\.com)"
+            + PATTERN_AFFILIATE_URL_QUERY
+            + ")"
+        )
+        self.assertTrue(
+            awin_url_pattern == expected_pattern1
+            or awin_url_pattern == expected_pattern2,
+            f"Pattern '{awin_url_pattern}' does not match either of the expected patterns",
+        )
+
+    def test_no_users_in_configuration(self):
+        """
+        Test: Verify that None is returned when there are no users in the configuration.
+        """
+        # Generate Admitad URL pattern with no users in the configuration
+        base_handler = TestHandler()
+        base_handler.selected_users = {"amazon.es":{"amazon": {"affiliate_id": "affiliate-21"}}}
+
+        admitad_url_pattern = base_handler._build_affiliate_url_pattern(
+            "admitad_advertisers"
+        )
+        self.assertIsNone(admitad_url_pattern)
 
 
 if __name__ == "__main__":
