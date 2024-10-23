@@ -8,6 +8,9 @@ configuration:
   excluded_users:
     name: "Excluded Users"
     description: "List of users to be excluded from link modification (Format: - id: user)."
+  discount_keywords:
+    name: "Discount Keywords"
+    description: "List of keywords that trigger the bot to display AliExpress discount codes when used in a message (Format: - key: command)."
   msg_affiliate_link_modified:
     name: "Affiliate Link Modified Message"
     description: "Message to display when an affiliate link has been modified."
