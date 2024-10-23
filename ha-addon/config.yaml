@@ -63,6 +63,7 @@ options:
   admitad_adversiters:
     - domain: giftmio.com
       id: 93fd4vbk6c873a1e3014d68450d763
+  creator_affiliate_percentage: "10"
   log_level: INFO
 schema:
   bot_token: str
@@ -89,5 +90,6 @@ schema:
   admitad_adversiters:
     - domain: str?
       id: str?
+  creator_affiliate_percentage: str?
   log_level: list(DEBUG|INFO|WARN|ERROR|CRITICAL)
 

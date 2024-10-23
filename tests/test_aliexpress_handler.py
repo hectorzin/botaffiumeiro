@@ -32,7 +32,7 @@ class TestHandleAliExpressLinks(unittest.IsolatedAsyncioTestCase):
         context = {
             "message": mock_message,
             "modified_message": mock_message.text,
-            "selected_users": mock_selected_users
+            "selected_users": mock_selected_users,
         }
         result = await handler.handle_links(context)
 
@@ -69,7 +69,7 @@ class TestHandleAliExpressLinks(unittest.IsolatedAsyncioTestCase):
         context = {
             "message": mock_message,
             "modified_message": mock_message.text,
-            "selected_users": mock_selected_users
+            "selected_users": mock_selected_users,
         }
         result = await handler.handle_links(context)
 
@@ -101,7 +101,7 @@ class TestHandleAliExpressLinks(unittest.IsolatedAsyncioTestCase):
         context = {
             "message": mock_message,
             "modified_message": mock_message.text,
-            "selected_users": mock_selected_users
+            "selected_users": mock_selected_users,
         }
         result = await handler.handle_links(context)
 
@@ -131,7 +131,7 @@ class TestHandleAliExpressLinks(unittest.IsolatedAsyncioTestCase):
         context = {
             "message": mock_message,
             "modified_message": mock_message.text,
-            "selected_users": mock_selected_users
+            "selected_users": mock_selected_users,
         }
         result = await handler.handle_links(context)
 
@@ -161,7 +161,7 @@ class TestHandleAliExpressLinks(unittest.IsolatedAsyncioTestCase):
         context = {
             "message": mock_message,
             "modified_message": mock_message.text,
-            "selected_users": mock_selected_users
+            "selected_users": mock_selected_users,
         }
         result = await handler.handle_links(context)
 

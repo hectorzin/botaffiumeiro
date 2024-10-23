@@ -1,9 +1,13 @@
 import re
 
-from telegram import Message
-from handlers.base_handler import BaseHandler,PATTERN_URL_QUERY
+from handlers.base_handler import BaseHandler, PATTERN_URL_QUERY
 
-AMAZON_PATTERN=r"(https?://(?:www\.)?(?:amazon\.[a-z]{2,3}(?:\.[a-z]{2})?|amzn\.to|amzn\.eu)"+PATTERN_URL_QUERY+")"
+AMAZON_PATTERN = (
+    r"(https?://(?:www\.)?(?:amazon\.[a-z]{2,3}(?:\.[a-z]{2})?|amzn\.to|amzn\.eu)"
+    + PATTERN_URL_QUERY
+    + ")"
+)
+
 
 class AmazonHandler(BaseHandler):
     def __init__(self):
@@ -12,7 +16,9 @@ class AmazonHandler(BaseHandler):
     async def handle_links2(self, context) -> bool:
         """Handles Amazon links in the message."""
         message, modified_text, self.selected_users = self._unpack_context(context)
-        amazon_affiliate_id = self.selected_users.get("amazon", {}).get("affiliate_id", "")
+        amazon_affiliate_id = self.selected_users.get("amazon", {}).get(
+            "affiliate_id", ""
+        )
         if not amazon_affiliate_id:
             self.logger.info("Amazon affiliate ID is not set. Skipping processing.")
             return False

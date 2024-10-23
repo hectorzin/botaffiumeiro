@@ -4,31 +4,34 @@ import re
 from urllib.parse import urlparse, parse_qs
 from abc import ABC, abstractmethod
 from telegram import Message
-from urllib.parse import  urlparse, parse_qs, urlencode
+from urllib.parse import urlparse, parse_qs, urlencode
 from typing import Tuple
 from telegram import Message
 
-from config import (
-    MSG_AFFILIATE_LINK_MODIFIED,
-    MSG_REPLY_PROVIDED_BY_USER,
-    DELETE_MESSAGES,
-)
+from config import config_data
 
 # Known short URL domains for expansion
-PATTERN_URL_QUERY="?[^\s]+"
-PATTERN_AFFILIATE_URL_QUERY="/[a-zA-Z0-9\-\._~:/?#\[\]@!$&'()*+,;=%]+"
+PATTERN_URL_QUERY = "?[^\s]+"
+PATTERN_AFFILIATE_URL_QUERY = "/[a-zA-Z0-9\-\._~:/?#\[\]@!$&'()*+,;=%]+"
+
 
 class BaseHandler(ABC):
 
-
     def __init__(self):
-        
+
         self.logger = logging.getLogger(__name__)
         self.selected_users = {}
 
-    def _unpack_context(self,context) -> Tuple [Message,str,]:
-        return context["message"], context["modified_message"], context["selected_users"]
-    
+    def _unpack_context(self, context) -> Tuple[
+        Message,
+        str,
+    ]:
+        return (
+            context["message"],
+            context["modified_message"],
+            context["selected_users"],
+        )
+
     def _expand_shortened_url_from_list(self, url: str, domains: list[str]) -> str:
         """
         Expands shortened URLs by following redirects if the domain matches one of the given domains.
@@ -164,9 +167,9 @@ class BaseHandler(ABC):
         # Get user information
         user_first_name = message.from_user.first_name
         user_username = message.from_user.username
-        polite_message = f"{MSG_REPLY_PROVIDED_BY_USER} @{user_username if user_username else user_first_name}:\n\n{new_text}\n\n{MSG_AFFILIATE_LINK_MODIFIED}"
+        polite_message = f"{config_data['MSG_REPLY_PROVIDED_BY_USER']} @{user_username if user_username else user_first_name}:\n\n{new_text}\n\n{config_data['MSG_AFFILIATE_LINK_MODIFIED']}"
 
-        if DELETE_MESSAGES:
+        if config_data["DELETE_MESSAGES"]:
             # Delete original message and send a new one
             reply_to_message_id = (
                 message.reply_to_message.message_id
@@ -193,10 +196,10 @@ class BaseHandler(ABC):
     def _build_affiliate_url_pattern(self, advertiser_key):
         """
         Builds a URL pattern for a given affiliate platform (e.g., Admitad, Awin) by gathering all the advertiser domains.
-        
+
         Parameters:
         - advertiser_key: The key in selected_users that holds advertisers (e.g., 'admitad', 'awin').
-        
+
         Returns:
         - A regex pattern string that matches any of the advertiser domains.
         """
@@ -207,8 +210,8 @@ class BaseHandler(ABC):
 
         # extract all domains handled by the current adversiter_key
         for domain, user_data in self.selected_users.items():
-            advertisers_n = user_data.get(advertiser_key, {}).get('advertisers', {})            
-            advertisers.update(advertisers_n)        
+            advertisers_n = user_data.get(advertiser_key, {}).get("advertisers", {})
+            advertisers.update(advertisers_n)
 
         # Add each domain, properly escaped for regex, to the affiliate_domains set
         for domain in advertisers.keys():
@@ -222,9 +225,13 @@ class BaseHandler(ABC):
         domain_pattern = "|".join(affiliate_domains)
 
         # Return the complete URL pattern
-        url_pattern_template = r"(https?://(?:[\w\-]+\.)?({})" + PATTERN_AFFILIATE_URL_QUERY + ")"
+        url_pattern_template = (
+            r"(https?://(?:[\w\-]+\.)?({})" + PATTERN_AFFILIATE_URL_QUERY + ")"
+        )
 
-        return url_pattern_template.format(domain_pattern,)
+        return url_pattern_template.format(
+            domain_pattern,
+        )
 
     async def _process_store_affiliate_links(
         self,
@@ -239,14 +246,12 @@ class BaseHandler(ABC):
         """Generic method to handle affiliate links for different platforms."""
 
         if not url_pattern:
-            self.logger.info(
-                f"{message.message_id}: No affiliate list"
-            )
+            self.logger.info(f"{message.message_id}: No affiliate list")
             return False
 
         new_text = text
         requires_publisher = "{affiliate_id}" in format_template
-        requires_advertiser = "{advertiser_id}" in format_template                        
+        requires_advertiser = "{advertiser_id}" in format_template
 
         # Find regular store links and affiliate links
         store_links = re.findall(url_pattern, new_text)
@@ -262,15 +267,21 @@ class BaseHandler(ABC):
                 # look for the store in our list
                 for store_link, store_domain in store_links:
                     if store_link in link:
-                        selected_affiliate_data = self.selected_users.get(store_domain,{}).get(affiliate_platform, {})
+                        selected_affiliate_data = self.selected_users.get(
+                            store_domain, {}
+                        ).get(affiliate_platform, {})
                         publisher_id = selected_affiliate_data.get("publisher_id", None)
-                        advertiser_id = selected_affiliate_data.get("advertisers", {}).get(store_domain, None)
-                        if (requires_publisher and not publisher_id) or (requires_advertiser and not advertiser_id):
+                        advertiser_id = selected_affiliate_data.get(
+                            "advertisers", {}
+                        ).get(store_domain, None)
+                        if (requires_publisher and not publisher_id) or (
+                            requires_advertiser and not advertiser_id
+                        ):
                             self.logger.info(
                                 f"{message.message_id}: No publisher or adversiter ID defined for this handler. Skipping processing."
                             )
                             continue
-                        user=self.selected_users.get(store_domain,{}).get("user", {})
+                        user = self.selected_users.get(store_domain, {}).get("user", {})
                         self.logger.info(f"User choosen: {user}")
 
                 if advertiser_id:
@@ -313,10 +324,16 @@ class BaseHandler(ABC):
                 f"{message.message_id}: Found {len(store_links)} store links. Processing..."
             )
             for link, store_domain in store_links:
-                selected_affiliate_data = self.selected_users.get(store_domain,{}).get(affiliate_platform, {})
+                selected_affiliate_data = self.selected_users.get(store_domain, {}).get(
+                    affiliate_platform, {}
+                )
                 publisher_id = selected_affiliate_data.get("publisher_id", None)
-                advertiser_id = selected_affiliate_data.get("advertisers", {}).get(store_domain, None)
-                if (requires_publisher and not publisher_id) or (requires_advertiser and not advertiser_id):
+                advertiser_id = selected_affiliate_data.get("advertisers", {}).get(
+                    store_domain, None
+                )
+                if (requires_publisher and not publisher_id) or (
+                    requires_advertiser and not advertiser_id
+                ):
                     self.logger.info(
                         f"{message.message_id}: No publisher or adversiter ID defined for this handler. Skipping processing."
                     )
@@ -330,10 +347,14 @@ class BaseHandler(ABC):
                     advertiser_id=advertiser_id,
                 )
                 new_text = new_text.replace(link, affiliate_link)
-                user=self.selected_users.get(store_domain,{}).get("user", {})
+                user = self.selected_users.get(store_domain, {}).get("user", {})
                 self.logger.info(f"User choosen: {user}")
 
-                aliexpress_discount_codes = self.selected_users.get(store_domain,{}).get("aliexpress", {}).get("discount_codes", None)
+                aliexpress_discount_codes = (
+                    self.selected_users.get(store_domain, {})
+                    .get("aliexpress", {})
+                    .get("discount_codes", None)
+                )
                 if "aliexpress" in store_domain and aliexpress_discount_codes:
                     new_text += f"\n\n{aliexpress_discount_codes}"
                     self.logger.debug(

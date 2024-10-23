@@ -1,8 +1,9 @@
-from telegram import Message
+from handlers.base_handler import BaseHandler, PATTERN_URL_QUERY
 
-from handlers.base_handler import BaseHandler,PATTERN_URL_QUERY
+AWIN_PATTERN = (
+    r"(https?://(?:[\w\-]+\.)?awin1\.com/cread\.php\?" + PATTERN_URL_QUERY + ")"
+)
 
-AWIN_PATTERN= r"(https?://(?:[\w\-]+\.)?awin1\.com/cread\.php\?"+PATTERN_URL_QUERY+")"
 
 class AwinHandler(BaseHandler):
     def __init__(self):
