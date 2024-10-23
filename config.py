@@ -119,7 +119,7 @@ def add_user_to_domain_percentage_table(user_id, user_data, percentage):
     - user_data: Configuration data of the user (structured as amazon, awin, admitad, aliexpress)
     - percentage: Percentage of time this user should be selected for each domain
     """
-    logger.info(f"Adding {user_id} with percentage {percentage}")
+    logger.debug(f"Adding {user_id} with percentage {percentage}")
 
     add_to_domain_table(
         "aliexpress.com",
