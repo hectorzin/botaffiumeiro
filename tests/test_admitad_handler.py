@@ -12,31 +12,6 @@ class TestHandler(BaseHandler):
 
 class TestHandleAdmitadLinks(unittest.IsolatedAsyncioTestCase):
 
-    # @patch("handlers.base_handler.BaseHandler._prepare_message")
-    # @patch("handlers.base_handler.BaseHandler._process_message")
-    # async def test_no_action_when_admitad_publisher_id_is_none(self, mock_process,mock_prepare):
-    #     """Test that no action is taken if ADMITAD_PUBLISHER_ID is None."""
-    #     mock_selected_users = {
-    #         "pccomponentes.com":{
-    #         "admitad": {
-    #             "publisher_id": None,
-    #             "advertisers": {"pccomponentes.com": "20982"},
-    #         }
-    #     }}
-    #     admitad_handler = AdmitadHandler()
-    #     admitad_handler.selected_users=mock_selected_users
-    #     mock_message = AsyncMock()
-    #     mock_message.text = "Check this out: https://www.pccomponentes.com/some-product I hope you like it"
-    #     mock_message.message_id = 1
-    #     mock_message.from_user.username = "testuser1"
-    #     mock_prepare.return_value=mock_message.text
-
-    #     result = await admitad_handler.handle_links(mock_message)
-
-    #     mock_message.chat.send_message.assert_not_called()
-    #     mock_process.assert_not_called()
-
-    #     self.assertFalse(result)
 
     @patch("handlers.base_handler.BaseHandler._process_message")
     async def test_admitad_aliexpress_link_admitad_config_empty_list(
