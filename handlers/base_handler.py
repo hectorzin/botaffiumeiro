@@ -330,7 +330,7 @@ class BaseHandler(ABC):
                     advertiser_id=advertiser_id,
                 )
                 new_text = new_text.replace(link, affiliate_link)
-                user=self.selected_users.get("user", {})
+                user=self.selected_users.get(store_domain,{}).get("user", {})
                 self.logger.info(f"User choosen: {user}")
 
                 aliexpress_discount_codes = self.selected_users.get(store_domain,{}).get("aliexpress", {}).get("discount_codes", None)
