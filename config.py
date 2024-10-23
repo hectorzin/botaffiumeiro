@@ -19,7 +19,8 @@ config_data = {
     # Telegram
     "BOT_TOKEN": "",
     "DELETE_MESSAGES": "",
-    "EXCLUDED_USERS": "",
+    "EXCLUDED_USERS": [],
+    "DISCOUNT_KEYWORDS": [],
     # Messages
     "MSG_AFFILIATE_LINK_MODIFIED": "",
     "MSG_REPLY_PROVIDED_BY_USER": "",
@@ -248,6 +249,9 @@ def load_configuration():
     )
     config_data["EXCLUDED_USERS"] = config_file_data.get("telegram", {}).get(
         "excluded_users", []
+    )
+    config_data["DISCOUNT_KEYWORDS"] = config_file_data.get("telegram", {}).get(
+        "discount_keywords", []
     )
 
     # Messages

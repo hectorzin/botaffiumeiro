@@ -14,6 +14,11 @@ telegram:
 messages:
   affiliate_link_modified: "Here is the modified link with our affiliate program"
   reply_provided_by_user: "Reply provided by"
+  discount_keywords:
+    - discounts
+    - bonus
+    - bonuses
+    - aliexpress
 
 # ---------------------------------- AMAZON --------------------------------- #
 
