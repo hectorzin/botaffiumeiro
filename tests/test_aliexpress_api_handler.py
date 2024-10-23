@@ -14,7 +14,7 @@ class TestHandler(BaseHandler):
 class TestHandleAliExpressAPILinks(unittest.IsolatedAsyncioTestCase):
 
     @patch("handlers.base_handler.BaseHandler._process_message")
-    async def test_aliexpress_no_app_key(self,mock_process):
+    async def test_aliexpress_no_app_key(self, mock_process):
         """Test: No action is taken if AliExpress app_key is empty in selected_users."""
 
         # Mock selected_users without AliExpress app_key
@@ -30,10 +30,10 @@ class TestHandleAliExpressAPILinks(unittest.IsolatedAsyncioTestCase):
         context = {
             "message": mock_message,
             "modified_message": mock_message.text,
-            "selected_users": mock_selected_users
+            "selected_users": mock_selected_users,
         }
 
-        result=await aliexpress_handler.handle_links(context)
+        result = await aliexpress_handler.handle_links(context)
 
         # Ensure no action is taken when the app_key is empty
         mock_process.assert_not_called()
@@ -54,10 +54,10 @@ class TestHandleAliExpressAPILinks(unittest.IsolatedAsyncioTestCase):
         context = {
             "message": mock_message,
             "modified_message": mock_message.text,
-            "selected_users": mock_selected_users
+            "selected_users": mock_selected_users,
         }
 
-        result=await aliexpress_handler.handle_links(context)
+        result = await aliexpress_handler.handle_links(context)
 
         # Ensure no actions are taken
         mock_process.assert_not_called()
@@ -68,9 +68,7 @@ class TestHandleAliExpressAPILinks(unittest.IsolatedAsyncioTestCase):
         "handlers.aliexpress_api_handler.AliexpressAPIHandler._convert_to_aliexpress_affiliate"
     )
     @patch("handlers.base_handler.BaseHandler._process_message")
-    async def test_long_aliexpress_link(
-        self, mock_process, mock_convert, mock_expand
-    ):
+    async def test_long_aliexpress_link(self, mock_process, mock_convert, mock_expand):
         """Test: Long AliExpress links."""
 
         aliexpress_handler = AliexpressAPIHandler()
@@ -100,10 +98,10 @@ class TestHandleAliExpressAPILinks(unittest.IsolatedAsyncioTestCase):
         context = {
             "message": mock_message,
             "modified_message": mock_message.text,
-            "selected_users": mock_selected_users
+            "selected_users": mock_selected_users,
         }
 
-        result=await aliexpress_handler.handle_links(context)
+        result = await aliexpress_handler.handle_links(context)
 
         expected_message = (
             "Here is a product: https://www.aliexpress.com/item/1005002958205071.html?aff_id=affiliate_21\n\n"

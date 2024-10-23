@@ -4,11 +4,22 @@ from datetime import datetime
 from telegram import Update, User, Message, Chat
 from unittest.mock import Mock, AsyncMock, patch
 
-from botaffiumeiro import is_user_excluded, modify_link,expand_shortened_url,extract_domains_from_message,extract_embedded_url,prepare_message,select_user_for_domain
+from botaffiumeiro import (
+    is_user_excluded,
+    modify_link,
+    expand_shortened_url,
+    extract_domains_from_message,
+    extract_embedded_url,
+    prepare_message,
+    select_user_for_domain,
+)
 
 
 class TestIsUserExcluded(unittest.TestCase):
-    @patch("botaffiumeiro.EXCLUDED_USERS", [12345, "excluded_user"])
+    @patch(
+        "botaffiumeiro.config_data",
+        {"EXCLUDED_USERS": [12345, "excluded_user"]},
+    )
     def test_is_user_excluded_in_list(self):
         user = User(
             id=12345,
@@ -21,7 +32,10 @@ class TestIsUserExcluded(unittest.TestCase):
 
         self.assertTrue(result)
 
-    @patch("botaffiumeiro.EXCLUDED_USERS", [12345, "excluded_user"])
+    @patch(
+        "botaffiumeiro.config_data",
+        {"EXCLUDED_USERS": [12345, "excluded_user"]},
+    )
     def test_is_user_excluded_not_in_list(self):
         user = User(
             id=67890,
@@ -34,7 +48,10 @@ class TestIsUserExcluded(unittest.TestCase):
 
         self.assertFalse(result)
 
-    @patch("botaffiumeiro.EXCLUDED_USERS", [12345, "excluded_user"])
+    @patch(
+        "botaffiumeiro.config_data",
+        {"EXCLUDED_USERS": [12345, "excluded_user"]},
+    )
     def test_is_user_excluded_in_list_without_username(self):
         user = User(
             id=12345,
@@ -157,6 +174,7 @@ class TestModifyLink(unittest.IsolatedAsyncioTestCase):
         mock_is_user_excluded.asset_not_called()
         mock_process_link_handlers.assert_not_called()
 
+
 class TestExpandShortenedURL(unittest.TestCase):
 
     @patch("requests.head")
@@ -203,6 +221,7 @@ class TestExpandShortenedURL(unittest.TestCase):
         self.assertEqual(expanded_url, "https://www.aliexpress.com/item/12345.html")
         mock_head.assert_called_once_with(short_url, allow_redirects=True)
 
+
 class TestExtractDomainsFromMessage(unittest.TestCase):
 
     def test_direct_domain_extraction(self):
@@ -210,9 +229,7 @@ class TestExtractDomainsFromMessage(unittest.TestCase):
         Test: Extract domains directly from the message without embedded URLs.
         """
         message_text = "Check out this link: https://www.amazon.com/someproduct and this: https://aliexpress.com/item/12345"
-        domains, modified_message = extract_domains_from_message(
-            message_text
-        )
+        domains, modified_message = extract_domains_from_message(message_text)
 
         self.assertIn("amazon.com", domains)
         self.assertIn("aliexpress.com", domains)
@@ -226,9 +243,7 @@ class TestExtractDomainsFromMessage(unittest.TestCase):
             "Visit https://awin1.com/cread.php?ulp=https://aliexpress.com/item/12345"
         )
 
-        domains, modified_message = extract_domains_from_message(
-            message_text
-        )
+        domains, modified_message = extract_domains_from_message(message_text)
 
         self.assertIn(
             "aliexpress.com", domains
@@ -241,9 +256,7 @@ class TestExtractDomainsFromMessage(unittest.TestCase):
         Test: No embedded URLs, only direct domain extraction.
         """
         message_text = "Check out https://amazon.com/product123"
-        domains, modified_message = extract_domains_from_message(
-            message_text
-        )
+        domains, modified_message = extract_domains_from_message(message_text)
 
         self.assertIn("amazon.com", domains)  # Should extract only amazon.com
         self.assertEqual(len(domains), 1)  # Only one domain should be found
@@ -259,9 +272,7 @@ class TestExtractDomainsFromMessage(unittest.TestCase):
         )
 
         # Here, we mock the embedded URL extraction to return amazon.com from awin's ulp parameter
-        domains, modified_message = extract_domains_from_message(
-            message_text
-        )
+        domains, modified_message = extract_domains_from_message(message_text)
 
         self.assertIn("amazon.com", domains)
         self.assertIn("aliexpress.com", domains)
@@ -272,9 +283,7 @@ class TestExtractDomainsFromMessage(unittest.TestCase):
         Test: No matching domains or patterns in the message.
         """
         message_text = "There are no valid links in this message."
-        domains, modified_message = extract_domains_from_message(
-            message_text
-        )
+        domains, modified_message = extract_domains_from_message(message_text)
 
         self.assertEqual(
             domains, set()
@@ -285,29 +294,26 @@ class TestExtractDomainsFromMessage(unittest.TestCase):
         Test: Handle invalid URLs that should not be extracted.
         """
         message_text = "Visit this: ftp://invalid-url.com and this invalid scheme: invalid://nope.com"
-        domains, modified_message = extract_domains_from_message(
-            message_text
-        )
+        domains, modified_message = extract_domains_from_message(message_text)
 
         self.assertEqual(
             domains, set()
         )  # Should return an empty set since the URLs are invalid
 
-    @patch("botaffiumeiro.expand_shortened_url", return_value="https://www.amazon.com/dp/product123")
-    def test_amazon_shortened_url(self,mock_expand):
+    @patch(
+        "botaffiumeiro.expand_shortened_url",
+        return_value="https://www.amazon.com/dp/product123",
+    )
+    def test_amazon_shortened_url(self, mock_expand):
         """
         Test: Handle shortened Amazon URL (amzn.to) and expand it.
         """
         message_text = "Check out this product: https://amzn.to/abc123"
 
         # Simulate the expansion of the shortened URL
-        expand_shortened_url = Mock(
-            return_value="https://www.amazon.com/dp/product123"
-        )
+        expand_shortened_url = Mock(return_value="https://www.amazon.com/dp/product123")
 
-        domains, modified_message = extract_domains_from_message(
-            message_text
-        )
+        domains, modified_message = extract_domains_from_message(message_text)
         mock_expand.assert_called_once_with("https://amzn.to/abc123")
 
         self.assertIn(
@@ -321,8 +327,11 @@ class TestExtractDomainsFromMessage(unittest.TestCase):
         # Verify that the shortened URL has been replaced in the message
         self.assertIn("https://www.amazon.com/dp/product123", modified_message)
 
-    @patch("botaffiumeiro.expand_shortened_url", return_value="https://www.aliexpress.com/item/1005001234567890.html")
-    def test_aliexpress_shortened_url(self,mock_expand):
+    @patch(
+        "botaffiumeiro.expand_shortened_url",
+        return_value="https://www.aliexpress.com/item/1005001234567890.html",
+    )
+    def test_aliexpress_shortened_url(self, mock_expand):
         """
         Test: Handle shortened AliExpress URL (s.click.aliexpress.com) and expand it.
         """
@@ -330,10 +339,10 @@ class TestExtractDomainsFromMessage(unittest.TestCase):
             "Check out this deal: https://s.click.aliexpress.com/e/buyproduct"
         )
 
-        domains, modified_message = extract_domains_from_message(
-            message_text
+        domains, modified_message = extract_domains_from_message(message_text)
+        mock_expand.assert_called_once_with(
+            "https://s.click.aliexpress.com/e/buyproduct"
         )
-        mock_expand.assert_called_once_with("https://s.click.aliexpress.com/e/buyproduct")
 
         self.assertIn(
             "aliexpress.com", domains
@@ -366,34 +375,32 @@ class TestExtractDomainsFromMessage(unittest.TestCase):
         ]
 
         # Call the function that processes the message and expands shortened URLs
-        domains, modified_message = extract_domains_from_message(
-            message_text
-        )
+        domains, modified_message = extract_domains_from_message(message_text)
 
         # Check that the expand_shortened_url function was called twice with correct URLs
         mock_expand.assert_any_call("https://amzn.to/abc123")
         mock_expand.assert_any_call("https://s.click.aliexpress.com/e/buyproduct")
-        
+
         # Ensure the extracted domains include amazon.com and aliexpress.com
         self.assertIn("amazon.com", domains)
         self.assertIn("aliexpress.com", domains)
-        
+
         # Verify the shortened URLs were replaced with the expanded versions
         self.assertNotIn("amzn.to", modified_message)
         self.assertNotIn("s.click.aliexpress.com", modified_message)
-        
+
         # Check that the expanded URLs are now in the message
         self.assertIn("https://www.amazon.com/dp/product456", modified_message)
-        self.assertIn("https://www.aliexpress.com/item/1005001234567890.html", modified_message)
+        self.assertIn(
+            "https://www.aliexpress.com/item/1005001234567890.html", modified_message
+        )
 
     def test_amazon_full_url_uk(self):
         """
         Test: Handle full Amazon URL with amazon.co.uk.
         """
         message_text = "Check out this product on Amazon UK: https://www.amazon.co.uk/dp/product123"
-        domains, modified_message = extract_domains_from_message(
-            message_text
-        )
+        domains, modified_message = extract_domains_from_message(message_text)
 
         self.assertIn(
             "amazon.co.uk", domains
@@ -405,9 +412,7 @@ class TestExtractDomainsFromMessage(unittest.TestCase):
         Test: No matching domains or patterns in the message.
         """
         message_text = "There are no valid links in this message."
-        domains, modified_message = extract_domains_from_message(
-            message_text
-        )
+        domains, modified_message = extract_domains_from_message(message_text)
 
         self.assertEqual(
             domains, set()
@@ -424,9 +429,7 @@ class TestExtractDomainsFromMessage(unittest.TestCase):
 
         message_text = "Check out this Amazon link: https://amzn.to/abc123"
 
-        domains, modified_message = extract_domains_from_message(
-            message_text
-        )
+        domains, modified_message = extract_domains_from_message(message_text)
 
         self.assertIn("amazon.com", domains)
         self.assertEqual(
@@ -447,9 +450,7 @@ class TestExtractDomainsFromMessage(unittest.TestCase):
         mock_head.side_effect = [mock_response_amazon, mock_response_aliexpress]
 
         message_text = "Check out this Amazon link: https://amzn.to/abc123 and this AliExpress link: https://s.click.aliexpress.com/e/xyz789"
-        domains, modified_message = extract_domains_from_message(
-            message_text
-        )
+        domains, modified_message = extract_domains_from_message(message_text)
 
         self.assertIn("amazon.com", domains)
         self.assertIn("aliexpress.com", domains)
@@ -458,7 +459,6 @@ class TestExtractDomainsFromMessage(unittest.TestCase):
             "Check out this Amazon link: https://www.amazon.com/dp/B08XYZ123 and this AliExpress link: https://www.aliexpress.com/item/12345.html",
         )
 
-
     @patch("requests.head")
     def test_extract_domains_with_short_urls(self, mock_head):
         """
@@ -466,9 +466,13 @@ class TestExtractDomainsFromMessage(unittest.TestCase):
         """
         # Simula las respuestas de las cabeceras para las URLs cortas
         mock_response_amazon = Mock()
-        mock_response_amazon.url = "https://www.amazon.com/dp/B08XYZ123"  # URL expandida de Amazon
+        mock_response_amazon.url = (
+            "https://www.amazon.com/dp/B08XYZ123"  # URL expandida de Amazon
+        )
         mock_response_aliexpress = Mock()
-        mock_response_aliexpress.url = "https://www.aliexpress.com/item/12345.html"  # URL expandida de AliExpress
+        mock_response_aliexpress.url = (
+            "https://www.aliexpress.com/item/12345.html"  # URL expandida de AliExpress
+        )
 
         # Configura el mock para devolver las respuestas simuladas en secuencia
         mock_head.side_effect = [mock_response_amazon, mock_response_aliexpress]
@@ -477,9 +481,7 @@ class TestExtractDomainsFromMessage(unittest.TestCase):
         message_text = "Check out this Amazon deal: https://amzn.to/abc123 and this AliExpress: https://s.click.aliexpress.com/e/buyproduct"
 
         # Llama a la función a probar
-        domains, modified_message = extract_domains_from_message(
-            message_text
-        )
+        domains, modified_message = extract_domains_from_message(message_text)
 
         # Verifica que los dominios correctos fueron extraídos
         self.assertIn("amazon.com", domains)  # Debería encontrar amazon.com
@@ -491,7 +493,9 @@ class TestExtractDomainsFromMessage(unittest.TestCase):
 
         # Verifica que las URLs cortas ya no estén en el mensaje modificado
         self.assertNotIn("https://amzn.to/abc123", modified_message)
-        self.assertNotIn("https://s.click.aliexpress.com/e/buyproduct", modified_message)
+        self.assertNotIn(
+            "https://s.click.aliexpress.com/e/buyproduct", modified_message
+        )
 
     def test_extract_domains_with_long_urls(self):
         """
@@ -504,9 +508,7 @@ class TestExtractDomainsFromMessage(unittest.TestCase):
         )
 
         # Llama a la función que procesa el mensaje
-        domains, modified_message = extract_domains_from_message(
-            message_text
-        )
+        domains, modified_message = extract_domains_from_message(message_text)
 
         # Verifica que los dominios correctos fueron extraídos
         self.assertIn("amazon.com", domains)  # Debería encontrar amazon.com
@@ -518,6 +520,7 @@ class TestExtractDomainsFromMessage(unittest.TestCase):
 
         # Asegúrate de que no hubo modificaciones innecesarias
         self.assertEqual(message_text, modified_message)
+
 
 class TestExtractEmbeddedUrl(unittest.TestCase):
 
@@ -586,6 +589,7 @@ class TestExtractEmbeddedUrl(unittest.TestCase):
         self.assertIn("another.com", result)
         self.assertEqual(len(result), 2)  # Two valid domains should be extracted
 
+
 class TestPrepareMessage(unittest.TestCase):
 
     @patch("botaffiumeiro.extract_domains_from_message")
@@ -623,7 +627,9 @@ class TestPrepareMessage(unittest.TestCase):
         # Check the returned context structure
         self.assertIsNotNone(context)
         self.assertEqual(context["message"], message)
-        self.assertEqual(context["modified_message"], "Modified message with expanded URLs")
+        self.assertEqual(
+            context["modified_message"], "Modified message with expanded URLs"
+        )
         self.assertIn("amazon.com", context["selected_users"])
         self.assertEqual(context["selected_users"]["amazon.com"]["user"], "user1")
 
@@ -632,7 +638,9 @@ class TestPrepareMessage(unittest.TestCase):
 
     @patch("handlers.base_handler.BaseHandler._extract_domains_from_message")
     @patch("handlers.base_handler.BaseHandler._select_user_for_domain")
-    def test_prepare_message_with_no_domains(self, mock_select_user, mock_extract_domains):
+    def test_prepare_message_with_no_domains(
+        self, mock_select_user, mock_extract_domains
+    ):
         """
         Test: Handle a case where no valid domains are found in the message.
         """
@@ -655,10 +663,11 @@ class TestPrepareMessage(unittest.TestCase):
         # Check that the message text was not changed
         self.assertEqual(modified_message, "This message contains no links.")
 
-
     @patch("botaffiumeiro.extract_domains_from_message")
     @patch("botaffiumeiro.select_user_for_domain")
-    def test_prepare_message_with_no_domains(self, mock_select_user, mock_extract_domains):
+    def test_prepare_message_with_no_domains(
+        self, mock_select_user, mock_extract_domains
+    ):
         """
         Test: Handle a case where no valid domains are found in the message.
         """
@@ -681,15 +690,19 @@ class TestPrepareMessage(unittest.TestCase):
         # Check that the message text was not changed
         self.assertEqual(context["modified_message"], "This message contains no links.")
 
-
     @patch("botaffiumeiro.extract_domains_from_message")
     @patch("botaffiumeiro.select_user_for_domain")
-    def test_prepare_message_with_mixed_domains(self, mock_select_user, mock_extract_domains):
+    def test_prepare_message_with_mixed_domains(
+        self, mock_select_user, mock_extract_domains
+    ):
         """
         Test: Simulate a message where one domain has a user and another domain does not.
         """
         # Mock the domains extracted from the message
-        mock_extract_domains.return_value = {"amazon.com", "unknown.com"}, "Modified message with expanded URLs"
+        mock_extract_domains.return_value = {
+            "amazon.com",
+            "unknown.com",
+        }, "Modified message with expanded URLs"
 
         # Define a function for side_effect to return users based on the domain
         def select_user_side_effect(domain):
@@ -704,7 +717,9 @@ class TestPrepareMessage(unittest.TestCase):
 
         # Simulate a message object with text
         message = Mock()
-        message.text = "Check out this Amazon link: https://amzn.to/abc123 and some unknown link."
+        message.text = (
+            "Check out this Amazon link: https://amzn.to/abc123 and some unknown link."
+        )
 
         # Call the method to get the context
         context = prepare_message(message)
@@ -717,16 +732,22 @@ class TestPrepareMessage(unittest.TestCase):
         self.assertNotIn("unknown.com", context["selected_users"])
 
         # Verify the modified message
-        self.assertEqual(context["modified_message"], "Modified message with expanded URLs")
+        self.assertEqual(
+            context["modified_message"], "Modified message with expanded URLs"
+        )
 
     @patch("botaffiumeiro.extract_domains_from_message")
     @patch("botaffiumeiro.select_user_for_domain")
-    def test_prepare_message_with_only_unknown_domains(self, mock_select_user, mock_extract_domains):
+    def test_prepare_message_with_only_unknown_domains(
+        self, mock_select_user, mock_extract_domains
+    ):
         """
         Test: Simulate a message where all domains are unknown.
         """
         # Mock the domains extracted from the message
-        mock_extract_domains.return_value = {"unknown.com"}, "Modified message with expanded URLs"
+        mock_extract_domains.return_value = {
+            "unknown.com"
+        }, "Modified message with expanded URLs"
 
         # Mock the user selection for the unknown domain
         mock_select_user.return_value = None  # No user for unknown.com
@@ -745,16 +766,23 @@ class TestPrepareMessage(unittest.TestCase):
         mock_select_user.assert_called_once_with("unknown.com")
 
         # Verify the modified message
-        self.assertEqual(context["modified_message"], "Modified message with expanded URLs")
+        self.assertEqual(
+            context["modified_message"], "Modified message with expanded URLs"
+        )
 
     @patch("botaffiumeiro.extract_domains_from_message")
     @patch("botaffiumeiro.select_user_for_domain")
-    def test_prepare_message_with_expanded_urls(self, mock_select_user, mock_extract_domains):
+    def test_prepare_message_with_expanded_urls(
+        self, mock_select_user, mock_extract_domains
+    ):
         """
         Test: Ensure that prepare_message returns both the selected users and the modified message.
         """
         # Mock the domains and the modified message returned by extract_domains_from_message
-        mock_extract_domains.return_value = {"amazon.com", "aliexpress.com"}, "Modified message with expanded URLs"
+        mock_extract_domains.return_value = {
+            "amazon.com",
+            "aliexpress.com",
+        }, "Modified message with expanded URLs"
 
         # Define a function for side_effect to return users based on the domain
         def select_user_side_effect(domain):
@@ -786,7 +814,9 @@ class TestPrepareMessage(unittest.TestCase):
         self.assertEqual(context["selected_users"]["aliexpress.com"]["user"], "user2")
 
         # Verify the modified message
-        self.assertEqual(context["modified_message"], "Modified message with expanded URLs")
+        self.assertEqual(
+            context["modified_message"], "Modified message with expanded URLs"
+        )
 
     @patch("botaffiumeiro.extract_domains_from_message")
     @patch("botaffiumeiro.select_user_for_domain")
@@ -804,6 +834,7 @@ class TestPrepareMessage(unittest.TestCase):
         # Verify that no users were selected and the modified message is None
         self.assertEqual(context["selected_users"], {})
         self.assertIsNone(context["modified_message"])
+
 
 class TestSelectUserForDomain(unittest.TestCase):
 
@@ -909,7 +940,9 @@ class TestSelectUserForDomain(unittest.TestCase):
             "user2": {"amazon_affiliate_id": "user2-affiliate-id"},
         },
     )
-    @patch("random.uniform", return_value=150)  # Valor aleatorio fuera de rango (no debería ocurrir)
+    @patch(
+        "random.uniform", return_value=150
+    )  # Valor aleatorio fuera de rango (no debería ocurrir)
     def test_fallback_to_first_user(self, mock_random):
         """Test: If no match is found in random selection, fallback to the first user."""
         selected_user = select_user_for_domain("amazon")

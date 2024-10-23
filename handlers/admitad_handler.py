@@ -1,8 +1,7 @@
-from telegram import Message
+from handlers.base_handler import BaseHandler, PATTERN_URL_QUERY
 
-from handlers.base_handler import BaseHandler,PATTERN_URL_QUERY
+ADMITAD_PATTERN = r"(https?://(?:[\w\-]+\.)?wextap\.com/g" + PATTERN_URL_QUERY + ")"
 
-ADMITAD_PATTERN=  r"(https?://(?:[\w\-]+\.)?wextap\.com/g"+PATTERN_URL_QUERY+")"
 
 class AdmitadHandler(BaseHandler):
 

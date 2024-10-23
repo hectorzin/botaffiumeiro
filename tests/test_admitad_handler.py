@@ -12,8 +12,8 @@ class TestHandler(BaseHandler):
 
 class TestHandleAdmitadLinks(unittest.IsolatedAsyncioTestCase):
 
-    #@patch("handlers.base_handler.BaseHandler._prepare_message")
-    #@patch("handlers.base_handler.BaseHandler._process_message")
+    # @patch("handlers.base_handler.BaseHandler._prepare_message")
+    # @patch("handlers.base_handler.BaseHandler._process_message")
     # async def test_no_action_when_admitad_publisher_id_is_none(self, mock_process,mock_prepare):
     #     """Test that no action is taken if ADMITAD_PUBLISHER_ID is None."""
     #     mock_selected_users = {
@@ -56,7 +56,7 @@ class TestHandleAdmitadLinks(unittest.IsolatedAsyncioTestCase):
         context = {
             "message": mock_message,
             "modified_message": mock_message.text,
-            "selected_users": mock_selected_users
+            "selected_users": mock_selected_users,
         }
 
         await admitad_handler.handle_links(context)
@@ -64,7 +64,7 @@ class TestHandleAdmitadLinks(unittest.IsolatedAsyncioTestCase):
         # Verify that no message was modified or sent
         mock_message.chat.send_message.assert_not_called()
         mock_process.assert_not_called()
-        self.assertEqual(context['modified_message'], mock_message.text)
+        self.assertEqual(context["modified_message"], mock_message.text)
 
     @patch("handlers.base_handler.BaseHandler._process_message")
     async def test_admitad_link_in_list(self, mock_process):
@@ -91,13 +91,13 @@ class TestHandleAdmitadLinks(unittest.IsolatedAsyncioTestCase):
         context = {
             "message": mock_message,
             "modified_message": mock_message.text,
-            "selected_users": mock_selected_users
+            "selected_users": mock_selected_users,
         }
 
         await admitad_handler.handle_links(context)
 
         expected_message = "Check this out: https://wextap.com/g/93fd4vbk6c873a1e3014d68450d763/?ulp=https://www.giftmio.com/some-product I hope you like it"
-        
+
         mock_process.assert_called_with(mock_message, expected_message)
 
     @patch("handlers.base_handler.BaseHandler._process_message")
@@ -122,7 +122,7 @@ class TestHandleAdmitadLinks(unittest.IsolatedAsyncioTestCase):
         context = {
             "message": mock_message,
             "modified_message": mock_message.text,
-            "selected_users": mock_selected_users
+            "selected_users": mock_selected_users,
         }
 
         await admitad_handler.handle_links(context)
@@ -152,7 +152,7 @@ class TestHandleAdmitadLinks(unittest.IsolatedAsyncioTestCase):
         context = {
             "message": mock_message,
             "modified_message": mock_message.text,
-            "selected_users": mock_selected_users
+            "selected_users": mock_selected_users,
         }
 
         await admitad_handler.handle_links(context)
@@ -182,7 +182,7 @@ class TestHandleAdmitadLinks(unittest.IsolatedAsyncioTestCase):
         context = {
             "message": mock_message,
             "modified_message": mock_message.text,
-            "selected_users": mock_selected_users
+            "selected_users": mock_selected_users,
         }
 
         await admitad_handler.handle_links(context)
@@ -219,13 +219,12 @@ class TestHandleAdmitadLinks(unittest.IsolatedAsyncioTestCase):
         context = {
             "message": mock_message,
             "modified_message": mock_message.text,
-            "selected_users": mock_selected_users
+            "selected_users": mock_selected_users,
         }
 
         await admitad_handler.handle_links(context)
 
         mock_process.assert_called_with(mock_message, expected_message)
-
 
     @patch("handlers.base_handler.BaseHandler._process_message")
     async def test_admitad_aliexpress_link_no_admitad_config(self, mock_process):
@@ -239,7 +238,7 @@ class TestHandleAdmitadLinks(unittest.IsolatedAsyncioTestCase):
             }
         }
         admitad_handler = AdmitadHandler()
-        admitad_handler.selected_users=mock_selected_users
+        admitad_handler.selected_users = mock_selected_users
 
         mock_message = AsyncMock()
         mock_message.text = "Here is a product: https://www.aliexpress.com/item/1005002958205071.html I hope you like it"
@@ -248,7 +247,7 @@ class TestHandleAdmitadLinks(unittest.IsolatedAsyncioTestCase):
         context = {
             "message": mock_message,
             "modified_message": mock_message.text,
-            "selected_users": mock_selected_users
+            "selected_users": mock_selected_users,
         }
 
         await admitad_handler.handle_links(context)
@@ -268,7 +267,7 @@ class TestHandleAdmitadLinks(unittest.IsolatedAsyncioTestCase):
             }
         }
         admitad_handler = AdmitadHandler()
-        admitad_handler.selected_users=mock_selected_users
+        admitad_handler.selected_users = mock_selected_users
 
         mock_message = AsyncMock()
         mock_message.text = "Here is a product: https://www.pccomponentes.com/item/1005002958205071.html I hope you like it"
@@ -281,7 +280,7 @@ class TestHandleAdmitadLinks(unittest.IsolatedAsyncioTestCase):
         context = {
             "message": mock_message,
             "modified_message": mock_message.text,
-            "selected_users": mock_selected_users
+            "selected_users": mock_selected_users,
         }
 
         await admitad_handler.handle_links(context)

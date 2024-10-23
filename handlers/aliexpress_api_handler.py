@@ -4,7 +4,6 @@ import re
 import requests
 import time
 
-from telegram import Message
 from handlers.base_handler import BaseHandler
 from handlers.aliexpress_handler import ALIEXPRESS_PATTERN
 
@@ -39,7 +38,9 @@ class AliexpressAPIHandler(BaseHandler):
         timestamp = str(int(time.time() * 1000))  # Current timestamp in milliseconds
 
         # Get AliExpress-specific configuration from self.selected_users
-        aliexpress_config = self.selected_users.get("aliexpress.com",{}).get("aliexpress", {})
+        aliexpress_config = self.selected_users.get("aliexpress.com", {}).get(
+            "aliexpress", {}
+        )
         app_key = aliexpress_config.get("app_key")
         app_secret = aliexpress_config.get("app_secret")
         tracking_id = aliexpress_config.get("tracking_id")
@@ -65,7 +66,7 @@ class AliexpressAPIHandler(BaseHandler):
 
         # Make the request to the Aliexpress API
         try:
-            user=self.selected_users.get("aliexpress.com",{}).get("user", {})
+            user = self.selected_users.get("aliexpress.com", {}).get("user", {})
             self.logger.info(f"User choosen: {user}")
             response = requests.get(ALIEXPRESS_API_URL, params=params)
             self.logger.info(f"API request sent. Status code: {response.status_code}")
@@ -98,10 +99,12 @@ class AliexpressAPIHandler(BaseHandler):
 
     async def handle_links(self, context) -> bool:
         """Handles AliExpress links and converts them using the Aliexpress API."""
-        
+
         message, modified_text, self.selected_users = self._unpack_context(context)
         # Retrieve the AliExpress configuration from self.selected_users
-        aliexpress_config = self.selected_users.get("aliexpress.com",{}).get("aliexpress", {})
+        aliexpress_config = self.selected_users.get("aliexpress.com", {}).get(
+            "aliexpress", {}
+        )
         app_key = aliexpress_config.get("app_key")
         discount_codes = aliexpress_config.get("discount_codes", "")
 
@@ -138,7 +141,9 @@ class AliexpressAPIHandler(BaseHandler):
         # Add discount codes if they are configured
         if discount_codes:
             new_text += f"\n\n{discount_codes}"
-            self.logger.debug(f"{message.message_id}: Appended AliExpress discount codes.")
+            self.logger.debug(
+                f"{message.message_id}: Appended AliExpress discount codes."
+            )
 
         # Process the message if modifications were made
         if new_text != modified_text:

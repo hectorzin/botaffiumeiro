@@ -2,41 +2,35 @@ import logging
 import requests
 import random
 import re
+import threading
 
-from config import (
-    LOG_LEVEL,
-    BOT_TOKEN,
-    EXCLUDED_USERS,
-)
+from config import config_data
 
 from telegram import Update, User
 from telegram.ext import Application, MessageHandler, filters
 from publicsuffix2 import get_sld
 from typing import Tuple
-from urllib.parse import  urlparse, parse_qs
+from urllib.parse import urlparse, parse_qs
 
-from handlers.admitad_handler import AdmitadHandler,ADMITAD_PATTERN
+from handlers.admitad_handler import AdmitadHandler, ADMITAD_PATTERN
 from handlers.aliexpress_api_handler import AliexpressAPIHandler
-from handlers.aliexpress_handler import AliexpressHandler,ALIEXPRESS_PATTERN
-from handlers.amazon_handler import AmazonHandler,AMAZON_PATTERN
-from handlers.awin_handler import AwinHandler,AWIN_PATTERN
-from config import (
-    domain_percentage_table,
-    all_users_configurations,    
-)
+from handlers.aliexpress_handler import AliexpressHandler, ALIEXPRESS_PATTERN
+from handlers.amazon_handler import AmazonHandler, AMAZON_PATTERN
+from handlers.awin_handler import AwinHandler, AWIN_PATTERN
+from config import domain_percentage_table, all_users_configurations, load_configuration
 
 SHORT_URL_DOMAINS = ["amzn.to", "s.click.aliexpress.com", "bit.ly", "tinyurl.com"]
 DOMAIN_PATTERNS = {
     "amazon": AMAZON_PATTERN,
     "aliexpress": ALIEXPRESS_PATTERN,
     "awin": AWIN_PATTERN,
-    "admitad": ADMITAD_PATTERN
+    "admitad": ADMITAD_PATTERN,
 }
 #    "aliexpress_short_url_pattern": r"https?://s\.click\.aliexpress\.com/e/[\w\d_]+",
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    level=LOG_LEVEL,
+    level=config_data["LOG_LEVEL"],
 )
 logger = logging.getLogger(__name__)
 logging.getLogger("httpx").setLevel(
@@ -45,15 +39,18 @@ logging.getLogger("httpx").setLevel(
     else logging.CRITICAL
 )
 
+
 def is_user_excluded(user: User) -> bool:
     """Checks if the user is in the list of excluded users."""
 
     user_id = user.id
     username = user.username
     logger.debug(f"Checking if user {username} (ID: {user_id}) is excluded.")
-    excluded = user_id in EXCLUDED_USERS or (username and username in EXCLUDED_USERS)
+    excluded_users = config_data["EXCLUDED_USERS"]
+    excluded = user_id in excluded_users or (username and username in excluded_users)
     logger.debug(f"User {username} (ID: {user_id}) is excluded: {excluded}")
     return excluded
+
 
 def expand_shortened_url(url: str):
     """Expands shortened URLs by following redirects using a HEAD request."""
@@ -66,6 +63,7 @@ def expand_shortened_url(url: str):
     except requests.RequestException as e:
         logger.error(f"Error expanding shortened URL {url}: {e}")
     return url
+
 
 def extract_embedded_url(query_params):
     """
@@ -142,6 +140,7 @@ def extract_domains_from_message(message_text: str) -> Tuple[set, str]:
 
     return domains, message_text
 
+
 def select_user_for_domain(domain):
     """
     Selects a user for the given domain based on percentages in domain_percentage_table.
@@ -192,8 +191,9 @@ def choose_users(domains) -> dict:
         selected_user_data = select_user_for_domain(domain)
         if selected_user_data:
             selected_users[domain] = selected_user_data
-    
+
     return selected_users
+
 
 def prepare_message(message) -> dict:
     """
@@ -212,13 +212,13 @@ def prepare_message(message) -> dict:
         return {
             "message": message,  # Original message (None if not provided)
             "modified_message": None,  # No modification since there was no valid message
-            "selected_users": {}  # No users selected as there are no domains
+            "selected_users": {},  # No users selected as there are no domains
         }
 
     message_text = message.text
     # Extract domains and the modified message text
     domains, modified_message = extract_domains_from_message(message_text)
-    
+
     # Select users for each domain
     selected_users = choose_users(domains)
 
@@ -226,10 +226,11 @@ def prepare_message(message) -> dict:
     context = {
         "message": message,  # Original message
         "modified_message": modified_message,  # Message with expanded URLs (if applicable)
-        "selected_users": selected_users  # Dictionary of selected users by domain
+        "selected_users": selected_users,  # Dictionary of selected users by domain
     }
 
     return context
+
 
 async def process_link_handlers(message) -> None:
     """Process all link handlers for Amazon, Awin, Admitad, and AliExpress."""
@@ -281,11 +282,26 @@ async def modify_link(update: Update, context) -> None:
     logger.info(f"{update.update_id}: Update processed.")
 
 
+def reload_config_periodically(interval):
+    """
+    Function to reload the configuration periodically every `interval` seconds.
+    """
+    load_configuration()
+    threading.Timer(interval, reload_config_periodically, [interval]).start()
+
+
 def main() -> None:
     """Start the bot with python-telegram-bot"""
-
+    load_configuration()
     logger.info("Configuring the bot")
-    application = Application.builder().token(BOT_TOKEN).build()
+
+    # Program a job to reaload config every day
+    reload_thread = threading.Thread(
+        target=reload_config_periodically, args=(24 * 60 * 60,), daemon=True
+    )
+    reload_thread.start()
+
+    application = Application.builder().token(config_data["BOT_TOKEN"]).build()
 
     application.add_handler(
         MessageHandler(filters.ALL & filters.ChatType.GROUPS, modify_link)
