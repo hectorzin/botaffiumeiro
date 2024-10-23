@@ -1,9 +1,13 @@
 import re
 
-from telegram import Message
-from handlers.base_handler import BaseHandler,PATTERN_URL_QUERY
+from handlers.base_handler import BaseHandler, PATTERN_URL_QUERY
 
-ALIEXPRESS_PATTERN=r"(https?://(?:[a-z]{2,3}\.)?aliexpress\.[a-z]{2,3}(?:\.[a-z]{2,3})?"+PATTERN_URL_QUERY+")"
+ALIEXPRESS_PATTERN = (
+    r"(https?://(?:[a-z]{2,3}\.)?aliexpress\.[a-z]{2,3}(?:\.[a-z]{2,3})?"
+    + PATTERN_URL_QUERY
+    + ")"
+)
+
 
 class AliexpressHandler(BaseHandler):
     def __init__(self):
@@ -16,7 +20,9 @@ class AliexpressHandler(BaseHandler):
         aliexpress_data = self.selected_users.get("aliexpress.com", {})
 
         # Check if discount codes and message are not empty before proceeding
-        aliexpress_discount_codes = aliexpress_data.get("aliexpress", {}).get("discount_codes", None)
+        aliexpress_discount_codes = aliexpress_data.get("aliexpress", {}).get(
+            "discount_codes", None
+        )
         if not aliexpress_discount_codes:
             self.logger.info(
                 f"{message.message_id}: Discount message or codes are empty. Skipping reply."
@@ -34,8 +40,10 @@ class AliexpressHandler(BaseHandler):
                 f"{message.message_id}: Found {len(aliexpress_links)} AliExpress links. Processing..."
             )
             if (
-                "aliexpress.com" in aliexpress_data.get("awin", {}).get("advertisers", {})
-                or "aliexpress.com" in aliexpress_data.get("admitad", {}).get("advertisers", {})
+                "aliexpress.com"
+                in aliexpress_data.get("awin", {}).get("advertisers", {})
+                or "aliexpress.com"
+                in aliexpress_data.get("admitad", {}).get("advertisers", {})
                 or aliexpress_data.get("aliexpress", {}).get("app_key", "")
             ):
                 self.logger.info(

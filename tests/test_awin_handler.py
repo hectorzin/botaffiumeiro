@@ -24,7 +24,7 @@ class TestHandleAwinLinks(unittest.IsolatedAsyncioTestCase):
         context = {
             "message": mock_message,
             "modified_message": mock_message.text,
-            "selected_users": mock_selected_users
+            "selected_users": mock_selected_users,
         }
         result = await handler.handle_links(context)
 
@@ -51,7 +51,7 @@ class TestHandleAwinLinks(unittest.IsolatedAsyncioTestCase):
         context = {
             "message": mock_message,
             "modified_message": mock_message.text,
-            "selected_users": mock_selected_users
+            "selected_users": mock_selected_users,
         }
         result = await handler.handle_links(context)
 
@@ -72,15 +72,16 @@ class TestHandleAwinLinks(unittest.IsolatedAsyncioTestCase):
         handler = AwinHandler()
         mock_selected_users = {
             "giftmio.com": {
-            "awin": {
-                "publisher_id": "my_awin_id",
-                "advertisers": {"giftmio.com": "20982"},
+                "awin": {
+                    "publisher_id": "my_awin_id",
+                    "advertisers": {"giftmio.com": "20982"},
+                }
             }
-        }}
+        }
         context = {
             "message": mock_message,
             "modified_message": mock_message.text,
-            "selected_users": mock_selected_users
+            "selected_users": mock_selected_users,
         }
         result = await handler.handle_links(context)
 
@@ -100,15 +101,16 @@ class TestHandleAwinLinks(unittest.IsolatedAsyncioTestCase):
         handler = AwinHandler()
         mock_selected_users = {
             "giftmio.com": {
-            "awin": {
-                "publisher_id": "my_awin_id",
-                "advertisers": {"giftmio.com": "20982"},
+                "awin": {
+                    "publisher_id": "my_awin_id",
+                    "advertisers": {"giftmio.com": "20982"},
+                }
             }
-        }}
+        }
         context = {
             "message": mock_message,
             "modified_message": mock_message.text,
-            "selected_users": mock_selected_users
+            "selected_users": mock_selected_users,
         }
         result = await handler.handle_links(context)
 
@@ -127,24 +129,23 @@ class TestHandleAwinLinks(unittest.IsolatedAsyncioTestCase):
         handler = AwinHandler()
         mock_selected_users = {
             "giftmio.com": {
-            "awin": {
-                "publisher_id": "my_awin_id",
-                "advertisers": {"giftmio.com": "20982"},
+                "awin": {
+                    "publisher_id": "my_awin_id",
+                    "advertisers": {"giftmio.com": "20982"},
+                }
             }
-        }}
+        }
         context = {
             "message": mock_message,
             "modified_message": mock_message.text,
-            "selected_users": mock_selected_users
+            "selected_users": mock_selected_users,
         }
         result = await handler.handle_links(context)
 
         mock_message.chat.send_message.assert_not_called()
 
     @patch("handlers.base_handler.BaseHandler._process_message")
-    async def test_awin_aliexpress_link_without_discount(
-        self, mock_process
-    ):
+    async def test_awin_aliexpress_link_without_discount(self, mock_process):
         """Test AliExpress link in Awin list, no discount code added."""
 
         mock_message = AsyncMock()
@@ -156,18 +157,19 @@ class TestHandleAwinLinks(unittest.IsolatedAsyncioTestCase):
         handler = AwinHandler()
         mock_selected_users = {
             "aliexpress.com": {
-            "awin": {
-                "publisher_id": "my_awin_id",
-                "advertisers": {"aliexpress.com": "11640"},
-            },
-            "aliexpress": {
-                "discount_codes": None,
-            },
-        }}
+                "awin": {
+                    "publisher_id": "my_awin_id",
+                    "advertisers": {"aliexpress.com": "11640"},
+                },
+                "aliexpress": {
+                    "discount_codes": None,
+                },
+            }
+        }
         context = {
             "message": mock_message,
             "modified_message": mock_message.text,
-            "selected_users": mock_selected_users
+            "selected_users": mock_selected_users,
         }
         result = await handler.handle_links(context)
 
@@ -188,18 +190,19 @@ class TestHandleAwinLinks(unittest.IsolatedAsyncioTestCase):
         handler = AwinHandler()
         mock_selected_users = {
             "aliexpress.com": {
-            "awin": {
-                "publisher_id": "my_awin_id",
-                "advertisers": {"aliexpress.com": "11640"},
-            },
-            "aliexpress": {
-                "discount_codes": "Here is your discount code!",
-            },
-        }}
+                "awin": {
+                    "publisher_id": "my_awin_id",
+                    "advertisers": {"aliexpress.com": "11640"},
+                },
+                "aliexpress": {
+                    "discount_codes": "Here is your discount code!",
+                },
+            }
+        }
         context = {
             "message": mock_message,
             "modified_message": mock_message.text,
-            "selected_users": mock_selected_users
+            "selected_users": mock_selected_users,
         }
         result = await handler.handle_links(context)
 
@@ -221,27 +224,26 @@ class TestHandleAwinLinks(unittest.IsolatedAsyncioTestCase):
         handler = AwinHandler()
         mock_selected_users = {
             "aliexpress.com": {
-            "awin": {
-                "publisher_id": "my_awin_id",
-                "advertisers": {"pccomponentes.com": "20982"},
-            },
-            "aliexpress": {
-                "discount_codes": "Here is your discount code!",
-            },
-        }}
+                "awin": {
+                    "publisher_id": "my_awin_id",
+                    "advertisers": {"pccomponentes.com": "20982"},
+                },
+                "aliexpress": {
+                    "discount_codes": "Here is your discount code!",
+                },
+            }
+        }
         context = {
             "message": mock_message,
             "modified_message": mock_message.text,
-            "selected_users": mock_selected_users
+            "selected_users": mock_selected_users,
         }
         result = await handler.handle_links(context)
 
         mock_message.chat.send_message.assert_not_called()
 
     @patch("handlers.base_handler.BaseHandler._process_message")
-    async def test_awin_no_aliexpress_from_link_with_discount(
-        self, mock_process
-    ):
+    async def test_awin_no_aliexpress_from_link_with_discount(self, mock_process):
         """Test No AliExpress link in Awin list, the discount should not be applied."""
 
         mock_message = AsyncMock()
@@ -255,18 +257,19 @@ class TestHandleAwinLinks(unittest.IsolatedAsyncioTestCase):
         handler = AwinHandler()
         mock_selected_users = {
             "pccomponentes.com": {
-            "awin": {
-                "publisher_id": "my_awin_id",
-                "advertisers": {"pccomponentes.com": "20982"},
-            },
-            "aliexpress": {
-                "discount_codes": "Here is your discount code!",
-            },
-        }}
+                "awin": {
+                    "publisher_id": "my_awin_id",
+                    "advertisers": {"pccomponentes.com": "20982"},
+                },
+                "aliexpress": {
+                    "discount_codes": "Here is your discount code!",
+                },
+            }
+        }
         context = {
             "message": mock_message,
             "modified_message": mock_message.text,
-            "selected_users": mock_selected_users
+            "selected_users": mock_selected_users,
         }
         result = await handler.handle_links(context)
 

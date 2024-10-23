@@ -30,7 +30,7 @@ class TestHandleAmazonLinks(unittest.IsolatedAsyncioTestCase):
         context = {
             "message": mock_message,
             "modified_message": mock_message.text,
-            "selected_users": mock_selected_users
+            "selected_users": mock_selected_users,
         }
 
         result = await amazon_handler.handle_links(context)
@@ -41,9 +41,7 @@ class TestHandleAmazonLinks(unittest.IsolatedAsyncioTestCase):
         self.assertFalse(result)
 
     @patch("handlers.base_handler.BaseHandler._process_message")
-    async def test_no_action_when_amazon_affiliate_id_is_none(
-        self, mock_process
-    ):
+    async def test_no_action_when_amazon_affiliate_id_is_none(self, mock_process):
         """Test that no action is taken if AMAZON_AFFILIATE_ID is None."""
         mock_selected_users = {"amazon.es": {"amazon": {"affiliate_id": None}}}
         amazon_handler = AmazonHandler()
@@ -57,7 +55,7 @@ class TestHandleAmazonLinks(unittest.IsolatedAsyncioTestCase):
         context = {
             "message": mock_message,
             "modified_message": mock_message.text,
-            "selected_users": mock_selected_users
+            "selected_users": mock_selected_users,
         }
 
         result = await amazon_handler.handle_links(context)
@@ -69,9 +67,7 @@ class TestHandleAmazonLinks(unittest.IsolatedAsyncioTestCase):
 
     @patch("botaffiumeiro.expand_shortened_url")
     @patch("handlers.base_handler.BaseHandler._process_message")
-    async def test_long_amazon_link_without_affiliate(
-        self, mock_process, mock_expand
-    ):
+    async def test_long_amazon_link_without_affiliate(self, mock_process, mock_expand):
         """Test if long Amazon links without affiliate ID are converted to include the affiliate ID."""
         mock_selected_users = {
             "amazon.com": {
@@ -92,7 +88,7 @@ class TestHandleAmazonLinks(unittest.IsolatedAsyncioTestCase):
         context = {
             "message": mock_message,
             "modified_message": mock_message.text,
-            "selected_users": mock_selected_users
+            "selected_users": mock_selected_users,
         }
 
         result = await amazon_handler.handle_links(context)
@@ -107,7 +103,9 @@ class TestHandleAmazonLinks(unittest.IsolatedAsyncioTestCase):
     async def test_amazon_link_with_affiliate(self, mock_process):
         """Test if Amazon links with an existing affiliate ID are modified to use ours."""
         mock_selected_users = {
-            "amazon.com": {"amazon": {"advertisers": {"amazon.com": "our_affiliate_id"}}}
+            "amazon.com": {
+                "amazon": {"advertisers": {"amazon.com": "our_affiliate_id"}}
+            }
         }
         amazon_handler = AmazonHandler()
 
@@ -118,7 +116,7 @@ class TestHandleAmazonLinks(unittest.IsolatedAsyncioTestCase):
         context = {
             "message": mock_message,
             "modified_message": mock_message.text,
-            "selected_users": mock_selected_users
+            "selected_users": mock_selected_users,
         }
 
         result = await amazon_handler.handle_links(context)
@@ -143,7 +141,7 @@ class TestHandleAmazonLinks(unittest.IsolatedAsyncioTestCase):
         context = {
             "message": mock_message,
             "modified_message": mock_message.text,
-            "selected_users": mock_selected_users
+            "selected_users": mock_selected_users,
         }
 
         result = await amazon_handler.handle_links(context)

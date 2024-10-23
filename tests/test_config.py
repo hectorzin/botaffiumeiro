@@ -243,18 +243,10 @@ class TestAddUserToDomainPercentageTable(unittest.TestCase):
         """
         user_id = "user"
         user_data = {
-            "amazon": {
-                "advertisers": {}
-            },
-            "aliexpress": {
-                "app_key": None
-            },
-            "awin": {
-                "advertisers": {}
-            },
-            "admitad": {
-                "advertisers": {}
-            }
+            "amazon": {"advertisers": {}},
+            "aliexpress": {"app_key": None},
+            "awin": {"advertisers": {}},
+            "admitad": {"advertisers": {}},
         }
         config.add_user_to_domain_percentage_table(user_id, user_data, 50)
 
@@ -268,25 +260,19 @@ class TestAddUserToDomainPercentageTable(unittest.TestCase):
         """
         user_id = "main"
         user_data = {
-            "amazon": {
-                "advertisers": {"amazon.es":"amazon-affiliate-id"}
-            },
-            "aliexpress": {
-                "app_key": None
-            },
-            "awin": {
-                "advertisers": {}
-            },
-            "admitad": {
-                "advertisers": {}
-            }
+            "amazon": {"advertisers": {"amazon.es": "amazon-affiliate-id"}},
+            "aliexpress": {"app_key": None},
+            "awin": {"advertisers": {}},
+            "admitad": {"advertisers": {}},
         }
         config.add_user_to_domain_percentage_table(user_id, user_data, 50)
 
         # Amazon should be added to the table
         self.assertIn("amazon.es", config.domain_percentage_table)
         self.assertEqual(config.domain_percentage_table["amazon.es"][0]["user"], "main")
-        self.assertEqual(config.domain_percentage_table["amazon.es"][0]["percentage"], 50)
+        self.assertEqual(
+            config.domain_percentage_table["amazon.es"][0]["percentage"], 50
+        )
 
     @patch("config.domain_percentage_table", {})
     def test_multiple_affiliate_ids(self):
@@ -295,29 +281,19 @@ class TestAddUserToDomainPercentageTable(unittest.TestCase):
         """
         user_id = "main"
         user_data = {
-            "amazon": {
-                "advertisers": {"amazon.es":"amazon-affiliate-id"}
-            },
-            "aliexpress": {
-                "app_key": "aliexpress-app-key"
-            },
-            "awin": {
-                "advertisers": {
-                    "awin-example.com": "awin-affiliate-id"
-                }
-            },
-            "admitad": {
-                "advertisers": {
-                    "admitad-example.com": "admitad-affiliate-id"
-                }
-            }
+            "amazon": {"advertisers": {"amazon.es": "amazon-affiliate-id"}},
+            "aliexpress": {"app_key": "aliexpress-app-key"},
+            "awin": {"advertisers": {"awin-example.com": "awin-affiliate-id"}},
+            "admitad": {"advertisers": {"admitad-example.com": "admitad-affiliate-id"}},
         }
         config.add_user_to_domain_percentage_table(user_id, user_data, 50)
 
         # Amazon should be added
         self.assertIn("amazon.es", config.domain_percentage_table)
         self.assertEqual(config.domain_percentage_table["amazon.es"][0]["user"], "main")
-        self.assertEqual(config.domain_percentage_table["amazon.es"][0]["percentage"], 50)
+        self.assertEqual(
+            config.domain_percentage_table["amazon.es"][0]["percentage"], 50
+        )
 
         # AliExpress should be added
         self.assertIn("aliexpress.com", config.domain_percentage_table)
@@ -354,36 +330,20 @@ class TestAddUserToDomainPercentageTable(unittest.TestCase):
         # First user with Amazon and AliExpress
         user_id_1 = "user1"
         user_data_1 = {
-            "amazon": {
-                "advertisers": {"amazon.es":"amazon-affiliate-id"}
-            },
-            "aliexpress": {
-                "app_key": "aliexpress-app-key-1"
-            },
-            "awin": {
-                "advertisers": {}
-            },
-            "admitad": {
-                "advertisers": {}
-            }
+            "amazon": {"advertisers": {"amazon.es": "amazon-affiliate-id"}},
+            "aliexpress": {"app_key": "aliexpress-app-key-1"},
+            "awin": {"advertisers": {}},
+            "admitad": {"advertisers": {}},
         }
         config.add_user_to_domain_percentage_table(user_id_1, user_data_1, 60)
 
         # Second user with the same domains but different IDs
         user_id_2 = "user2"
         user_data_2 = {
-            "amazon": {
-                "advertisers": {"amazon.es":"amazon-affiliate-id-2"}
-            },
-            "aliexpress": {
-                "app_key": "aliexpress-app-key-2"
-            },
-            "awin": {
-                "advertisers": {}
-            },
-            "admitad": {
-                "advertisers": {}
-            }
+            "amazon": {"advertisers": {"amazon.es": "amazon-affiliate-id-2"}},
+            "aliexpress": {"app_key": "aliexpress-app-key-2"},
+            "awin": {"advertisers": {}},
+            "admitad": {"advertisers": {}},
         }
         config.add_user_to_domain_percentage_table(user_id_2, user_data_2, 40)
 
@@ -392,11 +352,19 @@ class TestAddUserToDomainPercentageTable(unittest.TestCase):
         self.assertEqual(len(config.domain_percentage_table["amazon.es"]), 2)
 
         # Check both users in Amazon
-        self.assertEqual(config.domain_percentage_table["amazon.es"][0]["user"], "user1")
-        self.assertEqual(config.domain_percentage_table["amazon.es"][0]["percentage"], 60)
+        self.assertEqual(
+            config.domain_percentage_table["amazon.es"][0]["user"], "user1"
+        )
+        self.assertEqual(
+            config.domain_percentage_table["amazon.es"][0]["percentage"], 60
+        )
 
-        self.assertEqual(config.domain_percentage_table["amazon.es"][1]["user"], "user2")
-        self.assertEqual(config.domain_percentage_table["amazon.es"][1]["percentage"], 40)
+        self.assertEqual(
+            config.domain_percentage_table["amazon.es"][1]["user"], "user2"
+        )
+        self.assertEqual(
+            config.domain_percentage_table["amazon.es"][1]["percentage"], 40
+        )
 
         # AliExpress should have two users
         self.assertIn("aliexpress.com", config.domain_percentage_table)
@@ -425,58 +393,30 @@ class TestAddUserToDomainPercentageTable(unittest.TestCase):
         # First user with Amazon and an Awin advertiser
         user_id_1 = "user1"
         user_data_1 = {
-            "amazon": {
-                "advertisers": {"amazon.es":"amazon-affiliate-id-1"}
-            },
-            "aliexpress": {
-                "app_key": None
-            },
-            "awin": {
-                "advertisers": {
-                    "awin-user1.com": "awin-affiliate-id-1"
-                }
-            },
-            "admitad": {
-                "advertisers": {}
-            }
+            "amazon": {"advertisers": {"amazon.es": "amazon-affiliate-id-1"}},
+            "aliexpress": {"app_key": None},
+            "awin": {"advertisers": {"awin-user1.com": "awin-affiliate-id-1"}},
+            "admitad": {"advertisers": {}},
         }
         config.add_user_to_domain_percentage_table(user_id_1, user_data_1, 70)
 
         # Second user with AliExpress and an Admitad advertiser (no Amazon)
         user_id_2 = "user2"
         user_data_2 = {
-            "amazon": {
-                "advertisers": {}
-            },
-            "aliexpress": {
-                "app_key": "aliexpress-app-key-2"
-            },
-            "awin": {
-                "advertisers": {}
-            },
-            "admitad": {
-                "advertisers": {
-                    "admitad-user2.com": "admitad-affiliate-id-2"
-                }
-            }
+            "amazon": {"advertisers": {}},
+            "aliexpress": {"app_key": "aliexpress-app-key-2"},
+            "awin": {"advertisers": {}},
+            "admitad": {"advertisers": {"admitad-user2.com": "admitad-affiliate-id-2"}},
         }
         config.add_user_to_domain_percentage_table(user_id_2, user_data_2, 30)
 
         # Third user with Amazon and AliExpress (shared with the first and second users)
         user_id_3 = "user3"
         user_data_3 = {
-            "amazon": {
-                "advertisers": {"amazon.es":"amazon-affiliate-id-3"}
-            },
-            "aliexpress": {
-                "app_key": "aliexpress-app-key-3"
-            },
-            "awin": {
-                "advertisers": {}
-            },
-            "admitad": {
-                "advertisers": {}
-            }
+            "amazon": {"advertisers": {"amazon.es": "amazon-affiliate-id-3"}},
+            "aliexpress": {"app_key": "aliexpress-app-key-3"},
+            "awin": {"advertisers": {}},
+            "admitad": {"advertisers": {}},
         }
         config.add_user_to_domain_percentage_table(user_id_3, user_data_3, 50)
 
@@ -487,11 +427,19 @@ class TestAddUserToDomainPercentageTable(unittest.TestCase):
         self.assertEqual(len(config.domain_percentage_table["amazon.es"]), 2)
 
         # Check user1 and user3 in Amazon
-        self.assertEqual(config.domain_percentage_table["amazon.es"][0]["user"], "user1")
-        self.assertEqual(config.domain_percentage_table["amazon.es"][0]["percentage"], 70)
+        self.assertEqual(
+            config.domain_percentage_table["amazon.es"][0]["user"], "user1"
+        )
+        self.assertEqual(
+            config.domain_percentage_table["amazon.es"][0]["percentage"], 70
+        )
 
-        self.assertEqual(config.domain_percentage_table["amazon.es"][1]["user"], "user3")
-        self.assertEqual(config.domain_percentage_table["amazon.es"][1]["percentage"], 50)
+        self.assertEqual(
+            config.domain_percentage_table["amazon.es"][1]["user"], "user3"
+        )
+        self.assertEqual(
+            config.domain_percentage_table["amazon.es"][1]["percentage"], 50
+        )
 
         # AliExpress should have 2 users (user2 and user3)
         self.assertIn("aliexpress.com", config.domain_percentage_table)
@@ -544,58 +492,30 @@ class TestAddUserToDomainPercentageTable(unittest.TestCase):
         # First user has AliExpress via API
         user_id_1 = "user1"
         user_data_1 = {
-            "amazon": {
-                "advertisers": {}
-            },
-            "aliexpress": {
-                "app_key": "aliexpress-api-key"
-            },
-            "awin": {
-                "advertisers": {}
-            },
-            "admitad": {
-                "advertisers": {}
-            }
+            "amazon": {"advertisers": {}},
+            "aliexpress": {"app_key": "aliexpress-api-key"},
+            "awin": {"advertisers": {}},
+            "admitad": {"advertisers": {}},
         }
         config.add_user_to_domain_percentage_table(user_id_1, user_data_1, 50)
 
         # Second user has AliExpress via Awin
         user_id_2 = "user2"
         user_data_2 = {
-            "amazon": {
-                "affiliate_id": None
-            },
-            "aliexpress": {
-                "app_key": None
-            },
-            "awin": {
-                "advertisers": {
-                    "aliexpress.com": "awin-aliexpress-id"
-                }
-            },
-            "admitad": {
-                "advertisers": {}
-            }
+            "amazon": {"affiliate_id": None},
+            "aliexpress": {"app_key": None},
+            "awin": {"advertisers": {"aliexpress.com": "awin-aliexpress-id"}},
+            "admitad": {"advertisers": {}},
         }
         config.add_user_to_domain_percentage_table(user_id_2, user_data_2, 30)
 
         # Third user has AliExpress via Admitad
         user_id_3 = "user3"
         user_data_3 = {
-            "amazon": {
-                "affiliate_id": None
-            },
-            "aliexpress": {
-                "app_key": None
-            },
-            "awin": {
-                "advertisers": {}
-            },
-            "admitad": {
-                "advertisers": {
-                    "aliexpress.com": "admitad-aliexpress-id"
-                }
-            }
+            "amazon": {"affiliate_id": None},
+            "aliexpress": {"app_key": None},
+            "awin": {"advertisers": {}},
+            "admitad": {"advertisers": {"aliexpress.com": "admitad-aliexpress-id"}},
         }
         config.add_user_to_domain_percentage_table(user_id_3, user_data_3, 20)
 
@@ -639,7 +559,7 @@ class TestAdjustDomainAffiliatePercentages(unittest.TestCase):
         Test: Only the main user is in the domain. The user should get 100% of the percentage.
         """
         creator_percentage = 0
-        user_percentage =100 - creator_percentage
+        user_percentage = 100 - creator_percentage
         config.domain_percentage_table = {
             "amazon": [{"user": "main", "percentage": user_percentage}]
         }
@@ -663,7 +583,7 @@ class TestAdjustDomainAffiliatePercentages(unittest.TestCase):
         Test: One user and one creator. Percentages should adjust based on creator_percentage.
         """
         creator_percentage = 30
-        user_percentage =100 - creator_percentage
+        user_percentage = 100 - creator_percentage
         config.domain_percentage_table = {
             "amazon": [
                 {"user": "main", "percentage": user_percentage},
@@ -816,6 +736,46 @@ class TestAdjustDomainAffiliatePercentages(unittest.TestCase):
 
         # Verify that the original percentage of the user has not changed before adjustment
         self.assertEqual(original_user_percentage, 100)
+
+    @patch("config.domain_percentage_table", {})
+    def test_main_user_only(self):
+        """
+        Test: The main user is the only one in the logisplan.com domain.
+        The user should get 100% of the percentage.
+        """
+        creator_percentage = 10  # Percentage intended for creators, not applicable here
+        user_percentage = (
+            100 - creator_percentage
+        )  # Should be 100 since there's no creator
+
+        # Setting up the domain_percentage_table with main user
+        config.domain_percentage_table = {
+            "amazon.com": [
+                {
+                    "user": "main",
+                    "percentage": user_percentage,
+                }  # Main user with 100% intended
+            ]
+        }
+
+        config.adjust_domain_affiliate_percentages(
+            "amazon.com", creator_percentage
+        )  # No creator influence
+
+        # Assert that the user's percentage remains 100%
+        self.assertEqual(
+            config.domain_percentage_table["amazon.com"][0]["user"], "main"
+        )
+        self.assertEqual(
+            config.domain_percentage_table["amazon.com"][0]["percentage"], 100
+        )
+
+        # Verify that the total percentage sums to 100%
+        total_percentage = sum(
+            entry["percentage"]
+            for entry in config.domain_percentage_table["amazon.com"]
+        )
+        self.assertEqual(total_percentage, 100)
 
 
 if __name__ == "__main__":

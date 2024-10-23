@@ -3,10 +3,7 @@ import unittest
 from unittest.mock import AsyncMock, Mock, patch
 from urllib.parse import unquote
 from handlers.base_handler import BaseHandler, PATTERN_AFFILIATE_URL_QUERY
-from config import (
-    MSG_AFFILIATE_LINK_MODIFIED,
-    MSG_REPLY_PROVIDED_BY_USER,
-)
+from config import config_data
 
 
 class TestHandler(BaseHandler):
@@ -209,10 +206,16 @@ class TestProcessMessage(unittest.TestCase):
 
     def setUp(self):
         """Set up the TestHandler instance."""
-        selected_users = {"amazon": {"affiliate_id": "affiliate-21"}}
         self.handler = TestHandler()  # Pasar selected_users al crear la instancia
 
-    @patch("config.DELETE_MESSAGES", True)
+    @patch(
+        "botaffiumeiro.config_data",
+        {
+            "DELETE_MESSAGES": True,
+            "MSG_REPLY_PROVIDED_BY_USER": "Messager provider by user",
+            "MSG_AFFILIATE_LINK_MODIFIED": "Affiliate link changed",
+        },
+    )
     async def test_send_message_and_delete_original(self):
         """Test when DELETE_MESSAGES is True, the original message should be deleted and a new one sent."""
         mock_message = AsyncMock()
@@ -226,9 +229,9 @@ class TestProcessMessage(unittest.TestCase):
         await self.handler.process_message(mock_message, new_text)
 
         expected_message = (
-            f"{MSG_REPLY_PROVIDED_BY_USER} @john_doe:\n\n"
+            f"{config_data['MSG_REPLY_PROVIDED_BY_USER']} @john_doe:\n\n"
             f"{new_text}\n\n"
-            f"{MSG_AFFILIATE_LINK_MODIFIED}"
+            f"{config_data['MSG_AFFILIATE_LINK_MODIFIED']}"
         )
 
         # Check that the original message was deleted
@@ -236,7 +239,14 @@ class TestProcessMessage(unittest.TestCase):
         # Check that a new message was sent
         mock_message.chat.send_message.assert_called_once_with(text=expected_message)
 
-    @patch("config.DELETE_MESSAGES", False)
+    @patch(
+        "botaffiumeiro.config_data",
+        {
+            "DELETE_MESSAGES": False,
+            "MSG_REPLY_PROVIDED_BY_USER": "Messager provider by user",
+            "MSG_AFFILIATE_LINK_MODIFIED": "Affiliate link changed",
+        },
+    )
     async def test_send_message_without_delete(self):
         """Test when DELETE_MESSAGES is False, the original message should not be deleted, and the bot replies to it."""
         mock_message = AsyncMock()
@@ -250,9 +260,9 @@ class TestProcessMessage(unittest.TestCase):
         await self.handler.process_message(mock_message, new_text)
 
         expected_message = (
-            f"{MSG_REPLY_PROVIDED_BY_USER} @john_doe:\n\n"
+            f"{config_data['MSG_REPLY_PROVIDED_BY_USER']} @john_doe:\n\n"
             f"{new_text}\n\n"
-            f"{MSG_AFFILIATE_LINK_MODIFIED}"
+            f"{config_data['MSG_AFFILIATE_LINK_MODIFIED']}"
         )
 
         # Check that the original message was not deleted
@@ -262,7 +272,14 @@ class TestProcessMessage(unittest.TestCase):
             text=expected_message, reply_to_message_id=mock_message.message_id
         )
 
-    @patch("config.DELETE_MESSAGES", True)
+    @patch(
+        "botaffiumeiro.config_data",
+        {
+            "DELETE_MESSAGES": True,
+            "MSG_REPLY_PROVIDED_BY_USER": "Messager provider by user",
+            "MSG_AFFILIATE_LINK_MODIFIED": "Affiliate link changed",
+        },
+    )
     async def test_send_message_is_reply_and_delete(self):
         """Test when DELETE_MESSAGES is True, and the original message is a reply to another message."""
         mock_message = AsyncMock()
@@ -278,9 +295,9 @@ class TestProcessMessage(unittest.TestCase):
         await self.handler.process_message(mock_message, new_text)
 
         expected_message = (
-            f"{MSG_REPLY_PROVIDED_BY_USER} @jane_doe:\n\n"
+            f"{config_data['MSG_REPLY_PROVIDED_BY_USER']} @jane_doe:\n\n"
             f"{new_text}\n\n"
-            f"{MSG_AFFILIATE_LINK_MODIFIED}"
+            f"{config_data['MSG_AFFILIATE_LINK_MODIFIED']}"
         )
 
         # Check that the original message was deleted
@@ -291,7 +308,14 @@ class TestProcessMessage(unittest.TestCase):
             reply_to_message_id=mock_message.reply_to_message.message_id,
         )
 
-    @patch("config.DELETE_MESSAGES", False)
+    @patch(
+        "botaffiumeiro.config_data",
+        {
+            "DELETE_MESSAGES": False,
+            "MSG_REPLY_PROVIDED_BY_USER": "Messager provider by user",
+            "MSG_AFFILIATE_LINK_MODIFIED": "Affiliate link changed",
+        },
+    )
     async def test_send_message_is_reply_without_delete(self):
         """Test when DELETE_MESSAGES is False, and the original message is a reply to another message."""
         mock_message = AsyncMock()
@@ -307,9 +331,9 @@ class TestProcessMessage(unittest.TestCase):
         await self.handler.process_message(mock_message, new_text)
 
         expected_message = (
-            f"{MSG_REPLY_PROVIDED_BY_USER} @jane_doe:\n\n"
+            f"{config_data['MSG_REPLY_PROVIDED_BY_USER']} @jane_doe:\n\n"
             f"{new_text}\n\n"
-            f"{MSG_AFFILIATE_LINK_MODIFIED}"
+            f"{config_data['MSG_AFFILIATE_LINK_MODIFIED']}"
         )
 
         # Check that the original message was not deleted
@@ -319,7 +343,14 @@ class TestProcessMessage(unittest.TestCase):
             text=expected_message, reply_to_message_id=mock_message.message_id
         )
 
-    @patch("config.DELETE_MESSAGES", True)
+    @patch(
+        "botaffiumeiro.config_data",
+        {
+            "DELETE_MESSAGES": True,
+            "MSG_REPLY_PROVIDED_BY_USER": "Messager provider by user",
+            "MSG_AFFILIATE_LINK_MODIFIED": "Affiliate link changed",
+        },
+    )
     async def test_send_message_without_username(self):
         """Test when the user has no username, use the first name instead."""
         mock_message = AsyncMock()
@@ -334,9 +365,9 @@ class TestProcessMessage(unittest.TestCase):
         await self.handler.process_message(mock_message, new_text)
 
         expected_message = (
-            f"{MSG_REPLY_PROVIDED_BY_USER} @Jane:\n\n"
+            f"{config_data['MSG_REPLY_PROVIDED_BY_USER']} @Jane:\n\n"
             f"{new_text}\n\n"
-            f"{MSG_AFFILIATE_LINK_MODIFIED}"
+            f"{config_data['MSG_AFFILIATE_LINK_MODIFIED']}"
         )
 
         # Check that the original message was deleted
@@ -363,9 +394,7 @@ class TestBuildAffiliateUrlPattern(unittest.TestCase):
             }
         }
         # Generate Admitad URL pattern
-        admitad_url_pattern = base_handler._build_affiliate_url_pattern(
-            "admitad"
-        )
+        admitad_url_pattern = base_handler._build_affiliate_url_pattern("admitad")
 
         # The expected regex should match example1.com, example2.com, and example3.com
         # The order is not known
@@ -398,9 +427,7 @@ class TestBuildAffiliateUrlPattern(unittest.TestCase):
             }
         }
 
-        admitad_url_pattern = base_handler._build_affiliate_url_pattern(
-            "admitad"
-        )
+        admitad_url_pattern = base_handler._build_affiliate_url_pattern("admitad")
         self.assertIsNone(admitad_url_pattern)
 
     def test_awin_url_pattern(self):
@@ -451,7 +478,9 @@ class TestBuildAffiliateUrlPattern(unittest.TestCase):
         """
         # Generate Admitad URL pattern with no users in the configuration
         base_handler = TestHandler()
-        base_handler.selected_users = {"amazon.es":{"amazon": {"affiliate_id": "affiliate-21"}}}
+        base_handler.selected_users = {
+            "amazon.es": {"amazon": {"affiliate_id": "affiliate-21"}}
+        }
 
         admitad_url_pattern = base_handler._build_affiliate_url_pattern(
             "admitad_advertisers"
