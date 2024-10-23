@@ -7,7 +7,7 @@ import threading
 from config import config_data
 
 from telegram import Update, User
-from telegram.ext import Application, MessageHandler, filters
+from telegram.ext import Application, MessageHandler, filters, CommandHandler
 from publicsuffix2 import get_sld
 from typing import Tuple
 from urllib.parse import urlparse, parse_qs
@@ -195,12 +195,13 @@ def choose_users(domains) -> dict:
     return selected_users
 
 
-def prepare_message(message) -> dict:
+def prepare_message(message, default_domains=None) -> dict:
     """
     Prepares the message by extracting domains, selecting users, and returning a processing context.
 
     Parameters:
     - message: The message object containing the text with links.
+    - default_domains: An optional list of domains to consider if the message is a command or lacks domains.
 
     Returns:
     - A dictionary (context) containing:
@@ -215,10 +216,21 @@ def prepare_message(message) -> dict:
             "selected_users": {},  # No users selected as there are no domains
         }
 
+    if not message or not message.text:
+        return {
+            "message": message,  # Original message (None if not provided)
+            "modified_message": None,  # No modification since there was no valid message
+            "selected_users": {}  # No users selected as there are no domains
+        }
+
     message_text = message.text
     # Extract domains and the modified message text
-    domains, modified_message = extract_domains_from_message(message_text)
-
+    if default_domains:
+        domains=default_domains
+        modified_message=message_text
+    else:
+        domains, modified_message = extract_domains_from_message(message_text)
+    
     # Select users for each domain
     selected_users = choose_users(domains)
 
@@ -226,7 +238,7 @@ def prepare_message(message) -> dict:
     context = {
         "message": message,  # Original message
         "modified_message": modified_message,  # Message with expanded URLs (if applicable)
-        "selected_users": selected_users,  # Dictionary of selected users by domain
+        "selected_users": selected_users  # Dictionary of selected users by domain
     }
 
     return context
@@ -289,6 +301,26 @@ def reload_config_periodically(interval):
     load_configuration()
     threading.Timer(interval, reload_config_periodically, [interval]).start()
 
+async def handle_discount_command(update: Update, context) -> None:
+    """
+    Maneja los comandos de descuento llamando a la función 'show_discount_codes' de AliexpressHandler.
+    """
+    logger.info(f"Processing discount command: {update.message.text}")
+
+    context = prepare_message(update.message,["aliexpress.com"])
+    await AliexpressHandler().show_discount_codes(context)
+
+    logger.info(f"Discount code shown for command: {update.message.text}")
+
+def register_discount_handlers(application):
+    """
+    Registra dinámicamente todos los comandos de descuento en el bot.
+    """
+    for keyword in config_data["DISCOUNT_KEYWORDS"]:
+        application.add_handler(
+            CommandHandler(keyword, handle_discount_command)
+        )
+
 
 def main() -> None:
     """Start the bot with python-telegram-bot"""
@@ -303,6 +335,7 @@ def main() -> None:
 
     application = Application.builder().token(config_data["BOT_TOKEN"]).build()
 
+    register_discount_handlers(application)
     application.add_handler(
         MessageHandler(filters.ALL & filters.ChatType.GROUPS, modify_link)
     )
