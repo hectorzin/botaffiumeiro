@@ -12,20 +12,26 @@ telegram:
 # -------------------------------- MESSAGES --------------------------------- #
 
 messages:
-  affiliate_link_modified: "Here is the modified link with our affiliate program:"
+  affiliate_link_modified: "Here is the modified link with our affiliate program"
   reply_provided_by_user: "Reply provided by"
 
 # ---------------------------------- AMAZON --------------------------------- #
 
 amazon:
-  affiliate_id: "botaffiumeiro_cofee-21"
+  amazon.es: botaffiumeiro_cofee-21
+  amazon.com: hectorzindomo-20
+  amazon.com.au: hectorzindomo-22
+  amazon.co.uk: hectorzindomo-21
+  amazon.fr: hectorzindo0d-21
+  amazon.it: hectorzindo04-21
+  amazon.de: hectorzindo0e-21
 
 # ----------------------------------- AWIN ---------------------------------- #
 
 awin:
   publisher_id: "1639881"
   advertisers:
-    aliexpress.com: "11640"
+#    aliexpress.com: "11640"
     pccomponentes.com: "20982"
     leroymerlin.es: "20598"
 
@@ -50,5 +56,8 @@ aliexpress:
     💰50$ off for purchases over 400$:【IFP5RIN】
 
 # ---------------------------------- GENERAL -------------------------------- #
+
+affiliate_settings:
+  creator_affiliate_percentage: 10
 
 log_level: "INFO"

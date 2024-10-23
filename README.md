@@ -149,6 +149,16 @@ By changing these variables, you can personalize how the bot interacts with user
 1. Translate the bot's messages into any language.
 2. Adjust the messaging style to fit your preferences.
 
+### Support for creators
+This parameter allows you to define what percentage of the links shared in Telegram groups will be replaced with affiliate links belonging to the software creators. However, there are a few important conditions to keep in mind:
+
+1. Available Affiliate Links: Only links that the software creators have affiliate programs for will be eligible to be replaced.
+
+2. Affiliate Priority: If the user does not have an affiliate link for a specific domain, but the creators of the software do, the creators' affiliate link will be used instead.
+
+This ensures that affiliate links are always used when available, whether from the user or the software creators, while respecting the configured percentage.
+
+
 ## Development
 
 We usually use _Visual Studio Code_ to develop the project.
