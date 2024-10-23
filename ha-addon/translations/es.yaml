@@ -41,7 +41,10 @@ configuration:
   admitad_adversiters:
     name: "Anunciantes de Admitad"
     description: "Lista de anunciantes de Admitad y sus IDs de campaña (formato: - domain: DOMINIO y id: ID)."
+  creator_affiliate_percentage:
+    name: "Porcentaje de Afiliación de Creadores"
+    description: "Soporte a los creadores 🙏. Define el porcentaje de enlaces que serán reemplazados por enlaces de afiliados pertenecientes a los creadores del software cuando el usuario no tenga un enlace para un dominio específico. ¡Gracias!"
   log_level:
-  name: "Nivel de Log"
-  description: "Configura el nivel de registro (DEBUG, INFO, WARN, ERROR, CRITICAL)."
+    name: "Nivel de Log"
+    description: "Configura el nivel de registro (DEBUG, INFO, WARN, ERROR, CRITICAL)."
 
