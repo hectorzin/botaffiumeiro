@@ -15,6 +15,7 @@ config = {
         "bot_token": data.get("bot_token", ""),
         "delete_messages": data.get("delete_messages", True),
         "excluded_users": [user.get("id") for user in data.get("excluded_users", [])],
+        "discount_keywords": [user.get("key") for user in data.get("discount_keywords", [])]
     },
     "messages": {
         "affiliate_link_modified": data.get(

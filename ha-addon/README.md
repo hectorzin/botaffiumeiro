@@ -22,6 +22,17 @@ Below is a breakdown of all the available configuration fields, including exampl
   ```
 **NOTE**: If you want to leave the list empty you must write []
 
+
+- **discount_keywords**: List of keywords that trigger the bot to display AliExpress discount codes when used in a message. You can define multiple keywords in a list format using the following structure:
+
+  ```yaml
+  - key: "discounts"
+  - key: "bonus"
+  - key: "bonuses"
+  - key: "aliexpress"
+
+**NOTE**: If you want to leave the list empty you must write []
+
 ### 2. Message settings
 
 - **msg_affiliate_link_modified**: The message that will be sent when a Telegram message has been modified with an affiliate link.

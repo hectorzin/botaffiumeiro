@@ -17,6 +17,11 @@ options:
   excluded_users:
     - id: "HectorziN"
     - id: "danimart1991"
+  discount_keywords:
+    - key: discounts
+    - key: bonus
+    - key: bonuses
+    - key: aliexpress
   msg_affiliate_link_modified: "Here is the modified link with our affiliate program:"
   msg_reply_provided_by_user: "Reply provided by"
   amazon_affiliate_id: "botaffiumeiro_cofee-21"
@@ -65,6 +70,8 @@ schema:
   delete_messages: bool?
   excluded_users:
     - id: str?
+  discount_keywords:
+    - key: str?
   msg_affiliate_link_modified: str?
   msg_reply_provided_by_user: str?
   amazon:
