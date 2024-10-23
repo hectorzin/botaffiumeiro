@@ -21,7 +21,9 @@ config = {
         "reply_provided_by_user": data.get("msg_reply_provided_by_user", "Reply provided by")
     },
     "amazon": {
-        "affiliate_id": data.get("amazon_affiliate_id", "botaffiumeiro_cofee-21")
+        "advertisers": {
+            advertiser["domain"]: advertiser["id"] for advertiser in data.get("amazon", [])
+        }
     },
     "awin": {
         "publisher_id": data.get("awin_publisher_id", ""),

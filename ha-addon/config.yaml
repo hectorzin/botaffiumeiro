@@ -20,6 +20,23 @@ options:
   msg_affiliate_link_modified: "Here is the modified link with our affiliate program:"
   msg_reply_provided_by_user: "Reply provided by"
   amazon_affiliate_id: "botaffiumeiro_cofee-21"
+  amazon:
+    - domain: amazon.es
+      id: "11640"
+    - domain: amazon.es
+      id: botaffiumeiro_cofee-21
+    - domain: amazon.com
+      id: hectorzindomo-20
+    - domain: amazon.com.au
+      id: hectorzindomo-22
+    - domain: amazon.co.uk
+      hectorzindomo-21
+    - domain: amazon.fr
+      id: hectorzindo0d-21
+    - domain: amazon.it
+      id: hectorzindo04-21
+    - domain: amazon.de
+      id: hectorzindo0e-21
   aliexpress_app_key: ""
   aliexpress_app_secret: ""
   aliexpress_tracking_id: ""
@@ -49,7 +66,9 @@ schema:
     - id: str?
   msg_affiliate_link_modified: str?
   msg_reply_provided_by_user: str?
-  amazon_affiliate_id: str?
+  amazon:
+    - domain: str?
+      id: str?
   aliexpress_app_key: str?
   aliexpress_app_secret: str?
   aliexpress_tracking_id: str?
