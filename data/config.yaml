@@ -8,6 +8,11 @@ telegram:
   excluded_users:
     - "HectorziN"
     - "danimart1991"
+  discount_keywords:
+    - discounts
+    - bonus
+    - bonuses
+    - aliexpress
 
 # -------------------------------- MESSAGES --------------------------------- #
 
@@ -31,7 +36,7 @@ amazon:
 awin:
   publisher_id: "1639881"
   advertisers:
-#    aliexpress.com: "11640"
+    aliexpress.com: "11640"
     pccomponentes.com: "20982"
     leroymerlin.es: "20598"
 

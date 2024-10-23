@@ -10,7 +10,7 @@ from config import (
 )
 
 from telegram import Update, User
-from telegram.ext import Application, MessageHandler, filters
+from telegram.ext import Application, MessageHandler, CommandHandler, filters
 from publicsuffix2 import get_sld
 from typing import Tuple
 from urllib.parse import  urlparse, parse_qs
@@ -23,6 +23,7 @@ from handlers.awin_handler import AwinHandler,AWIN_PATTERN
 from config import (
     domain_percentage_table,
     all_users_configurations,    
+    DISCOUNT_KEYWORDS
 )
 
 SHORT_URL_DOMAINS = ["amzn.to", "s.click.aliexpress.com", "bit.ly", "tinyurl.com"]
@@ -195,12 +196,13 @@ def choose_users(domains) -> dict:
     
     return selected_users
 
-def prepare_message(message) -> dict:
+def prepare_message(message, default_domains=None) -> dict:
     """
     Prepares the message by extracting domains, selecting users, and returning a processing context.
 
     Parameters:
     - message: The message object containing the text with links.
+    - default_domains: An optional list of domains to consider if the message is a command or lacks domains.
 
     Returns:
     - A dictionary (context) containing:
@@ -217,7 +219,11 @@ def prepare_message(message) -> dict:
 
     message_text = message.text
     # Extract domains and the modified message text
-    domains, modified_message = extract_domains_from_message(message_text)
+    if default_domains:
+        domains=default_domains
+        modified_message=message_text
+    else:
+        domains, modified_message = extract_domains_from_message(message_text)
     
     # Select users for each domain
     selected_users = choose_users(domains)
@@ -280,12 +286,34 @@ async def modify_link(update: Update, context) -> None:
 
     logger.info(f"{update.update_id}: Update processed.")
 
+async def handle_discount_command(update: Update, context) -> None:
+    """
+    Maneja los comandos de descuento llamando a la función 'show_discount_codes' de AliexpressHandler.
+    """
+    logger.info(f"Processing discount command: {update.message.text}")
+
+    context = prepare_message(update.message,["aliexpress.com"])
+    await AliexpressHandler().show_discount_codes(context)
+
+    logger.info(f"Discount code shown for command: {update.message.text}")
+
+def register_discount_handlers(application):
+    """
+    Registra dinámicamente todos los comandos de descuento en el bot.
+    """
+    for keyword in DISCOUNT_KEYWORDS:
+        application.add_handler(
+            CommandHandler(keyword, handle_discount_command)
+        )
+
 
 def main() -> None:
     """Start the bot with python-telegram-bot"""
 
     logger.info("Configuring the bot")
     application = Application.builder().token(BOT_TOKEN).build()
+
+    register_discount_handlers(application)
 
     application.add_handler(
         MessageHandler(filters.ALL & filters.ChatType.GROUPS, modify_link)
