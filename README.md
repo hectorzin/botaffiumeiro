@@ -13,6 +13,7 @@ botaffiumeiro is a Telegram bot that detects Amazon, Aliexpress and other links 
   - If no affiliate ID is present, the bot automatically adds your personalized affiliate ID.
 - **User exclusion**: You can specify certain users to be excluded from link modifications, allowing them to share links without alteration.
 - **AliExpress discount codes**: When AliExpress links are detected, the bot automatically adds current discount codes to the message.
+- **AliExpress discount commands**: Users can request AliExpress discount codes using configurable commands, such as `/discounts`, `/bonus`, etc.
 - **Aliowing to delete message or not**: When AliExpress links are detected, the bot automatically adds current discount codes to the message.
 
 ### Supported platforms:
@@ -133,6 +134,17 @@ aliexpress:
     💰25$ off for purchases over 200$:【IFPQDMH】
     💰50$ off for purchases over 400$:【IFP5RIN】
 ```
+
+### Discount Commands Configuration
+
+You can define custom commands that users can use to request AliExpress discount codes in your `config.yaml` file. The following example shows how to configure discount keywords:
+
+```yaml
+discount_keywords:
+  - discounts
+  - bonus
+  - bonuses
+  - aliexpress
 
 ### Customizing and/or translating the Bot
 
