@@ -1,45 +1,69 @@
 import re
-import httpx
-from data.config import ALIEXPRESS_DISCOUNT_CODES, MSG_ALIEXPRESS_DISCOUNT, AWIN_ADVERTISERS, ADMITAD_ADVERTISERS
 
-# Pattern to detect long AliExpress links
-ALIEXPRESS_URL_PATTERN = r"(https?://(?:[a-z]{2,3}\.)?aliexpress\.[a-z]{2,3}(?:\.[a-z]{2})?/(?:[\w\d\-\./?=&%]+))"
+from handlers.base_handler import BaseHandler, PATTERN_URL_QUERY
 
-# Pattern to detect short AliExpress links
-ALIEXPRESS_SHORT_URL_PATTERN = r"https?://s\.click\.aliexpress\.com/e/[\w\d_]+"
+ALIEXPRESS_PATTERN = (
+    r"(https?://(?:[a-z]{2,3}\.)?aliexpress\.[a-z]{2,3}(?:\.[a-z]{2,3})?"
+    + PATTERN_URL_QUERY
+    + ")"
+)
 
-async def expand_aliexpress_short_link(short_url):
-    """Expands a short AliExpress link into its full URL by following redirects."""
-    try:
-        async with httpx.AsyncClient(follow_redirects=True) as client:
-            response = await client.get(short_url)
-            return str(response.url) if response.status_code == 200 else short_url
-    except Exception as e:
-        print(f"Error expanding short URL {short_url}: {e}")
-        return short_url
 
-async def handle_aliexpress_links(message) -> bool:
-    """Handles both long and short AliExpress links in the message."""
-    # Detect both long and short AliExpress links
-    aliexpress_links = re.findall(ALIEXPRESS_URL_PATTERN, message.text)
-    aliexpress_short_links = re.findall(ALIEXPRESS_SHORT_URL_PATTERN, message.text)
+class AliexpressHandler(BaseHandler):
+    def __init__(self):
+        super().__init__()
 
-    # Combine both short and long links into a single list
-    all_aliexpress_links = aliexpress_links + aliexpress_short_links
+    async def show_discount_codes(self, context) -> None:
+        """Displays the AliExpress discount codes for the user."""
+        # Retrieve AliExpress-specific data
+        message, modified_text, self.selected_users = self._unpack_context(context)
+        aliexpress_data = self.selected_users.get("aliexpress.com", {})
 
-    # If there are any AliExpress links in the message
-    if all_aliexpress_links:
-        # Check if aliexpress.com is in AWIN_ADVERTISERS or ADMITAD_ADVERTISERS
-        if "aliexpress.com" in AWIN_ADVERTISERS or "aliexpress.com" in ADMITAD_ADVERTISERS:
-            # If it's in either list, do nothing because the other handlers will process it
-            return False
+        # Check if there are any discount codes available for AliExpress
+        aliexpress_discount_codes = aliexpress_data.get("aliexpress", {}).get("discount_codes", None)
 
-        # If not in any advertiser list, send the discount codes
+        if not aliexpress_discount_codes:
+            self.logger.info(f"{message.message_id}: Discount codes are empty. Skipping reply.")
+            return
+
+        # Send the discount codes as a response to the original message
         await message.chat.send_message(
-            f"{MSG_ALIEXPRESS_DISCOUNT}{ALIEXPRESS_DISCOUNT_CODES}",
-            reply_to_message_id=message.message_id
+            f"{aliexpress_discount_codes}",
+            reply_to_message_id=message.message_id,
         )
-        return True
+        self.logger.info(f"{message.message_id}: Sent AliExpress discount codes.")
+        user = aliexpress_data.get("user", {})
+        self.logger.info(f"User chosen: {user}")
 
-    # Return False if no AliExpress links were found
-    return False
+    async def handle_links(self, context) -> bool:
+        """Handles both long and short AliExpress links in the message."""
+        message, modified_text, self.selected_users = self._unpack_context(context)
+        # Extraemos self.selected_users.get("aliexpress.com", {}) a una variable
+        aliexpress_data = self.selected_users.get("aliexpress.com", {})
+
+        aliexpress_links = re.findall(ALIEXPRESS_PATTERN, modified_text)
+
+        if aliexpress_links:
+            self.logger.info(
+                f"{message.message_id}: Found {len(aliexpress_links)} AliExpress links. Processing..."
+            )
+            if (
+                "aliexpress.com" in aliexpress_data.get("awin", {}).get("advertisers", {})
+                or "aliexpress.com" in aliexpress_data.get("admitad", {}).get("advertisers", {})
+                or aliexpress_data.get("aliexpress", {}).get("app_key", "")
+            ):
+                self.logger.info(
+                    f"{message.message_id}: AliExpress links found in advertisers. Skipping processing."
+                )
+                return False
+
+            self.logger.debug(
+                f"{message.message_id}: No advertiser found for AliExpress. Sending discount codes."
+            )
+            await self.show_discount_codes(context)
+            return True
+
+        self.logger.info(
+            f"{message.message_id}: No AliExpress links found in the message."
+        )
+        return False

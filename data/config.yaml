@@ -1,0 +1,68 @@
+# ------------------------------ CONFIGURATION ------------------------------ #
+
+# Telegram settings
+telegram:
+  bot_token: "7516463545:AAFBslKeRduxy7zYxT8ND549YAio8hoL3-0" #TEST bot @botaffiumeiro
+#  bot_token: "7551954742:AAHENDKWDOxBlL-h5enc3WymtMB9x_rAlrk" #Bueno, bot @botaffumeiro
+
+  delete_messages: True
+  excluded_users:
+    - "HectorziNo"
+    - "danimart1991"
+  discount_keywords:
+    - discounts
+    - bonus
+    - bonuses
+    - aliexpress
+
+# -------------------------------- MESSAGES --------------------------------- #
+
+messages:
+  affiliate_link_modified: "Here is the modified link with our affiliate program:"
+  reply_provided_by_user: "Reply provided by"
+
+# ---------------------------------- AMAZON --------------------------------- #
+
+amazon:
+  amazon.es: botaffiumeiro_cofee-21
+  amazon.com: hectorzindomo-20
+  amazon.com.au: hectorzindomo-22
+  amazon.co.uk: hectorzindomo-21
+  amazon.fr: hectorzindo0d-21
+  amazon.it: hectorzindo04-21
+  amazon.de: hectorzindo0e-21
+
+# ----------------------------------- AWIN ---------------------------------- #
+
+awin:
+  publisher_id: "1639881"
+  advertisers:
+#    aliexpress.com: "11640"
+    pccomponentes.com: "20982"
+    leroymerlin.es: "20598"
+
+# --------------------------------- ADMITAD --------------------------------- #
+
+admitad:
+  publisher_id: "2306205"
+  advertisers:
+    giftmio.com: "93fd4vbk6c873a1e3014d68450d763"
+
+# -------------------------------- ALIEXPRESS ------------------------------- #
+
+aliexpress:
+  app_key: "510424"  # Replace with your AliExpress API key
+  app_secret: "6yS506vaEvjp6Wr3IJhPOVrK8jdODqeq"  # Replace with your AliExpress API secret
+  tracking_id: "BotAffumeiro"  # Replace with your AliExpress tracking ID
+  discount_codes: |
+    💥 AliExpress discount codes:  
+    💰2$ off for purchases over 20$:【IFPTKOH】
+    💰5$ off for purchases over 50$:【IFPT35D】
+    💰25$ off for purchases over 200$:【IFPQDMH】
+    💰50$ off for purchases over 400$:【IFP5RIN】
+
+# ---------------------------------- GENERAL -------------------------------- #
+affiliate_settings:
+  creator_affiliate_percentage: 10
+
+log_level: "INFO"
