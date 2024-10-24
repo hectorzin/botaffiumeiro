@@ -81,7 +81,8 @@ def extract_embedded_url(query_params):
             # Check if the value contains a valid URL
             parsed_url = urlparse(value)
             if parsed_url.scheme in ["http", "https"]:  # Check if it's a valid URL
-                embedded_domains.add(parsed_url.netloc)
+                domain=get_sld(parsed_url.netloc)
+                embedded_domains.add(domain)
     return embedded_domains
 
 
