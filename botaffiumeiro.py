@@ -1,23 +1,26 @@
 import logging
-import requests
 import random
 import re
+import requests
 import threading
 
-from config import config_data
-
-from telegram import Update, User
-from telegram.ext import Application, MessageHandler, filters, CommandHandler
 from publicsuffix2 import get_sld
+from telegram import Update, User
+from telegram.ext import Application, CommandHandler, Defaults, filters, MessageHandler
 from typing import Tuple
-from urllib.parse import urlparse, parse_qs
+from urllib.parse import parse_qs, urlparse
 
 from handlers.admitad_handler import AdmitadHandler, ADMITAD_PATTERN
 from handlers.aliexpress_api_handler import AliexpressAPIHandler
 from handlers.aliexpress_handler import AliexpressHandler, ALIEXPRESS_PATTERN
 from handlers.amazon_handler import AmazonHandler, AMAZON_PATTERN
 from handlers.awin_handler import AwinHandler, AWIN_PATTERN
-from config import domain_percentage_table, all_users_configurations, load_configuration
+from config import (
+    config_data,
+    domain_percentage_table,
+    all_users_configurations,
+    load_configuration,
+)
 
 SHORT_URL_DOMAINS = ["amzn.to", "s.click.aliexpress.com", "bit.ly", "tinyurl.com"]
 DOMAIN_PATTERNS = {
@@ -81,7 +84,7 @@ def extract_embedded_url(query_params):
             # Check if the value contains a valid URL
             parsed_url = urlparse(value)
             if parsed_url.scheme in ["http", "https"]:  # Check if it's a valid URL
-                domain=get_sld(parsed_url.netloc)
+                domain = get_sld(parsed_url.netloc)
                 embedded_domains.add(domain)
     return embedded_domains
 
@@ -217,21 +220,14 @@ def prepare_message(message, default_domains=None) -> dict:
             "selected_users": {},  # No users selected as there are no domains
         }
 
-    if not message or not message.text:
-        return {
-            "message": message,  # Original message (None if not provided)
-            "modified_message": None,  # No modification since there was no valid message
-            "selected_users": {}  # No users selected as there are no domains
-        }
-
     message_text = message.text
     # Extract domains and the modified message text
     if default_domains:
-        domains=default_domains
-        modified_message=message_text
+        domains = default_domains
+        modified_message = message_text
     else:
         domains, modified_message = extract_domains_from_message(message_text)
-    
+
     # Select users for each domain
     selected_users = choose_users(domains)
 
@@ -239,7 +235,7 @@ def prepare_message(message, default_domains=None) -> dict:
     context = {
         "message": message,  # Original message
         "modified_message": modified_message,  # Message with expanded URLs (if applicable)
-        "selected_users": selected_users  # Dictionary of selected users by domain
+        "selected_users": selected_users,  # Dictionary of selected users by domain
     }
 
     return context
@@ -302,25 +298,25 @@ def reload_config_periodically(interval):
     load_configuration()
     threading.Timer(interval, reload_config_periodically, [interval]).start()
 
+
 async def handle_discount_command(update: Update, context) -> None:
     """
     Maneja los comandos de descuento llamando a la función 'show_discount_codes' de AliexpressHandler.
     """
     logger.info(f"Processing discount command: {update.message.text}")
 
-    context = prepare_message(update.message,["aliexpress.com"])
+    context = prepare_message(update.message, ["aliexpress.com"])
     await AliexpressHandler().show_discount_codes(context)
 
     logger.info(f"Discount code shown for command: {update.message.text}")
+
 
 def register_discount_handlers(application):
     """
     Registra dinámicamente todos los comandos de descuento en el bot.
     """
     for keyword in config_data["DISCOUNT_KEYWORDS"]:
-        application.add_handler(
-            CommandHandler(keyword, handle_discount_command)
-        )
+        application.add_handler(CommandHandler(keyword, handle_discount_command))
 
 
 def main() -> None:
@@ -334,7 +330,10 @@ def main() -> None:
     )
     reload_thread.start()
 
-    application = Application.builder().token(config_data["BOT_TOKEN"]).build()
+    defaults = Defaults(parse_mode="HTML")
+    application = (
+        Application.builder().token(config_data["BOT_TOKEN"]).defaults(defaults).build()
+    )
 
     register_discount_handlers(application)
     application.add_handler(
