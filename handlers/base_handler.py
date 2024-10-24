@@ -7,6 +7,7 @@ from telegram import Message
 from urllib.parse import urlparse, parse_qs, urlencode
 from typing import Tuple
 from telegram import Message
+from publicsuffix2 import get_sld
 
 from config import config_data
 
@@ -232,6 +233,47 @@ class BaseHandler(ABC):
         return url_pattern_template.format(
             domain_pattern,
         )
+    
+    def _extract_store_urls(self, message_text: str, url_pattern: str) -> list:
+        """
+        Extracts store URLs directly from the message text or from URLs embedded in query parameters.
+
+        Parameters:
+        - message_text: The text of the message.
+        - url_pattern: The regex pattern to match store URLs.
+
+        Returns:
+        - A list of tuples (original_url, extracted_url, domain) matching the store pattern.
+        """
+        extracted_urls = []
+
+        def _extract_and_append(original, extracted):
+                """Helper function to parse and append URL and domain."""
+                parsed_url = urlparse(extracted)
+                domain = get_sld(parsed_url.netloc)  # Use get_sld to extract domain (handles cases like .co.uk)
+                extracted_urls.append((original, extracted, domain))    
+
+        # Find all URLs in the message text
+        urls_in_message = re.findall(r"https?://[^\s]+", message_text)
+
+        # Process each URL found in the message
+        for url in urls_in_message:
+            # If the URL matches the store pattern directly, add it to the list
+            if re.match(url_pattern, url):
+                _extract_and_append(url, url)
+            else:
+                # Parse the URL to extract query parameters
+                parsed_url = urlparse(url)
+                query_params = parse_qs(parsed_url.query)
+
+                # Check if any of the query parameters contains a URL matching the store pattern
+                for key, values in query_params.items():
+                    for value in values:
+                        if re.match(url_pattern, value):
+                            _extract_and_append(url, value)
+
+        return extracted_urls
+    
 
     async def _process_store_affiliate_links(
         self,
@@ -249,81 +291,17 @@ class BaseHandler(ABC):
             self.logger.info(f"{message.message_id}: No affiliate list")
             return False
 
-        new_text = text
+        store_links = self._extract_store_urls(text, url_pattern)
+
         requires_publisher = "{affiliate_id}" in format_template
         requires_advertiser = "{advertiser_id}" in format_template
-
-        # Find regular store links and affiliate links
-        store_links = re.findall(url_pattern, new_text)
-        affiliate_links = re.findall(affiliate_pattern, new_text)
-
-        if affiliate_links:
-            self.logger.info(
-                f"{message.message_id}: Found {len(affiliate_links)} affiliate links. Processing..."
-            )
-            for link in affiliate_links:
-                if len(store_links) == 0:
-                    return False
-                # look for the store in our list
-                for store_link, store_domain in store_links:
-                    if store_link in link:
-                        selected_affiliate_data = self.selected_users.get(
-                            store_domain, {}
-                        ).get(affiliate_platform, {})
-                        publisher_id = selected_affiliate_data.get("publisher_id", None)
-                        advertiser_id = selected_affiliate_data.get(
-                            "advertisers", {}
-                        ).get(store_domain, None)
-                        if (requires_publisher and not publisher_id) or (
-                            requires_advertiser and not advertiser_id
-                        ):
-                            self.logger.info(
-                                f"{message.message_id}: No publisher or adversiter ID defined for this handler. Skipping processing."
-                            )
-                            continue
-                        user = self.selected_users.get(store_domain, {}).get("user", {})
-                        self.logger.info(f"User choosen: {user}")
-
-                if advertiser_id:
-                    # Parse the affiliate link to extract URL parameters
-                    parsed_link = urlparse(link)
-                    query_params = parse_qs(parsed_link.query)
-
-                    # Loop through all query parameters to find the one containing the URL (like ulp)
-                    url_param_key = None
-                    original_url = None
-                    for key, value in query_params.items():
-                        # Assuming that a URL parameter will have 'http' in its value (to detect full URLs)
-                        if value and "http" in value[0]:
-                            url_param_key = key  # This is the tag (e.g., 'ulp')
-                            original_url = value[0]  # The full URL
-
-                    if url_param_key and original_url:
-                        # Update the format_template dynamically with the tag and extracted URL
-                        updated_format_template = format_template.replace(
-                            "{full_url}", original_url
-                        )
-                        updated_format_template = updated_format_template.replace(
-                            "{tag}", url_param_key
-                        )
-                    else:
-                        updated_format_template = format_template
-
-                    # Generate the modified affiliate URL
-                    modified_link = self._generate_affiliate_url(
-                        link,
-                        format_template=updated_format_template,
-                        affiliate_tag=affiliate_tag,
-                        affiliate_id=publisher_id,
-                        advertiser_id=advertiser_id,
-                    )
-                    new_text = new_text.replace(link, modified_link)
-
-        elif store_links:
+        new_text = text
+        if store_links:
             self.logger.info(
                 f"{message.message_id}: Found {len(store_links)} store links. Processing..."
             )
-            for link, store_domain in store_links:
+
+            for original_url, link, store_domain in store_links:
                 selected_affiliate_data = self.selected_users.get(store_domain, {}).get(
                     affiliate_platform, {}
                 )
@@ -338,6 +316,8 @@ class BaseHandler(ABC):
                         f"{message.message_id}: No publisher or adversiter ID defined for this handler. Skipping processing."
                     )
                     continue
+                user = self.selected_users.get(store_domain, {}).get("user", {})
+                self.logger.info(f"User choosen: {user}")
 
                 affiliate_link = self._generate_affiliate_url(
                     link,
@@ -346,9 +326,7 @@ class BaseHandler(ABC):
                     affiliate_id=publisher_id,
                     advertiser_id=advertiser_id,
                 )
-                new_text = new_text.replace(link, affiliate_link)
-                user = self.selected_users.get(store_domain, {}).get("user", {})
-                self.logger.info(f"User choosen: {user}")
+                new_text = new_text.replace(original_url, affiliate_link)
 
                 aliexpress_discount_codes = (
                     self.selected_users.get(store_domain, {})
