@@ -136,6 +136,13 @@ def add_user_to_domain_percentage_table(user_id, user_data, percentage):
     """
     logger.debug(f"Adding {user_id} with percentage {percentage}")
 
+    if user_data.get("aliexpress", {}).get("discount_codes", None):
+        add_to_domain_table(
+            "aliexpress.com",
+            user_id,
+            "Discount",
+            percentage,
+        )
     add_to_domain_table(
         "aliexpress.com",
         user_id,
