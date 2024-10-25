@@ -277,15 +277,16 @@ class BaseHandler(ABC):
 
     async def _process_store_affiliate_links(
         self,
-        message,
-        text,
-        url_pattern: str,
+        context,
         affiliate_platform: str,
-        affiliate_pattern: str,
         format_template: str,
         affiliate_tag: str,
     ) -> bool:
         """Generic method to handle affiliate links for different platforms."""
+
+        message, text, self.selected_users = self._unpack_context(context)
+        url_pattern = self._build_affiliate_url_pattern(affiliate_platform)
+
 
         if not url_pattern:
             self.logger.info(f"{message.message_id}: No affiliate list")
