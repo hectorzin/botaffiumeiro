@@ -5,10 +5,18 @@ FROM python:3.12-alpine
 RUN apk update && apk add --no-cache \
     git \
     jq \
-    bash
+    bash \
+	curl
 
-# Clone the Botaffiumeiro repository
-RUN git clone https://github.com/hectorzin/botaffiumeiro.git /botaffiumeiro
+ENV REPO_OWNER="hectorzin"
+ENV REPO_NAME="botaffiumeiro"
+
+# Fetch the latest release tag from GitHub API and download the release archive
+RUN latest_release=$(curl -s https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/releases/latest | jq -r .tag_name) && \
+    curl -L -o botaffiumeiro.tar.gz "https://github.com/$REPO_OWNER/$REPO_NAME/archive/${latest_release}.tar.gz" && \
+    tar -xzvf botaffiumeiro.tar.gz && \
+    mv "botaffiumeiro-${latest_release}" /botaffiumeiro && \
+    rm botaffiumeiro.tar.gz
 
 # Install project dependencies
 WORKDIR /botaffiumeiro
