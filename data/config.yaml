@@ -8,17 +8,17 @@ telegram:
   excluded_users:
     - "HectorziN"
     - "danimart1991"
+  discount_keywords:
+    - discounts
+    - bonus
+    - bonuses
+    - aliexpress
 
 # -------------------------------- MESSAGES --------------------------------- #
 
 messages:
   affiliate_link_modified: "<i>Here is the modified link with our affiliate program</i>"
   reply_provided_by_user: "Reply provided by"
-  discount_keywords:
-    - discounts
-    - bonus
-    - bonuses
-    - aliexpress
 
 # ---------------------------------- AMAZON --------------------------------- #
 
