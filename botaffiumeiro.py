@@ -248,11 +248,13 @@ async def process_link_handlers(message) -> None:
 
     context = prepare_message(message)
 
-    await AmazonHandler().handle_links(context)
-    await AwinHandler().handle_links(context)
-    await AdmitadHandler().handle_links(context)
-    await AliexpressAPIHandler().handle_links(context)
-    await AliexpressHandler().handle_links(context)
+    processed = await AmazonHandler().handle_links(context)
+    processed |= await AwinHandler().handle_links(context)
+    processed |= await AdmitadHandler().handle_links(context)
+    processed |= await AliexpressAPIHandler().handle_links(context)
+
+    if not processed:
+        await AliexpressHandler().handle_links(context)
 
     logger.info(
         f"Finished processing link handlers for message ID: {message.message_id}."
