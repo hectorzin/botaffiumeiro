@@ -13,7 +13,7 @@ amazon:
   amazon.de: hectorzindo0e-21
 
 ## New features
-- allow use of HTML in predefined messages: We can now use bold <b> italic,<i> etc styles in the predefined messages as shown in the following image:
+- allow use of HTML in predefined messages: We can now use bold, italic, etc styles in the predefined messages as shown in the following image:
 ![image](https://github.com/user-attachments/assets/39fb1059-5e34-4c1e-b988-1ba6aebb51f8)
 - You can use custom commands so that your Telegram group users can request AliExpress discount codes: /discount /aliexpress, etc.
 - Improved Logging levels
