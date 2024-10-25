@@ -101,9 +101,10 @@ def add_to_domain_table(domain, user_id, affiliate_id, percentage):
         if domain not in domain_percentage_table:
             domain_percentage_table[domain] = []
 
-        domain_percentage_table[domain].append(
-            {"user": user_id, "percentage": percentage}
-        )
+        if not any(entry["user"] == user_id for entry in domain_percentage_table[domain]):
+            domain_percentage_table[domain].append(
+                {"user": user_id, "percentage": percentage}
+            )
 
 
 def add_affiliate_stores_domains(user_id, advertisers, platform_key, percentage):
