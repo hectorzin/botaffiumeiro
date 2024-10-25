@@ -24,10 +24,7 @@ options:
     - key: aliexpress
   msg_affiliate_link_modified: "Here is the modified link with our affiliate program:"
   msg_reply_provided_by_user: "Reply provided by"
-  amazon_affiliate_id: "botaffiumeiro_cofee-21"
   amazon:
-    - domain: amazon.es
-      id: "11640"
     - domain: amazon.es
       id: botaffiumeiro_cofee-21
     - domain: amazon.com
@@ -35,7 +32,7 @@ options:
     - domain: amazon.com.au
       id: hectorzindomo-22
     - domain: amazon.co.uk
-      hectorzindomo-21
+      id: hectorzindomo-21
     - domain: amazon.fr
       id: hectorzindo0d-21
     - domain: amazon.it
