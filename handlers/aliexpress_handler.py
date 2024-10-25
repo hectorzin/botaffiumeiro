@@ -47,19 +47,6 @@ class AliexpressHandler(BaseHandler):
             self.logger.info(
                 f"{message.message_id}: Found {len(aliexpress_links)} AliExpress links. Processing..."
             )
-            if (
-                "aliexpress.com" in aliexpress_data.get("awin", {}).get("advertisers", {})
-                or "aliexpress.com" in aliexpress_data.get("admitad", {}).get("advertisers", {})
-                or aliexpress_data.get("aliexpress", {}).get("app_key", "")
-            ):
-                self.logger.info(
-                    f"{message.message_id}: AliExpress links found in advertisers. Skipping processing."
-                )
-                return False
-
-            self.logger.debug(
-                f"{message.message_id}: No advertiser found for AliExpress. Sending discount codes."
-            )
             await self.show_discount_codes(context)
             return True
 
