@@ -27,10 +27,8 @@ config = {
         ),
     },
     "amazon": {
-        "advertisers": {
             advertiser["domain"]: advertiser["id"]
             for advertiser in data.get("amazon", [])
-        }
     },
     "awin": {
         "publisher_id": data.get("awin_publisher_id", ""),
