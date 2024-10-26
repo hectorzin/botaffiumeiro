@@ -18,7 +18,7 @@ telegram:
 
 messages:
   affiliate_link_modified: "<i>Here is the modified link with our affiliate program</i>"
-  reply_provided_by_user: "Reply provided by"
+  reply_provided_by_user: "<b>Reply provided by</b>"
 
 # ---------------------------------- AMAZON --------------------------------- #
 
@@ -54,11 +54,11 @@ aliexpress:
   app_secret: "" # Replace with your AliExpress API secret
   tracking_id: "" # Replace with your AliExpress tracking ID
   discount_codes: |
-    💥 AliExpress discount codes:  
-    💰2$ off for purchases over 20$:【IFPTKOH】
-    💰5$ off for purchases over 50$:【IFPT35D】
-    💰25$ off for purchases over 200$:【IFPQDMH】
-    💰50$ off for purchases over 400$:【IFP5RIN】
+    💥 <i>AliExpress discount codes:</i> 
+    💰<b>2$</b> off for purchases over 20$: <b>IFPTKOH</b>
+    💰<b>5$</b> off for purchases over 50$: <b>IFPT35D</b>
+    💰<b>25$</b> off for purchases over 200$: <b>IFPQDMH</b>
+    💰<b>50$</b> off for purchases over 400$: <b>IFP5RIN</b>
 
 # ---------------------------------- GENERAL -------------------------------- #
 
