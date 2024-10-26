@@ -1,3 +1,11 @@
+# 2.0.2
+Bug/Amazon configuration error while sending from HA Addon to Botaffiumeiro
+
+# 2.0.1
+Bug/domain_added_two_times
+
+# 2.0.0
+
 ## WARNING: BREAKING CHANGES
 The way to configure Amazon links has changed.
 This is because it has been unified with affiliate stores and now allows handling Amazon from different countries.
