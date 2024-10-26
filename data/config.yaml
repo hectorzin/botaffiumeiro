@@ -55,10 +55,10 @@ aliexpress:
   tracking_id: "" # Replace with your AliExpress tracking ID
   discount_codes: |
     💥 <i>AliExpress discount codes:</i> 
-    💰<b>2$</b> off for purchases over 20$:【<b>IFPTKOH</b>】
-    💰<b>5$</b> off for purchases over 50$:【<b>IFPT35D</b>】
-    💰<b>25$</b> off for purchases over 200$:【<b>IFPQDMH</b>】
-    💰<b>50$</b> off for purchases over 400$:【<b>IFP5RIN</b>】
+    💰<b>2$</b> off for purchases over 20$: <b>IFPTKOH</b>
+    💰<b>5$</b> off for purchases over 50$: <b>IFPT35D</b>
+    💰<b>25$</b> off for purchases over 200$: <b>IFPQDMH</b>
+    💰<b>50$</b> off for purchases over 400$: <b>IFP5RIN</b>
 
 # ---------------------------------- GENERAL -------------------------------- #
 
