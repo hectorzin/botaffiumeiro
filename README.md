@@ -113,7 +113,7 @@ If your bot will operate in a group, follow these steps to add it:
 
 You can exclude certain users from having their Amazon links modified by the bot. You can do this by defining a list of usernames or Telegram user IDs.
 
-```
+```yaml
 telegram:
   excluded_users:
     - "username1"
@@ -125,7 +125,7 @@ telegram:
 
 When the bot detects an AliExpress link, it will automatically reply to the message with the pre-configured discount codes. You can modify these discount codes as needed.
 
-```
+```yaml
 aliexpress:
   discount_codes: |
     💥 AliExpress discount codes:
@@ -145,12 +145,13 @@ discount_keywords:
   - bonus
   - bonuses
   - aliexpress
+```
 
 ### Customizing and/or translating the Bot
 
 You can also customize the bot's response messages and translate them into different languages. To do this, you can modify the message strings in the code. For example:
 
-```
+```yaml
 messages:
   affiliate_link_modified: "Here is the modified link with our affiliate program:"
   reply_provided_by_user: "Reply provided by"
@@ -162,6 +163,7 @@ By changing these variables, you can personalize how the bot interacts with user
 2. Adjust the messaging style to fit your preferences.
 
 ### Support for creators
+
 This parameter allows you to define what percentage of the links shared in Telegram groups will be replaced with affiliate links belonging to the software creators. However, there are a few important conditions to keep in mind:
 
 1. Available Affiliate Links: Only links that the software creators have affiliate programs for will be eligible to be replaced.
@@ -169,7 +171,6 @@ This parameter allows you to define what percentage of the links shared in Teleg
 2. Affiliate Priority: If the user does not have an affiliate link for a specific domain, but the creators of the software do, the creators' affiliate link will be used instead.
 
 This ensures that affiliate links are always used when available, whether from the user or the software creators, while respecting the configured percentage.
-
 
 ## Development
 
@@ -188,4 +189,5 @@ We usually use _Visual Studio Code_ to develop the project.
 For testing you could directly run test with _Visual Studio Code Testing_ tab. Or installing _pytest_ with `pip install pytest` and then run the test with `python -m pytest tests/`.
 
 ## Spanish tutorial
+
 [![Watch the video](https://i9.ytimg.com/vi_webp/qr_WBQIQmUQ/mqdefault_custom_1.webp?v=671df9f3&sqp=CODD-LgG&rs=AOn4CLAKNu5P4DebLZWlwj0N7NGY38LIdQ)](https://youtu.be/qr_WBQIQmUQ)
