@@ -190,4 +190,4 @@ For testing you could directly run test with _Visual Studio Code Testing_ tab. O
 
 ## Spanish tutorial
 
-[![Watch the video](https://i9.ytimg.com/vi_webp/qr_WBQIQmUQ/mqdefault_custom_1.webp?v=671df9f3&sqp=CODD-LgG&rs=AOn4CLAKNu5P4DebLZWlwj0N7NGY38LIdQ)](https://youtu.be/qr_WBQIQmUQ)
+[![Watch the video](/docs/assets/spanish_video_thumbnail.png)](https://youtu.be/qr_WBQIQmUQ)

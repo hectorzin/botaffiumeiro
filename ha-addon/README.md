@@ -102,3 +102,7 @@ Below is a breakdown of all the available configuration fields, including exampl
 ## More information
 
 For more information look at the Botafumeiro repository https://github.com/hectorzin/botaffiumeiro
+
+## Spanish tutorial
+
+[![Watch the video](/docs/assets/spanish_video_thumbnail.png)](https://youtu.be/qr_WBQIQmUQ)
