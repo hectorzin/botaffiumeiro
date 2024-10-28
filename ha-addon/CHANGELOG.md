@@ -1,3 +1,9 @@
+# 2.0.3
+* bug: long Aliexpress links fails when asking API for an affiliate link by @hectorzin in https://github.com/hectorzin/botaffiumeiro/pull/53
+* feat: Show examples of HTML code in config.yaml by @hectorzin in https://github.com/hectorzin/botaffiumeiro/pull/48
+* doc: Add video tutorial to documentation by @hectorzin in https://github.com/hectorzin/botaffiumeiro/pull/50
+
+**Full Changelog**: https://github.com/hectorzin/botaffiumeiro/compare/2.0.1...2.0.2
 # 2.0.2
 Bug/Amazon configuration error while sending from HA Addon to Botaffiumeiro
 
