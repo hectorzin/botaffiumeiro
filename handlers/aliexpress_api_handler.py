@@ -4,6 +4,7 @@ import re
 import requests
 import time
 
+from urllib.parse import urlparse, urlunparse
 from handlers.base_handler import BaseHandler
 from handlers.aliexpress_handler import ALIEXPRESS_PATTERN
 
@@ -35,6 +36,8 @@ class AliexpressAPIHandler(BaseHandler):
     async def _convert_to_aliexpress_affiliate(self, source_url):
         """Converts a regular AliExpress link into an affiliate link using the Aliexpress API."""
         self.logger.info(f"Converting AliExpress link to affiliate link: {source_url}")
+        parsed_url = urlparse(source_url)
+        source_url = urlunparse((parsed_url.scheme, parsed_url.netloc, parsed_url.path, '', '', ''))
         timestamp = str(int(time.time() * 1000))  # Current timestamp in milliseconds
 
         # Get AliExpress-specific configuration from self.selected_users
