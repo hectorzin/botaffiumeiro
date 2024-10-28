@@ -1,7 +1,10 @@
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/hectorzin/botaffiumeiro)](https://github.com/hectorzin/botaffiumeiro/releases)
 [![Build](https://img.shields.io/github/actions/workflow/status/hectorzin/botaffiumeiro/deploy.yml)](https://github.com/hectorzin/botaffiumeiro/actions/workflows/deploy.yml)
 
-# botaffiumeiro
+<h1 style="display: flex; align-items: center;">
+  <img src="/docs/assets/logo_botaffiumeiro.png" alt="Logo de BotAffiumeiro" width="40" style="margin-right: 10px;"/>
+  BotAffiumeiro
+</h1>
 
 botaffiumeiro is a Telegram bot that detects Amazon, Aliexpress and other links shared in Telegram groups and automatically converts them into affiliate links using your custom Amazon Affiliate ID. This is especially useful for those who want to monetize links shared in their communities.
 
