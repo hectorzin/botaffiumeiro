@@ -1,4 +1,7 @@
-# Botaffiumeiro addon for Home Assistant
+<h1 style="display: flex; align-items: center;">
+  <img src="/docs/assets/logo_botaffiumeiro.png" alt="Logo de BotAffiumeiro" width="40" style="margin-right: 10px;"/>
+  Botaffiumeiro addon for Home Assistant
+</h1>
 
 Modify Telegram links for affiliate programs and manage them across multiple platforms, such as Amazon, AliExpress, Awin, and Admitad.
 
