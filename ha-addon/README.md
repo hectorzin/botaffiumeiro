@@ -1,5 +1,5 @@
 <h1 style="display: flex; align-items: center;">
-  <img src="/docs/assets/logo_botaffiumeiro.png" alt="Logo de BotAffiumeiro" width="40" style="margin-right: 10px;"/>
+  <img src="https://raw.githubusercontent.com/hectorzin/botaffiumeiro/main/docs/assets/logo_botaffiumeiro.png" width="40" style="margin-right: 10px;"/>
   Botaffiumeiro addon for Home Assistant
 </h1>
 
@@ -108,4 +108,4 @@ For more information look at the Botafumeiro repository https://github.com/hecto
 
 ## Spanish tutorial
 
-[![Watch the video](/docs/assets/spanish_video_thumbnail.png)](https://youtu.be/qr_WBQIQmUQ)
+[![Watch the video](https://github.com/hectorzin/botaffiumeiro/raw/main/docs/assets/spanish_video_thumbnail.png)](https://youtu.be/qr_WBQIQmUQ)
