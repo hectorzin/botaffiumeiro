@@ -2,7 +2,7 @@ import unittest
 
 from unittest.mock import AsyncMock, patch
 from handlers.base_handler import BaseHandler
-from handlers.admitad_handler import AdmitadHandler
+from handlers.pattern_handler import PatternHandler
 
 
 class TestHandler(BaseHandler):
@@ -21,7 +21,7 @@ class TestHandleAdmitadLinks(unittest.IsolatedAsyncioTestCase):
         mock_selected_users = {
             "admitad": {"publisher_id": "my_admitad_id", "advertisers": {}}
         }
-        admitad_handler = AdmitadHandler()
+        admitad_handler = PatternHandler()
         admitad_handler.selected_users = mock_selected_users
 
         mock_message = AsyncMock()
@@ -52,7 +52,7 @@ class TestHandleAdmitadLinks(unittest.IsolatedAsyncioTestCase):
                 }
             }
         }
-        admitad_handler = AdmitadHandler()
+        admitad_handler = PatternHandler()
         admitad_handler.selected_users = mock_selected_users
 
         mock_message = AsyncMock()
@@ -86,7 +86,7 @@ class TestHandleAdmitadLinks(unittest.IsolatedAsyncioTestCase):
                 }
             }
         }
-        admitad_handler = AdmitadHandler()
+        admitad_handler = PatternHandler()
         admitad_handler.selected_users = mock_selected_users
 
         mock_message = AsyncMock()
@@ -117,7 +117,7 @@ class TestHandleAdmitadLinks(unittest.IsolatedAsyncioTestCase):
                 }
             }
         }
-        admitad_handler = AdmitadHandler()
+        admitad_handler = PatternHandler()
         admitad_handler.selected_users = mock_selected_users
 
         mock_message = AsyncMock()
@@ -145,7 +145,7 @@ class TestHandleAdmitadLinks(unittest.IsolatedAsyncioTestCase):
                 }
             }
         }
-        admitad_handler = AdmitadHandler()
+        admitad_handler = PatternHandler()
         admitad_handler.selected_users = mock_selected_users
         mock_message = AsyncMock()
         mock_message.text = "Check this out: https://www.aliexpress.com/item/1005002958205071.html I hope you like it"
@@ -176,7 +176,7 @@ class TestHandleAdmitadLinks(unittest.IsolatedAsyncioTestCase):
                 "aliexpress": {"discount_codes": "Here is your discount code!"},
             }
         }
-        admitad_handler = AdmitadHandler()
+        admitad_handler = PatternHandler()
         admitad_handler.selected_users = mock_selected_users
 
         mock_message = AsyncMock()
@@ -212,7 +212,7 @@ class TestHandleAdmitadLinks(unittest.IsolatedAsyncioTestCase):
                 }
             }
         }
-        admitad_handler = AdmitadHandler()
+        admitad_handler = PatternHandler()
         admitad_handler.selected_users = mock_selected_users
 
         mock_message = AsyncMock()
@@ -241,7 +241,7 @@ class TestHandleAdmitadLinks(unittest.IsolatedAsyncioTestCase):
                 "aliexpress": {"discount_codes": "Here is your discount code!"},
             }
         }
-        admitad_handler = AdmitadHandler()
+        admitad_handler = PatternHandler()
         admitad_handler.selected_users = mock_selected_users
 
         mock_message = AsyncMock()
