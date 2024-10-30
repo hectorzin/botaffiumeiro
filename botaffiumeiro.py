@@ -10,11 +10,10 @@ from telegram.ext import Application, CommandHandler, Defaults, filters, Message
 from typing import Tuple
 from urllib.parse import parse_qs, urlparse
 
-from handlers.admitad_handler import AdmitadHandler, ADMITAD_PATTERN
+from handlers.pattern_handler import PatternHandler
 from handlers.aliexpress_api_handler import AliexpressAPIHandler
 from handlers.aliexpress_handler import AliexpressHandler, ALIEXPRESS_PATTERN
-from handlers.amazon_handler import AmazonHandler, AMAZON_PATTERN
-from handlers.awin_handler import AwinHandler, AWIN_PATTERN
+from handlers.patterns import PATTERNS
 from config import (
     config_data,
     domain_percentage_table,
@@ -24,10 +23,7 @@ from config import (
 
 SHORT_URL_DOMAINS = ["amzn.to", "s.click.aliexpress.com", "bit.ly", "tinyurl.com"]
 DOMAIN_PATTERNS = {
-    "amazon": AMAZON_PATTERN,
     "aliexpress": ALIEXPRESS_PATTERN,
-    "awin": AWIN_PATTERN,
-    "admitad": ADMITAD_PATTERN,
 }
 #    "aliexpress_short_url_pattern": r"https?://s\.click\.aliexpress\.com/e/[\w\d_]+",
 
@@ -141,6 +137,10 @@ def extract_domains_from_message(message_text: str) -> Tuple[set, str]:
             for platform, pattern in DOMAIN_PATTERNS.items():
                 if re.match(pattern, expanded_url):
                     domains.add(domain)
+            for platform, config in PATTERNS.items():
+                if re.match(config["pattern"], expanded_url):
+                    domains.add(domain)
+                    break  # Salir del bucle una vez encontrado
 
     return domains, message_text
 
@@ -248,9 +248,7 @@ async def process_link_handlers(message) -> None:
 
     context = prepare_message(message)
 
-    processed = await AmazonHandler().handle_links(context)
-    processed |= await AwinHandler().handle_links(context)
-    processed |= await AdmitadHandler().handle_links(context)
+    processed = await PatternHandler().handle_links(context)
     processed |= await AliexpressAPIHandler().handle_links(context)
 
     if not processed:

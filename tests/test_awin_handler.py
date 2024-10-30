@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import AsyncMock, patch
-from handlers.awin_handler import AwinHandler
+from handlers.pattern_handler import PatternHandler
 
 
 class TestHandleAwinLinks(unittest.IsolatedAsyncioTestCase):
@@ -12,7 +12,7 @@ class TestHandleAwinLinks(unittest.IsolatedAsyncioTestCase):
         mock_message.text = "Check this out: https://www.pccomponentes.com/some-product I hope you like it"
         mock_message.message_id = 1
         mock_message.from_user.username = "testuser1"
-        handler = AwinHandler()
+        handler = PatternHandler()
         mock_selected_users = {
             "pccomponentes.com": {
                 "awin": {
@@ -38,7 +38,7 @@ class TestHandleAwinLinks(unittest.IsolatedAsyncioTestCase):
         mock_message.message_id = 2
         mock_message.from_user.username = "testuser2"
 
-        handler = AwinHandler()
+        handler = PatternHandler()
         mock_selected_users = {
             "pccomponentes.com": {
                 "awin": {
@@ -69,7 +69,7 @@ class TestHandleAwinLinks(unittest.IsolatedAsyncioTestCase):
         mock_message.reply_to_message = AsyncMock()
         mock_message.reply_to_message.message_id = 10
 
-        handler = AwinHandler()
+        handler = PatternHandler()
         mock_selected_users = {
             "giftmio.com": {
                 "awin": {
@@ -98,7 +98,7 @@ class TestHandleAwinLinks(unittest.IsolatedAsyncioTestCase):
         mock_message.message_id = 3
         mock_message.from_user.username = "testuser3"
 
-        handler = AwinHandler()
+        handler = PatternHandler()
         mock_selected_users = {
             "giftmio.com": {
                 "awin": {
@@ -126,7 +126,7 @@ class TestHandleAwinLinks(unittest.IsolatedAsyncioTestCase):
         mock_message.message_id = 4
         mock_message.from_user.username = "testuser4"
 
-        handler = AwinHandler()
+        handler = PatternHandler()
         mock_selected_users = {
             "giftmio.com": {
                 "awin": {
@@ -154,7 +154,7 @@ class TestHandleAwinLinks(unittest.IsolatedAsyncioTestCase):
         mock_message.from_user.username = "testuser"
         mock_message.reply_to_message = None
 
-        handler = AwinHandler()
+        handler = PatternHandler()
         mock_selected_users = {
             "aliexpress.com": {
                 "awin": {
@@ -187,7 +187,7 @@ class TestHandleAwinLinks(unittest.IsolatedAsyncioTestCase):
         mock_message.from_user.username = "testuser2"
         mock_message.reply_to_message = None
 
-        handler = AwinHandler()
+        handler = PatternHandler()
         mock_selected_users = {
             "aliexpress.com": {
                 "awin": {
@@ -221,7 +221,7 @@ class TestHandleAwinLinks(unittest.IsolatedAsyncioTestCase):
         mock_message.message_id = 2
         mock_message.from_user.username = "testuser2"
 
-        handler = AwinHandler()
+        handler = PatternHandler()
         mock_selected_users = {
             "aliexpress.com": {
                 "awin": {
@@ -254,7 +254,7 @@ class TestHandleAwinLinks(unittest.IsolatedAsyncioTestCase):
 
         expected_message = "Here is a product: https://www.awin1.com/cread.php?awinmid=20982&awinaffid=my_awin_id&ued=https://www.pccomponentes.com/item/1005002958205071.html I hope you like it"
 
-        handler = AwinHandler()
+        handler = PatternHandler()
         mock_selected_users = {
             "pccomponentes.com": {
                 "awin": {

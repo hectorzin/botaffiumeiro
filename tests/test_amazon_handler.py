@@ -4,7 +4,7 @@ import re
 from unittest.mock import AsyncMock, patch
 
 from handlers.base_handler import BaseHandler
-from handlers.amazon_handler import AmazonHandler
+from handlers.pattern_handler import PatternHandler
 
 
 class TestHandler(BaseHandler):
@@ -20,7 +20,7 @@ class TestHandleAmazonLinks(unittest.IsolatedAsyncioTestCase):
         mock_selected_users = {
             "amazon.es": {"amazon": {"affiliate_id": "our_affiliate_id"}}
         }
-        amazon_handler = AmazonHandler()
+        amazon_handler = PatternHandler()
 
         mock_message = AsyncMock()
         mock_message.text = "This is a random message without Amazon links."
@@ -44,7 +44,7 @@ class TestHandleAmazonLinks(unittest.IsolatedAsyncioTestCase):
     async def test_no_action_when_amazon_affiliate_id_is_none(self, mock_process):
         """Test that no action is taken if AMAZON_AFFILIATE_ID is None."""
         mock_selected_users = {"amazon.es": {"amazon": {"affiliate_id": None}}}
-        amazon_handler = AmazonHandler()
+        amazon_handler = PatternHandler()
 
         mock_message = AsyncMock()
         mock_message.text = (
@@ -79,7 +79,7 @@ class TestHandleAmazonLinks(unittest.IsolatedAsyncioTestCase):
                 }
             }
         }
-        amazon_handler = AmazonHandler()
+        amazon_handler = PatternHandler()
 
         mock_message = AsyncMock()
         mock_message.text = "Here is a product: https://www.amazon.com/dp/B08N5WRWNW"
@@ -107,7 +107,7 @@ class TestHandleAmazonLinks(unittest.IsolatedAsyncioTestCase):
                 "amazon": {"advertisers": {"amazon.com": "our_affiliate_id"}}
             }
         }
-        amazon_handler = AmazonHandler()
+        amazon_handler = PatternHandler()
 
         mock_message = AsyncMock()
         mock_message.text = "Here is a product: https://www.amazon.com/dp/B08N5WRWNW?tag=another_affiliate"
@@ -132,7 +132,7 @@ class TestHandleAmazonLinks(unittest.IsolatedAsyncioTestCase):
         mock_selected_users = {
             "amazon.es": {"amazon": {"advertisers": {"amazon.es": "our_affiliate_id"}}}
         }
-        amazon_handler = AmazonHandler()
+        amazon_handler = PatternHandler()
 
         mock_message = AsyncMock()
         mock_message.text = "Check this out: https://www.amazon.es/dp/B01M9ATDY7?ref=cm_sw_r_apan_dp_ZYAS38F4N8NR5FHPH886&ref_=cm_sw_r_apan_dp_ZYAS38F4N8NR5FHPH886&social_share=cm_sw_r_apan_dp_ZYAS38F4N8NR5FHPH886&starsLeft=1&skipTwisterOG=1"
