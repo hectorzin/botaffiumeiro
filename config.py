@@ -53,6 +53,10 @@ def load_user_configuration(user, creator_percentage, user_data):
             "publisher_id": user_data.get("admitad", {}).get("publisher_id", None),
             "advertisers": user_data.get("admitad", {}).get("advertisers", {}),
         },
+        "tradedoubler": {
+            "publisher_id": user_data.get("tradedoubler", {}).get("publisher_id", None),
+            "advertisers": user_data.get("tradedoubler", {}).get("advertisers", {}),
+        },
         "aliexpress": {
             "discount_codes": user_data.get("aliexpress", {}).get(
                 "discount_codes", None
@@ -101,7 +105,9 @@ def add_to_domain_table(domain, user_id, affiliate_id, percentage):
         if domain not in domain_percentage_table:
             domain_percentage_table[domain] = []
 
-        if not any(entry["user"] == user_id for entry in domain_percentage_table[domain]):
+        if not any(
+            entry["user"] == user_id for entry in domain_percentage_table[domain]
+        ):
             domain_percentage_table[domain].append(
                 {"user": user_id, "percentage": percentage}
             )
@@ -163,6 +169,12 @@ def add_user_to_domain_percentage_table(user_id, user_data, percentage):
         user_id,
         user_data.get("admitad", {}).get("advertisers", {}),
         "admitad",
+        percentage,
+    )
+    add_affiliate_stores_domains(
+        user_id,
+        user_data.get("tradedoubler", {}).get("advertisers", {}),
+        "tradedoubler",
         percentage,
     )
 

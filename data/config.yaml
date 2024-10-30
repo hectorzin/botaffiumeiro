@@ -47,6 +47,14 @@ admitad:
   advertisers:
     giftmio.com: "93fd4vbk6c873a1e3014d68450d763"
 
+# --------------------------------- ADMITAD --------------------------------- #
+
+tradedoubler:
+  publisher_id: "3385366"
+  advertisers:
+    mediamarkt.es: "336358"
+    balay.es: "354019"
+    bosch-home.es: "316288"
 # -------------------------------- ALIEXPRESS ------------------------------- #
 
 aliexpress:
