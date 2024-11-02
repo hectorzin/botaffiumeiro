@@ -177,49 +177,49 @@ class TestModifyLink(unittest.IsolatedAsyncioTestCase):
 
 class TestExpandShortenedURL(unittest.TestCase):
 
-    @patch("requests.head")
-    def test_expand_amazon_short_url(self, mock_head):
+    @patch("requests.get")
+    def test_expand_amazon_short_url(self, mock_get):
         """
         Test: Expands a shortened Amazon URL (amzn.to).
         """
         mock_response = Mock()
         mock_response.url = "https://www.amazon.com/dp/B08XYZ123"
-        mock_head.return_value = mock_response
+        mock_get.return_value = mock_response
         short_url = "https://amzn.to/abc123"
         expanded_url = expand_shortened_url(short_url)
 
         self.assertEqual(expanded_url, "https://www.amazon.com/dp/B08XYZ123")
-        mock_head.assert_called_once_with(short_url, allow_redirects=True)
+        mock_get.assert_called_once_with(short_url, allow_redirects=True)
 
-    @patch("requests.head")
-    def test_no_redirect_url(self, mock_head):
+    @patch("requests.get")
+    def test_no_redirect_url(self, mock_get):
         """
         Test: URL does not redirect (original URL is returned).
         """
         mock_response = Mock()
         mock_response.url = "https://www.amazon.com/dp/B08XYZ123"
-        mock_head.return_value = mock_response
+        mock_get.return_value = mock_response
 
         long_url = "https://www.amazon.com/dp/B08XYZ123"
         expanded_url = expand_shortened_url(long_url)
 
         self.assertEqual(expanded_url, "https://www.amazon.com/dp/B08XYZ123")
-        mock_head.assert_called_once_with(long_url, allow_redirects=True)
+        mock_get.assert_called_once_with(long_url, allow_redirects=True)
 
-    @patch("requests.head")
-    def test_expand_aliexpress_short_url(self, mock_head):
+    @patch("requests.get")
+    def test_expand_aliexpress_short_url(self, mock_get):
         """
         Test: Expands a shortened AliExpress URL (s.click.aliexpress.com).
         """
         mock_response = Mock()
         mock_response.url = "https://www.aliexpress.com/item/12345.html"
-        mock_head.return_value = mock_response
+        mock_get.return_value = mock_response
 
         short_url = "https://s.click.aliexpress.com/e/abc123"
         expanded_url = expand_shortened_url(short_url)
 
         self.assertEqual(expanded_url, "https://www.aliexpress.com/item/12345.html")
-        mock_head.assert_called_once_with(short_url, allow_redirects=True)
+        mock_get.assert_called_once_with(short_url, allow_redirects=True)
 
 
 class TestExtractDomainsFromMessage(unittest.TestCase):
@@ -418,14 +418,14 @@ class TestExtractDomainsFromMessage(unittest.TestCase):
             domains, set()
         )  # Should return an empty set since no domains are matched
 
-    @patch("requests.head")
-    def test_expand_amazon_short_url_and_replace_in_message(self, mock_head):
+    @patch("requests.get")
+    def test_expand_amazon_short_url_and_replace_in_message(self, mock_get):
         """
         Test: Expands a shortened Amazon URL and replaces it in the message.
         """
         mock_response = Mock()
         mock_response.url = "https://www.amazon.com/dp/B08XYZ123"
-        mock_head.return_value = mock_response
+        mock_get.return_value = mock_response
 
         message_text = "Check out this Amazon link: https://amzn.to/abc123"
 
@@ -437,8 +437,8 @@ class TestExtractDomainsFromMessage(unittest.TestCase):
             "Check out this Amazon link: https://www.amazon.com/dp/B08XYZ123",
         )
 
-    @patch("requests.head")
-    def test_expand_multiple_short_urls_and_replace_in_message(self, mock_head):
+    @patch("requests.get")
+    def test_expand_multiple_short_urls_and_replace_in_message(self, mock_get):
         """
         Test: Expands multiple shortened URLs and replaces them in the message.
         """
@@ -447,7 +447,7 @@ class TestExtractDomainsFromMessage(unittest.TestCase):
         mock_response_aliexpress = Mock()
         mock_response_aliexpress.url = "https://www.aliexpress.com/item/12345.html"
 
-        mock_head.side_effect = [mock_response_amazon, mock_response_aliexpress]
+        mock_get.side_effect = [mock_response_amazon, mock_response_aliexpress]
 
         message_text = "Check out this Amazon link: https://amzn.to/abc123 and this AliExpress link: https://s.click.aliexpress.com/e/xyz789"
         domains, modified_message = extract_domains_from_message(message_text)
@@ -459,8 +459,8 @@ class TestExtractDomainsFromMessage(unittest.TestCase):
             "Check out this Amazon link: https://www.amazon.com/dp/B08XYZ123 and this AliExpress link: https://www.aliexpress.com/item/12345.html",
         )
 
-    @patch("requests.head")
-    def test_extract_domains_with_short_urls(self, mock_head):
+    @patch("requests.get")
+    def test_extract_domains_with_short_urls(self, mock_get):
         """
         Test: Extract domains after expanding shortened URLs.
         """
@@ -475,7 +475,7 @@ class TestExtractDomainsFromMessage(unittest.TestCase):
         )
 
         # Configura el mock para devolver las respuestas simuladas en secuencia
-        mock_head.side_effect = [mock_response_amazon, mock_response_aliexpress]
+        mock_get.side_effect = [mock_response_amazon, mock_response_aliexpress]
 
         # Texto con URLs acortadas
         message_text = "Check out this Amazon deal: https://amzn.to/abc123 and this AliExpress: https://s.click.aliexpress.com/e/buyproduct"
