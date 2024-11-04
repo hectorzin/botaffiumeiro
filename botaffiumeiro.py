@@ -21,7 +21,7 @@ from config import (
     load_configuration,
 )
 
-SHORT_URL_DOMAINS = ["amzn.to", "s.click.aliexpress.com", "bit.ly", "tinyurl.com"]
+SHORT_URL_DOMAINS = ["amzn.to", "amzn.eu", "s.click.aliexpress.com", "bit.ly", "tinyurl.com"]
 DOMAIN_PATTERNS = {
     "aliexpress": ALIEXPRESS_PATTERN,
 }
