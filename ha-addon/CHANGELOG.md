@@ -1,3 +1,6 @@
+# 2.1.2.0
+* addon bug, not updating to the latest version
+
 # 2.1.1.1
 * bug:rexexp error fixed, addon failed to work
 
