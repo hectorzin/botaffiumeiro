@@ -8,12 +8,9 @@ RUN apk update && apk add --no-cache \
     bash \
 	curl
 
-ENV REPO_OWNER="hectorzin"
-ENV REPO_NAME="botaffiumeiro"
-
 # Fetch the latest release tag from GitHub API and download the release archive
-RUN latest_release=$(curl -s https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/releases/latest | jq -r .tag_name) && \
-    curl -L -o botaffiumeiro.tar.gz "https://github.com/$REPO_OWNER/$REPO_NAME/archive/${latest_release}.tar.gz" && \
+RUN latest_release=$(curl -s https://api.github.com/repos/hectorzin/botaffiumeiro/releases/latest | jq -r .tag_name) && \
+    curl -L -o botaffiumeiro.tar.gz "https://github.com/hectorzin/botaffiumeiro/archive/${latest_release}.tar.gz" && \
     tar -xzvf botaffiumeiro.tar.gz && \
     mv "botaffiumeiro-${latest_release}" /botaffiumeiro && \
     rm botaffiumeiro.tar.gz
