@@ -22,4 +22,13 @@ PATTERNS = {
         "format_template": "https://wextap.com/g/{advertiser_id}/?ulp={full_url}",
         "affiliate_tag": None,
     },
+    "tradedoubler": {
+        "pattern": (
+            r"(https?://(?:[\w\-]+\.)?tradedoubler\.com/cread\.php\?"
+            + PATTERN_URL_QUERY
+            + ")"
+        ),
+        "format_template": "https://clk.tradedoubler.com/click?p={advertiser_id}&a={affiliate_id}&url={full_url}",
+        "affiliate_tag": "a",
+    },
 }
