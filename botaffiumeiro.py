@@ -56,7 +56,7 @@ def expand_shortened_url(url: str):
     logger.info(f"Try expanding shortened URL: {url}")
     try:
         # Utilizamos HEAD para seguir las redirecciones sin descargar todo el contenido
-        response = requests.head(url, allow_redirects=True)
+        response = requests.get(url, allow_redirects=True)
         logger.info(f"Expanded URL {url} to full link: {response.url}")
         return response.url
     except requests.RequestException as e:
