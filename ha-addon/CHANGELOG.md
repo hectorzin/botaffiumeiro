@@ -1,3 +1,12 @@
+# 2.1.0
+### NEW!
+Tradedoubler affiliate platform support: This platform allows affiliations to stores like mediamarkt, philips-hue, balay, boshc, dyson, HP, Huawey, PCBOX, etc.
+
+### Improvements and fixes
+* feat: Refactor pattern handlers by @hectorzin in https://github.com/hectorzin/botaffiumeiro/pull/57
+* bug: Short urls are not working by @hectorzin in https://github.com/hectorzin/botaffiumeiro/pull/59
+* Feat/tradedoubler by @hectorzin in https://github.com/hectorzin/botaffiumeiro/pull/58
+
 # 2.0.3
 * bug: long Aliexpress links fails when asking API for an affiliate link by @hectorzin in https://github.com/hectorzin/botaffiumeiro/pull/53
 * feat: Show examples of HTML code in config.yaml by @hectorzin in https://github.com/hectorzin/botaffiumeiro/pull/48
