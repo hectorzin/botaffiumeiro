@@ -1,3 +1,6 @@
+# 2.1.1.0
+* bug: amzn.eu not handled by @hectorzin in https://github.com/hectorzin/botaffiumeiro/pull/62
+
 # 2.1.0
 ### NEW!
 Tradedoubler affiliate platform support: This platform allows affiliations to stores like mediamarkt, philips-hue, balay, boshc, dyson, HP, Huawey, PCBOX, etc.
