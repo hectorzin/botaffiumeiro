@@ -44,6 +44,12 @@ configuration:
   admitad_adversiters:
     name: "Admitad Advertisers"
     description: "List of Admitad advertisers and their campaign IDs (format: - domain: DOMAIN and id: ID)."
+  tradedoubler_publisher_id:
+    name: "Tradedoubler Publisher ID"
+    description: "Your Tradedoubler Publisher ID for managing affiliate links of Tradedoubler stores."
+  tradedoubler_adversiters:
+    name: "Tradedoubler Advertisers"
+    description: "List of Tradedoubler advertisers and their campaign IDs (format: - domain: DOMAIN and id: ID)."
   creator_affiliate_percentage:
     name: "Creator Affiliate Percentage"
     description: "Creators support 🙏. Defines the percentage of links that will be replaced with affiliate links belonging to the software creators when the user does not have a link for a specific domain. Thanks!"    

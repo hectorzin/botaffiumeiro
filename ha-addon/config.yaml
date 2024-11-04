@@ -1,5 +1,5 @@
 name: "Botaffiumeiro"
-version: "2.0.3"
+version: "2.1.0"
 slug: "botaffiumeiro"
 description: "Modify Telegram links with affiliate links"
 url: "https://github.com/hectorzin/botaffiumeiro/tree/main/ha-addon"
@@ -60,6 +60,12 @@ options:
   admitad_adversiters:
     - domain: giftmio.com
       id: 93fd4vbk6c873a1e3014d68450d763
+  tradedoubler_publisher_id: "93fd4vbk6c873a1e3014d68450d763"
+  tradedoubler_adversiters:
+    - domain: mediamarkt.es
+      id: "336358"
+    - domain: philips-hue.com
+      id: "354182"
   creator_affiliate_percentage: "10"
   log_level: INFO
 schema:
@@ -85,6 +91,10 @@ schema:
       id: str?
   admitad_publisher_id: str?
   admitad_adversiters:
+    - domain: str?
+      id: str?
+  tradedoubler_publisher_id: str?
+  tradedoubler_adversiters:
     - domain: str?
       id: str?
   creator_affiliate_percentage: str?

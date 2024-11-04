@@ -85,7 +85,20 @@ Below is a breakdown of all the available configuration fields, including exampl
   ```
 **NOTE**: If you want to leave the list empty you must write []
 
-### 7. Support for creators
+### 7. Tradedoubler Settings
+
+- **tradedoubler_publisher_id**: Your Tradedoubler Publisher ID, used to manage affiliate links for Tradedoubler-supported stores.
+- **tradedoubler_advertisers**: A list of Tradedoubler-supported stores and their respective advertiser IDs, required to generate affiliate links for specific stores. You must use the following structure:
+
+  ```yaml
+  - domain: "store1.com"
+    id: "campaign_id_1"
+  - domain: "store2.com"
+    id: "campaign_id_2"
+  ```
+**NOTE**: If you want to leave the list empty you must write []
+
+### 8. Support for creators
 
 - **creator_affiliate_percentage**: This parameter allows you to define what percentage of the links shared in Telegram groups will be replaced with affiliate links belonging to the software creators. However, there are a few important conditions to keep in mind:
 
@@ -98,7 +111,7 @@ Below is a breakdown of all the available configuration fields, including exampl
   ```yaml
   creator_affiliate_percentage: 10  # Example: 10%
 
-### 8. LOG
+### 9. LOG
 
 - **log_level**: Set the logging level for the bot. Options include: _DEBUG_, _INFO_, _WARN_, _ERROR_, and _CRITICAL_.
 

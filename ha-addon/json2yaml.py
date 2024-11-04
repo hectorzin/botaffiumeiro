@@ -44,6 +44,13 @@ config = {
             for advertiser in data.get("admitad_adversiters", [])
         },
     },
+    "tradedoubler": {
+        "publisher_id": data.get("tradedoubler_publisher_id", ""),
+        "advertisers": {
+            advertiser["domain"]: advertiser["id"]
+            for advertiser in data.get("tradedoubler_adversiters", [])
+        },
+    },
     "aliexpress": {
         "app_key": data.get("aliexpress_app_key", ""),
         "app_secret": data.get("aliexpress_app_secret", ""),
