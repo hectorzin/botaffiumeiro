@@ -25,6 +25,7 @@ botaffiumeiro is a Telegram bot that detects Amazon, Aliexpress and other links 
 - **AliExpress** (special case adding discount codes)
 - **Awin** stores (e.g., PcComponentes, Leroy Merlin)
 - **Admitad** stores (e.g., AliExpress, GiftMio)
+- **Tradedoubler** stores (e.g. Mediamarkt, Philips HUE)
 
 ## Installation
 
