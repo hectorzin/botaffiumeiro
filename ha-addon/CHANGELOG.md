@@ -1,3 +1,6 @@
+# 2.1.1.1
+* bug:rexexp error fixed, addon failed to work
+
 # 2.1.1.0
 * bug: amzn.eu not handled by @hectorzin in https://github.com/hectorzin/botaffiumeiro/pull/62
 
