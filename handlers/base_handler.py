@@ -12,8 +12,8 @@ from publicsuffix2 import get_sld
 from config import config_data
 
 # Known short URL domains for expansion
-PATTERN_URL_QUERY = "?[^\s]+"
-PATTERN_AFFILIATE_URL_QUERY = "/[a-zA-Z0-9\-\._~:/?#\[\]@!$&'()*+,;=%]+"
+PATTERN_URL_QUERY = r"?[^\s]+"
+PATTERN_AFFILIATE_URL_QUERY = r"/[a-zA-Z0-9\-\._~:/?#\[\]@!$&'()*+,;=%]+"
 
 
 class BaseHandler(ABC):
