@@ -370,6 +370,7 @@ class TestExtractDomainsFromMessage(unittest.TestCase):
 
         # Simulate the expansion of the shortened URLs
         mock_expand.side_effect = [
+            "https://www.amazon.com/dp/product123",  # Long URL link, expands as itself
             "https://www.amazon.com/dp/product456",  # Expanded URL for amzn.to
             "https://www.aliexpress.com/item/1005001234567890.html",  # Expanded URL for aliexpress shortened link
         ]
@@ -378,6 +379,7 @@ class TestExtractDomainsFromMessage(unittest.TestCase):
         domains, modified_message = extract_domains_from_message(message_text)
 
         # Check that the expand_shortened_url function was called twice with correct URLs
+        mock_expand.assert_any_call("https://www.amazon.com/dp/product123")
         mock_expand.assert_any_call("https://amzn.to/abc123")
         mock_expand.assert_any_call("https://s.click.aliexpress.com/e/buyproduct")
 
@@ -501,24 +503,24 @@ class TestExtractDomainsFromMessage(unittest.TestCase):
         """
         Test: Extract domains from long Amazon and AliExpress URLs.
         """
-        # Texto con URLs largas ya expandidas
+        # Text with long URLs already expanded
         message_text = (
             "Check out this Amazon deal: https://www.amazon.com/dp/B08XYZ123 "
-            "and this AliExpress: https://www.aliexpress.com/item/12345.html"
+            "and this AliExpress: https://es.aliexpress.com/item/12345.html" ## We use a localized URL because expanding always, can change generic to local URL
         )
 
-        # Llama a la función que procesa el mensaje
+        # Call the function that processes the message
         domains, modified_message = extract_domains_from_message(message_text)
 
-        # Verifica que los dominios correctos fueron extraídos
-        self.assertIn("amazon.com", domains)  # Debería encontrar amazon.com
-        self.assertIn("aliexpress.com", domains)  # Debería encontrar aliexpress.com
+        # Verify that the correct domains were extracted
+        self.assertIn("amazon.com", domains)  # Should find amazon.com
+        self.assertIn("aliexpress.com", domains) # Should find aliexpress.com
 
-        # Verifica que las URLs completas estén presentes en el mensaje modificado
+        # Verify that the full URLs are present in the modified message
         self.assertIn("https://www.amazon.com/dp/B08XYZ123", modified_message)
-        self.assertIn("https://www.aliexpress.com/item/12345.html", modified_message)
+        self.assertIn("aliexpress.com/item/12345.html", modified_message) # Should find aliexpress.com (not checking exact subdomain, as it may expand to different regions)
 
-        # Asegúrate de que no hubo modificaciones innecesarias
+        # Ensure there were no unnecessary modifications
         self.assertEqual(message_text, modified_message)
 
 
