@@ -1,5 +1,5 @@
 name: "Botaffiumeiro"
-version: "2.1.2.0"
+version: "2.1.3.0"
 slug: "botaffiumeiro"
 description: "Modify Telegram links with affiliate links"
 url: "https://github.com/hectorzin/botaffiumeiro/tree/main/ha-addon"
@@ -14,58 +14,8 @@ startup: services
 options:
   bot_token: ""
   delete_messages: true
-  excluded_users:
-    - id: "HectorziN"
-    - id: "danimart1991"
-  discount_keywords:
-    - key: discounts
-    - key: bonus
-    - key: bonuses
-    - key: aliexpress
   msg_affiliate_link_modified: "Here is the modified link with our affiliate program:"
   msg_reply_provided_by_user: "Reply provided by"
-  amazon:
-    - domain: amazon.es
-      id: botaffiumeiro_cofee-21
-    - domain: amazon.com
-      id: hectorzindomo-20
-    - domain: amazon.com.au
-      id: hectorzindomo-22
-    - domain: amazon.co.uk
-      id: hectorzindomo-21
-    - domain: amazon.fr
-      id: hectorzindo0d-21
-    - domain: amazon.it
-      id: hectorzindo04-21
-    - domain: amazon.de
-      id: hectorzindo0e-21
-  aliexpress_app_key: ""
-  aliexpress_app_secret: ""
-  aliexpress_tracking_id: ""
-  aliexpress_discount_codes: 
-   - line: "💥 Códigos de descuento de AliExpress:"
-   - line: "💰2$ off for purchases over 20$:【IFPTKOH】"
-   - line: "💰5$ off for purchases over 50$:【IFPT35D】"
-   - line: "💰25$ off for purchases over 200$:【IFPQDMH】"
-   - line: "💰50$ off for purchases over 400$:【IFP5RIN】"
-  awin_publisher_id: "1639881"
-  awin_adversiters:
-    - domain: aliexpress.com
-      id: "11640"
-    - domain: pccomponentes.com
-      id: "20982"
-    - domain: leroymerlin.es
-      id: "20598"
-  admitad_publisher_id: "2306205"
-  admitad_adversiters:
-    - domain: giftmio.com
-      id: 93fd4vbk6c873a1e3014d68450d763
-  tradedoubler_publisher_id: "93fd4vbk6c873a1e3014d68450d763"
-  tradedoubler_adversiters:
-    - domain: mediamarkt.es
-      id: "336358"
-    - domain: philips-hue.com
-      id: "354182"
   creator_affiliate_percentage: "10"
   log_level: INFO
 schema:

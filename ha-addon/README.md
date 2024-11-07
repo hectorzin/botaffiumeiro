@@ -33,6 +33,7 @@ Below is a breakdown of all the available configuration fields, including exampl
   - key: "bonus"
   - key: "bonuses"
   - key: "aliexpress"
+  ```
 
 **NOTE**: If you want to leave the list empty you must write []
 
@@ -43,7 +44,14 @@ Below is a breakdown of all the available configuration fields, including exampl
 
 ### 3. Amazon settings
 
-- **amazon_affiliate_id**: Your Amazon Affiliate ID, which will be appended to Amazon links to generate affiliate URLs.
+A list of domains and ids per domain:
+
+  ```yaml
+    - domain: amazon.es
+      id: botaffiumeiro_cofee-21
+    - domain: amazon.com
+      id: hectorzindomo-20
+  ```
 
 ### 4. Aliexpress settings
 
