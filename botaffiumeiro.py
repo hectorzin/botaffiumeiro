@@ -21,11 +21,9 @@ from config import (
     load_configuration,
 )
 
-SHORT_URL_DOMAINS = ["amzn.to", "amzn.eu", "s.click.aliexpress.com", "bit.ly", "tinyurl.com"]
 DOMAIN_PATTERNS = {
     "aliexpress": ALIEXPRESS_PATTERN,
 }
-#    "aliexpress_short_url_pattern": r"https?://s\.click\.aliexpress\.com/e/[\w\d_]+",
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
@@ -87,14 +85,6 @@ def extract_embedded_url(query_params):
     return embedded_domains
 
 
-def is_short_url(url: str) -> bool:
-    """
-    Checks if the given URL belongs to a known short URL domain.
-    """
-    parsed_url = urlparse(url)
-    return parsed_url.netloc in SHORT_URL_DOMAINS
-
-
 def extract_domains_from_message(message_text: str) -> Tuple[set, str]:
     """
     Extracts domains from a message using domain patterns and searches for embedded URLs.
@@ -115,12 +105,9 @@ def extract_domains_from_message(message_text: str) -> Tuple[set, str]:
 
     for url in urls_in_message:
         # If it's a short URL, expand it
-        if is_short_url(url):
-            expanded_url = expand_shortened_url(url)
-            # Replace the short URL with the expanded URL in the message text
-            message_text = message_text.replace(url, expanded_url)
-        else:
-            expanded_url = url
+        expanded_url = expand_shortened_url(url)
+        # Replace the short URL with the expanded URL in the message text
+        message_text = message_text.replace(url, expanded_url)
 
         # Now extract the domain from the expanded URL
         parsed_url = urlparse(expanded_url)
