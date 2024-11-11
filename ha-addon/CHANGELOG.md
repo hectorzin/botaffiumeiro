@@ -1,3 +1,10 @@
+# 2.1.4.0
+* bug: If a short link has a . or , at the end won't expand and is not processed by @hectorzin in https://github.com/hectorzin/botaffiumeiro/pull/69
+* feat: Expand always URLs, to avoid loosing some links by @hectorzin in https://github.com/hectorzin/botaffiumeiro/pull/70
+
+# 2.1.3.0
+* bug: Aliexpress codes showed two times by @hectorzin in https://github.com/hectorzin/botaffiumeiro/pull/67
+
 # 2.1.2.0
 * addon bug, not updating to the latest version
 
