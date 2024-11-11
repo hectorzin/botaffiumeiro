@@ -60,7 +60,9 @@ config = {
         ),
     },
     "log_level": data.get("log_level", "INFO"),
-    "creator_affiliate_percentage": data.get("creator_affiliate_percentage", 10),
+    "affiliate_settings": {
+        "creator_affiliate_percentage": data.get("creator_affiliate_percentage", 10),
+    }
 }
 
 # Save the YAML file
