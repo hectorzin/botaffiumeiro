@@ -61,7 +61,7 @@ config = {
     },
     "log_level": data.get("log_level", "INFO"),
     "affiliate_settings": {
-        "creator_affiliate_percentage": data.get("creator_affiliate_percentage", 10),
+        "creator_affiliate_percentage": int(data.get("creator_affiliate_percentage", 10)),
     }
 }
 

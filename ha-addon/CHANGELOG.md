@@ -1,3 +1,6 @@
+# 2.1.4.2
+* crashes because it is passigne creator percentage as an str not a number
+
 # 2.1.4.1
 * bug: Percentage donation to creators where not passing from addon configuration to Bottafiumeiro app.
 
