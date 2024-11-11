@@ -1,3 +1,6 @@
+# 2.1.4.1
+* bug: Percentage donation to creators where not passing from addon configuration to Bottafiumeiro app.
+
 # 2.1.4.0
 * bug: If a short link has a . or , at the end won't expand and is not processed by @hectorzin in https://github.com/hectorzin/botaffiumeiro/pull/69
 * feat: Expand always URLs, to avoid loosing some links by @hectorzin in https://github.com/hectorzin/botaffiumeiro/pull/70
