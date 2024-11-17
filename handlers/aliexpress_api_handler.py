@@ -4,7 +4,7 @@ import re
 import requests
 import time
 
-from urllib.parse import urlparse, urlunparse
+from urllib.parse import urlparse, urlunparse,parse_qs
 from handlers.base_handler import BaseHandler
 from handlers.aliexpress_handler import ALIEXPRESS_PATTERN
 
@@ -100,10 +100,50 @@ class AliexpressAPIHandler(BaseHandler):
 
         return None
 
+    def _get_real_url(self, link: str) -> str:
+        """
+        Checks for a 'redirectUrl' parameter in the given link and extracts its value if present.
+        If no 'redirectUrl' is found, returns the original link.
+
+        Parameters:
+        - link: The original URL to analyze.
+
+        Returns:
+        - A string representing the resolved URL or the original link if no redirect exists.
+        """
+        parsed_url = urlparse(link)
+        query_params = parse_qs(parsed_url.query)
+
+        # Check if the 'redirectUrl' parameter exists in the query
+        if "redirectUrl" in query_params:
+            redirect_url = query_params["redirectUrl"][0]  # Extract the first value
+            return requests.utils.unquote(redirect_url)  # Decode the URL
+        return link  # Return the original link if no redirectUrl exists
+
+    def _resolve_redirects(self, message_text: str) -> dict:
+        """
+        Resolves redirected URLs (e.g., redirectUrl) in the message text.
+
+        Parameters:
+        - message_text: The text of the message to process.
+
+        Returns:
+        - A dictionary mapping original URLs to resolved URLs.
+        """
+        urls_in_message = re.findall(r"https?://[^\s]+", message_text)
+
+        original_to_resolved = {}
+        for url in urls_in_message:
+            resolved_url = self._get_real_url(url)  # Resolve redirectUrl if present
+            original_to_resolved[url] = resolved_url
+
+        return original_to_resolved
+
     async def handle_links(self, context) -> bool:
         """Handles AliExpress links and converts them using the Aliexpress API."""
 
         message, modified_text, self.selected_users = self._unpack_context(context)
+
         # Retrieve the AliExpress configuration from self.selected_users
         aliexpress_config = self.selected_users.get("aliexpress.com", {}).get(
             "aliexpress", {}
@@ -120,10 +160,14 @@ class AliexpressAPIHandler(BaseHandler):
             f"{message.message_id}: Handling AliExpress links in the message..."
         )
 
-        new_text = modified_text
+        # Map original links (with redirectUrl) to resolved links
+        original_to_resolved = self._resolve_redirects(modified_text)
 
-        # Find AliExpress links in the message text
-        aliexpress_links = re.findall(ALIEXPRESS_PATTERN, new_text)
+        # Extract resolved URLs that match the pattern
+        aliexpress_links = [
+            resolved for original, resolved in original_to_resolved.items()
+            if re.match(ALIEXPRESS_PATTERN, resolved)
+        ]
 
         if not aliexpress_links:
             self.logger.info(
@@ -135,11 +179,20 @@ class AliexpressAPIHandler(BaseHandler):
             f"{message.message_id}: Found {len(aliexpress_links)} AliExpress links. Processing..."
         )
 
-        # Convert the links to affiliate links
-        for link in aliexpress_links:
-            affiliate_link = await self._convert_to_aliexpress_affiliate(link)
-            if affiliate_link:
-                new_text = new_text.replace(link, affiliate_link)
+        # Map original links to their affiliate counterparts
+        updated_links = {}
+
+        # Convert the resolved links to affiliate links
+        for original, resolved in original_to_resolved.items():
+            if resolved in aliexpress_links:
+                affiliate_link = await self._convert_to_aliexpress_affiliate(resolved)
+                if affiliate_link:
+                    updated_links[original] = affiliate_link  # Replace the original link
+
+        # Replace original links with their affiliate counterparts
+        new_text = modified_text
+        for original, affiliate in updated_links.items():
+            new_text = new_text.replace(original, affiliate)
 
         # Add discount codes if they are configured
         if discount_codes:
