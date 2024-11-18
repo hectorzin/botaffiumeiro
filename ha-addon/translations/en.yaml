@@ -52,7 +52,7 @@ configuration:
     description: "List of Tradedoubler advertisers and their campaign IDs (format: - domain: DOMAIN and id: ID)."
   creator_affiliate_percentage:
     name: "Creator Affiliate Percentage"
-    description: "Creators support 🙏. Defines the percentage of links that will be replaced with affiliate links belonging to the software creators when the user does not have a link for a specific domain. Thanks!"    
+    description: "Creators support 🙏. Defines the percentage of links that will be replaced with affiliate links belonging to the software creators when the user does not have a link for a specific domain. Thanks!"
   log_level:
     name: "Log Level"
     description: "Set the logging level for the bot (DEBUG, INFO, WARN, ERROR, CRITICAL)."

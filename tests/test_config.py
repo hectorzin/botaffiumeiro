@@ -4,7 +4,6 @@ from unittest.mock import patch
 
 
 class TestAddToDomainTable(unittest.TestCase):
-
     @patch("config.domain_percentage_table", {})
     def test_user_with_affiliate_id(self):
         """
@@ -102,7 +101,6 @@ class TestAddToDomainTable(unittest.TestCase):
 
 
 class TestAddAffiliateStoresDomains(unittest.TestCase):
-
     @patch("config.domain_percentage_table", {})
     def test_no_advertisers(self):
         """
@@ -235,7 +233,6 @@ class TestAddAffiliateStoresDomains(unittest.TestCase):
 
 
 class TestAddUserToDomainPercentageTable(unittest.TestCase):
-
     @patch("config.domain_percentage_table", {})
     def test_no_affiliate_ids(self):
         """
@@ -552,7 +549,6 @@ class TestAddUserToDomainPercentageTable(unittest.TestCase):
 
 
 class TestAdjustDomainAffiliatePercentages(unittest.TestCase):
-
     @patch("config.domain_percentage_table", {})
     def test_only_user_in_domain(self):
         """

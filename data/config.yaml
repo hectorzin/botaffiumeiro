@@ -36,7 +36,7 @@ amazon:
 awin:
   publisher_id: "1639881"
   advertisers:
-#    aliexpress.com: "11640"
+    #    aliexpress.com: "11640"
     pccomponentes.com: "20982"
     leroymerlin.es: "20598"
 
@@ -62,7 +62,7 @@ aliexpress:
   app_secret: "" # Replace with your AliExpress API secret
   tracking_id: "" # Replace with your AliExpress tracking ID
   discount_codes: |
-    💥 <i>AliExpress discount codes:</i> 
+    💥 <i>AliExpress discount codes:</i>
     💰<b>2$</b> off for purchases over 20$: <b>IFPTKOH</b>
     💰<b>5$</b> off for purchases over 50$: <b>IFPT35D</b>
     💰<b>25$</b> off for purchases over 200$: <b>IFPQDMH</b>

@@ -37,7 +37,9 @@ class AliexpressAPIHandler(BaseHandler):
         """Converts a regular AliExpress link into an affiliate link using the Aliexpress API."""
         self.logger.info(f"Converting AliExpress link to affiliate link: {source_url}")
         parsed_url = urlparse(source_url)
-        source_url = urlunparse((parsed_url.scheme, parsed_url.netloc, parsed_url.path, '', '', ''))
+        source_url = urlunparse(
+            (parsed_url.scheme, parsed_url.netloc, parsed_url.path, "", "", "")
+        )
         timestamp = str(int(time.time() * 1000))  # Current timestamp in milliseconds
 
         # Get AliExpress-specific configuration from self.selected_users
