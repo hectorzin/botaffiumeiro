@@ -1,6 +1,6 @@
 import unittest
-
 from unittest.mock import AsyncMock, patch
+
 from handlers.base_handler import BaseHandler
 from handlers.pattern_handler import PatternHandler
 

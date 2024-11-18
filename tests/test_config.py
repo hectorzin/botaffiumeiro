@@ -1,14 +1,13 @@
 import unittest
-import config
 from unittest.mock import patch
+
+import config
 
 
 class TestAddToDomainTable(unittest.TestCase):
     @patch("config.domain_percentage_table", {})
     def test_user_with_affiliate_id(self):
-        """
-        Test: Add a user with an affiliate ID.
-        """
+        """Test: Add a user with an affiliate ID."""
         user_id = "main"
         affiliate_id = "amazon_affiliate_id"
         config.add_to_domain_table("amazon", user_id, affiliate_id, 90)
@@ -19,9 +18,7 @@ class TestAddToDomainTable(unittest.TestCase):
 
     @patch("config.domain_percentage_table", {})
     def test_user_without_affiliate_id(self):
-        """
-        Test: Do not add a user if they don't have an affiliate ID.
-        """
+        """Test: Do not add a user if they don't have an affiliate ID."""
         user_id = "main"
         affiliate_id = None
         config.add_to_domain_table("amazon", user_id, affiliate_id, 90)
@@ -30,9 +27,7 @@ class TestAddToDomainTable(unittest.TestCase):
 
     @patch("config.domain_percentage_table", {})
     def test_new_domain_creation(self):
-        """
-        Test: Create a new domain in the table if it doesn't exist.
-        """
+        """Test: Create a new domain in the table if it doesn't exist."""
         user_id = "main"
         affiliate_id = "user-affiliate-id"
         config.add_to_domain_table("amazon", user_id, affiliate_id, 90)
@@ -43,9 +38,7 @@ class TestAddToDomainTable(unittest.TestCase):
 
     @patch("config.domain_percentage_table", {})
     def test_existing_domain_append(self):
-        """
-        Test: Add a user to an existing domain without duplicating the domain.
-        """
+        """Test: Add a user to an existing domain without duplicating the domain."""
         # First user
         user_id_1 = "user1"
         affiliate_id_1 = "user1-affiliate-id"
@@ -72,9 +65,7 @@ class TestAddToDomainTable(unittest.TestCase):
 
     @patch("config.domain_percentage_table", {})
     def test_multiple_users_in_same_domain(self):
-        """
-        Test: Add multiple users to the same domain.
-        """
+        """Test: Add multiple users to the same domain."""
         # User 1
         user_id_1 = "user1"
         affiliate_id_1 = "user1-affiliate-id"
@@ -103,9 +94,7 @@ class TestAddToDomainTable(unittest.TestCase):
 class TestAddAffiliateStoresDomains(unittest.TestCase):
     @patch("config.domain_percentage_table", {})
     def test_no_advertisers(self):
-        """
-        Test: No advertisers for the store key. The table should remain empty.
-        """
+        """Test: No advertisers for the store key. The table should remain empty."""
         user_id = "main"
         user_data = {"awin_advertisers": {}}  # No advertisers
         config.add_affiliate_stores_domains(user_id, user_data, "awin_advertisers", 50)
@@ -115,9 +104,7 @@ class TestAddAffiliateStoresDomains(unittest.TestCase):
 
     @patch("config.domain_percentage_table", {})
     def test_single_advertiser(self):
-        """
-        Test: Add a single advertiser to the domain_percentage_table.
-        """
+        """Test: Add a single advertiser to the domain_percentage_table."""
         user_id = "main"
         advertisers = {
             "example.com": "affiliate-id",
@@ -135,9 +122,7 @@ class TestAddAffiliateStoresDomains(unittest.TestCase):
 
     @patch("config.domain_percentage_table", {})
     def test_multiple_advertisers(self):
-        """
-        Test: Add multiple advertisers to the domain_percentage_table.
-        """
+        """Test: Add multiple advertisers to the domain_percentage_table."""
         user_id = "main"
         advertisers = {
             "example1.com": "affiliate-id1",
@@ -166,9 +151,7 @@ class TestAddAffiliateStoresDomains(unittest.TestCase):
 
     @patch("config.domain_percentage_table", {})
     def test_existing_domain_append(self):
-        """
-        Test: Append a new user to an existing domain without overwriting.
-        """
+        """Test: Append a new user to an existing domain without overwriting."""
         # Pre-populate the table with one user for "example.com"
         config.domain_percentage_table = {
             "example.com": [{"user": "existing_user", "percentage": 60}]
@@ -199,9 +182,7 @@ class TestAddAffiliateStoresDomains(unittest.TestCase):
 
     @patch("config.domain_percentage_table", {})
     def test_different_percentages(self):
-        """
-        Test: Add different users with different percentages for the same advertiser.
-        """
+        """Test: Add different users with different percentages for the same advertiser."""
         # First user with 70% for "example.com"
         user_id_1 = "user1"
         adversiters_1 = {"example.com": "affiliate-id1"}
@@ -235,9 +216,7 @@ class TestAddAffiliateStoresDomains(unittest.TestCase):
 class TestAddUserToDomainPercentageTable(unittest.TestCase):
     @patch("config.domain_percentage_table", {})
     def test_no_affiliate_ids(self):
-        """
-        Test: No affiliate IDs provided for the user. The table should remain empty.
-        """
+        """Test: No affiliate IDs provided for the user. The table should remain empty."""
         user_id = "user"
         user_data = {
             "amazon": {"advertisers": {}},
@@ -252,9 +231,7 @@ class TestAddUserToDomainPercentageTable(unittest.TestCase):
 
     @patch("config.domain_percentage_table", {})
     def test_amazon_affiliate_id(self):
-        """
-        Test: The user has an Amazon affiliate ID. The table should be updated with Amazon.
-        """
+        """Test: The user has an Amazon affiliate ID. The table should be updated with Amazon."""
         user_id = "main"
         user_data = {
             "amazon": {"advertisers": {"amazon.es": "amazon-affiliate-id"}},
@@ -273,9 +250,7 @@ class TestAddUserToDomainPercentageTable(unittest.TestCase):
 
     @patch("config.domain_percentage_table", {})
     def test_multiple_affiliate_ids(self):
-        """
-        Test: The user has IDs for Amazon, AliExpress, and advertisers in Awin and Admitad.
-        """
+        """Test: The user has IDs for Amazon, AliExpress, and advertisers in Awin and Admitad."""
         user_id = "main"
         user_data = {
             "amazon": {"advertisers": {"amazon.es": "amazon-affiliate-id"}},
@@ -321,9 +296,7 @@ class TestAddUserToDomainPercentageTable(unittest.TestCase):
 
     @patch("config.domain_percentage_table", {})
     def test_multiple_users_same_domains(self):
-        """
-        Test: Multiple users with affiliate data for the same domains.
-        """
+        """Test: Multiple users with affiliate data for the same domains."""
         # First user with Amazon and AliExpress
         user_id_1 = "user1"
         user_data_1 = {
@@ -384,9 +357,7 @@ class TestAddUserToDomainPercentageTable(unittest.TestCase):
 
     @patch("config.domain_percentage_table", {})
     def test_multiple_users_with_shared_and_unique_domains(self):
-        """
-        Test: Multiple users where some domains overlap and others are unique.
-        """
+        """Test: Multiple users where some domains overlap and others are unique."""
         # First user with Amazon and an Awin advertiser
         user_id_1 = "user1"
         user_data_1 = {
@@ -483,9 +454,7 @@ class TestAddUserToDomainPercentageTable(unittest.TestCase):
 
     @patch("config.domain_percentage_table", {})
     def test_multiple_users_with_aliexpress_on_different_platforms(self):
-        """
-        Test: Multiple users with AliExpress affiliate IDs from different platforms (API, Awin, Admitad).
-        """
+        """Test: Multiple users with AliExpress affiliate IDs from different platforms (API, Awin, Admitad)."""
         # First user has AliExpress via API
         user_id_1 = "user1"
         user_data_1 = {
@@ -551,9 +520,7 @@ class TestAddUserToDomainPercentageTable(unittest.TestCase):
 class TestAdjustDomainAffiliatePercentages(unittest.TestCase):
     @patch("config.domain_percentage_table", {})
     def test_only_user_in_domain(self):
-        """
-        Test: Only the main user is in the domain. The user should get 100% of the percentage.
-        """
+        """Test: Only the main user is in the domain. The user should get 100% of the percentage."""
         creator_percentage = 0
         user_percentage = 100 - creator_percentage
         config.domain_percentage_table = {
@@ -575,9 +542,7 @@ class TestAdjustDomainAffiliatePercentages(unittest.TestCase):
 
     @patch("config.domain_percentage_table", {})
     def test_user_and_single_creator(self):
-        """
-        Test: One user and one creator. Percentages should adjust based on creator_percentage.
-        """
+        """Test: One user and one creator. Percentages should adjust based on creator_percentage."""
         creator_percentage = 30
         user_percentage = 100 - creator_percentage
         config.domain_percentage_table = {
@@ -612,9 +577,7 @@ class TestAdjustDomainAffiliatePercentages(unittest.TestCase):
 
     @patch("config.domain_percentage_table", {})
     def test_user_and_multiple_creators(self):
-        """
-        Test: One user and multiple creators. Percentages should adjust according to creator_percentage.
-        """
+        """Test: One user and multiple creators. Percentages should adjust according to creator_percentage."""
         creator_percentage = 30
 
         config.domain_percentage_table = {
@@ -660,9 +623,7 @@ class TestAdjustDomainAffiliatePercentages(unittest.TestCase):
 
     @patch("config.domain_percentage_table", {})
     def test_only_creators_in_domain(self):
-        """
-        Test: No main user, only creators. The creators should be adjusted to sum to 100%.
-        """
+        """Test: No main user, only creators. The creators should be adjusted to sum to 100%."""
         creator_percentage = 10
         config.domain_percentage_table = {
             "amazon": [
@@ -697,9 +658,7 @@ class TestAdjustDomainAffiliatePercentages(unittest.TestCase):
 
     @patch("config.domain_percentage_table", {})
     def test_user_with_zero_creator_percentage(self):
-        """
-        Test: User with 0% creator influence. The user should get 100%.
-        """
+        """Test: User with 0% creator influence. The user should get 100%."""
         creator_percentage = 0
         config.domain_percentage_table = {
             "amazon": [
@@ -735,8 +694,7 @@ class TestAdjustDomainAffiliatePercentages(unittest.TestCase):
 
     @patch("config.domain_percentage_table", {})
     def test_main_user_only(self):
-        """
-        Test: The main user is the only one in the logisplan.com domain.
+        """Test: The main user is the only one in the logisplan.com domain.
         The user should get 100% of the percentage.
         """
         creator_percentage = 10  # Percentage intended for creators, not applicable here

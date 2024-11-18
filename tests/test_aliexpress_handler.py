@@ -1,5 +1,4 @@
 import unittest
-
 from unittest.mock import AsyncMock
 
 from handlers.aliexpress_handler import AliexpressHandler
@@ -8,7 +7,6 @@ from handlers.aliexpress_handler import AliexpressHandler
 class TestHandleAliExpressLinks(unittest.IsolatedAsyncioTestCase):
     async def test_aliexpress_links_without_affiliate(self):
         """Test AliExpress links when they are not in the advertiser list and APP_KEY is empty."""
-
         mock_message = AsyncMock()
         mock_message.text = (
             "Check this out: https://www.aliexpress.com/item/1005002958205071.html"
@@ -43,7 +41,6 @@ class TestHandleAliExpressLinks(unittest.IsolatedAsyncioTestCase):
 
     async def test_no_discount_codes(self):
         """Test that no action is taken when ALIEXPRESS_DISCOUNT_CODES is empty."""
-
         mock_message = AsyncMock()
         mock_message.text = (
             "Check this out: https://www.aliexpress.com/item/1005002958205071.html"
@@ -73,7 +70,6 @@ class TestHandleAliExpressLinks(unittest.IsolatedAsyncioTestCase):
 
     async def test_no_aliexpress_links(self):
         """Test that no action is taken when no AliExpress links are present in the message."""
-
         mock_message = AsyncMock()
         mock_message.text = "This is a random message without AliExpress links."
         mock_message.message_id = 4

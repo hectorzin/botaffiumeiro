@@ -1,9 +1,8 @@
 import unittest
-
 from unittest.mock import AsyncMock, patch
 
-from handlers.base_handler import BaseHandler
 from handlers.aliexpress_api_handler import AliexpressAPIHandler
+from handlers.base_handler import BaseHandler
 
 
 class TestHandler(BaseHandler):
@@ -15,7 +14,6 @@ class TestHandleAliExpressAPILinks(unittest.IsolatedAsyncioTestCase):
     @patch("handlers.base_handler.BaseHandler._process_message")
     async def test_aliexpress_no_app_key(self, mock_process):
         """Test: No action is taken if AliExpress app_key is empty in selected_users."""
-
         # Mock selected_users without AliExpress app_key
         mock_selected_users = {"aliexpress": {"app_key": None}}
         aliexpress_handler = AliexpressAPIHandler()
@@ -41,7 +39,6 @@ class TestHandleAliExpressAPILinks(unittest.IsolatedAsyncioTestCase):
     @patch("handlers.base_handler.BaseHandler._process_message")
     async def test_no_aliexpress_link(self, mock_process):
         """Test: No action is taken if there are no AliExpress links in the message."""
-
         mock_selected_users = {"aliexpress": {"app_key": "some_app_key"}}
         aliexpress_handler = AliexpressAPIHandler()
 
@@ -69,7 +66,6 @@ class TestHandleAliExpressAPILinks(unittest.IsolatedAsyncioTestCase):
     @patch("handlers.base_handler.BaseHandler._process_message")
     async def test_long_aliexpress_link(self, mock_process, mock_convert, mock_expand):
         """Test: Long AliExpress links."""
-
         aliexpress_handler = AliexpressAPIHandler()
         mock_selected_users = {
             "aliexpress.com": {

@@ -1,4 +1,5 @@
 import json
+
 import yaml
 
 # File paths
@@ -6,7 +7,7 @@ json_file = "/data/options.json"
 yaml_file = "/botaffiumeiro/data/config.yaml"
 
 # Load the JSON file
-with open(json_file, "r") as f:
+with open(json_file) as f:
     data = json.load(f)
 
 # Convert JSON into the desired YAML structure

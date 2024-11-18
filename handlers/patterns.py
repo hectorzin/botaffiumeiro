@@ -1,6 +1,6 @@
-from handlers.base_handler import PATTERN_URL_QUERY
+from typing import Dict, Optional, TypedDict
 
-from typing import Dict, TypedDict, Optional
+from handlers.base_handler import PATTERN_URL_QUERY
 
 
 class PatternConfig(TypedDict):

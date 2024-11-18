@@ -17,7 +17,6 @@ class PatternHandler(BaseHandler):
 
     async def handle_links(self, context) -> bool:
         """Handles links based on the platform's patterns."""
-
         processed = False
         for platform, data in PATTERNS.items():
             processed |= await self.process_affiliate_link(context, platform, data)

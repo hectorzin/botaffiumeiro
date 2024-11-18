@@ -1,9 +1,9 @@
-import logging
-import yaml
-import requests
-
 from datetime import datetime, timedelta
-from typing import Dict, Any
+import logging
+from typing import Any, Dict
+
+import requests
+import yaml
 
 # Rutas a los archivos de configuración
 CONFIG_PATH = "data/config.yaml"
@@ -36,8 +36,7 @@ last_load_time = None
 
 
 def load_user_configuration(user, creator_percentage, user_data):
-    """
-    Load user-specific configuration for affiliate programs and settings
+    """Load user-specific configuration for affiliate programs and settings
     without including global items like API tokens or messages.
     """
     return {
@@ -70,15 +69,17 @@ def load_user_configuration(user, creator_percentage, user_data):
 
 
 def load_user_configuration_from_url(user_id, percentage, url):
-    """
-    Load user-specific configuration from a URL.
+    """Load user-specific configuration from a URL.
 
-    Parameters:
+    Parameters
+    ----------
     - user_id: ID of the user.
     - url: URL to fetch the user's configuration YAML file.
 
-    Returns:
+    Returns
+    -------
     - Dictionary containing user configuration data.
+
     """
     try:
         response = requests.get(url)
@@ -93,14 +94,15 @@ def load_user_configuration_from_url(user_id, percentage, url):
 
 
 def add_to_domain_table(domain, user_id, affiliate_id, percentage):
-    """
-    Adds a user to the domain percentage table if they have an ID for the given domain.
+    """Adds a user to the domain percentage table if they have an ID for the given domain.
 
-    Parameters:
+    Parameters
+    ----------
     - domain: The domain name to add to the table (e.g., "amazon", "aliexpress").
     - user_id: The ID of the user (e.g., "user", "HectorziN").
     - affiliate_id: The affiliate ID for the given domain.
     - percentage: The percentage of time this user should be selected for the domain.
+
     """
     if affiliate_id:
         if domain not in domain_percentage_table:
@@ -115,14 +117,15 @@ def add_to_domain_table(domain, user_id, affiliate_id, percentage):
 
 
 def add_affiliate_stores_domains(user_id, advertisers, platform_key, percentage):
-    """
-    Processes multiple domains for networks like Awin or Admitad.
+    """Processes multiple domains for networks like Awin or Admitad.
 
-    Parameters:
+    Parameters
+    ----------
     - user_id: The ID of the user (e.g., "user", "HectorziN")
     - advertisers: A dictionary of advertisers for the given platform (e.g., Awin or Admitad)
     - platform_key: The key indicating the platform (e.g., "awin", "admitad")
     - percentage: The percentage of time this user should be selected for these domains
+
     """
     if not advertisers:
         logger.info(f"No advertisers for {platform_key}. Skipping {user_id}.")
@@ -134,13 +137,14 @@ def add_affiliate_stores_domains(user_id, advertisers, platform_key, percentage)
 
 
 def add_user_to_domain_percentage_table(user_id, user_data, percentage):
-    """
-    Adds a user to the domain percentage table based on their affiliate configurations.
+    """Adds a user to the domain percentage table based on their affiliate configurations.
 
-    Parameters:
+    Parameters
+    ----------
     - user_id: ID of the user (e.g., "user", "HectorziN")
     - user_data: Configuration data of the user (structured as amazon, awin, admitad, aliexpress)
     - percentage: Percentage of time this user should be selected for each domain
+
     """
     logger.debug(f"Adding {user_id} with percentage {percentage}")
 
@@ -181,12 +185,13 @@ def add_user_to_domain_percentage_table(user_id, user_data, percentage):
 
 
 def adjust_domain_affiliate_percentages(domain, creator_percentage):
-    """
-    Adjusts the percentages of users in a given domain within domain_percentage_table, ensuring they sum to 100%.
+    """Adjusts the percentages of users in a given domain within domain_percentage_table, ensuring they sum to 100%.
 
-    Parameters:
+    Parameters
+    ----------
     - domain: The domain (e.g., "amazon", "aliexpress") to adjust in domain_percentage_table.
     - creator_percentage: The percentage of total influence given to creators by the user.
+
     """
     logger.debug(f"Adjusting percentages for domain: {domain}")
     domain_data = domain_percentage_table.get(domain, [])
@@ -255,10 +260,10 @@ def load_configuration():
     logger.info("Loading configuration")
     domain_percentage_table.clear()
     all_users_configurations.clear()
-    with open(CONFIG_PATH, "r", encoding="utf-8") as file:
+    with open(CONFIG_PATH, encoding="utf-8") as file:
         config_file_data = yaml.safe_load(file)
 
-    with open(CREATORS_CONFIG_PATH, "r", encoding="utf-8") as file:
+    with open(CREATORS_CONFIG_PATH, encoding="utf-8") as file:
         creators_file_data = yaml.safe_load(file)
 
     # Telegram settings

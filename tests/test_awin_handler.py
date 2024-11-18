@@ -1,12 +1,12 @@
 import unittest
 from unittest.mock import AsyncMock, patch
+
 from handlers.pattern_handler import PatternHandler
 
 
 class TestHandleAwinLinks(unittest.IsolatedAsyncioTestCase):
     async def test_no_action_when_awin_publisher_id_is_none(self):
         """Test that no action is taken if AWIN_PUBLISHER_ID is None."""
-
         mock_message = AsyncMock()
         mock_message.text = "Check this out: https://www.pccomponentes.com/some-product I hope you like it"
         mock_message.message_id = 1
@@ -58,7 +58,6 @@ class TestHandleAwinLinks(unittest.IsolatedAsyncioTestCase):
     @patch("handlers.base_handler.BaseHandler._process_message")
     async def test_awin_link_in_list(self, mock_process):
         """Test Awin links conversion when. New message must match the original reply structure."""
-
         mock_message = AsyncMock()
         mock_message.text = (
             "Check this out: https://www.giftmio.com/some-product I hope you like it"
@@ -93,7 +92,6 @@ class TestHandleAwinLinks(unittest.IsolatedAsyncioTestCase):
     @patch("handlers.base_handler.BaseHandler._process_message")
     async def test_awin_affiliate_link_from_list(self, mock_process):
         """Test if an existing Awin affiliate link is modified when the store is in our list of Awin advertisers."""
-
         mock_message = AsyncMock()
         mock_message.text = "Here is a product: https://www.awin1.com/cread.php?awinmid=other_id_not_mine&awinaffid=other_affiliate_id&ued=https://www.giftmio.com/some-product I hope you like it"
         mock_message.message_id = 3
@@ -122,7 +120,6 @@ class TestHandleAwinLinks(unittest.IsolatedAsyncioTestCase):
 
     async def test_awin_affiliate_link_not_in_list(self):
         """Test that an existing Awin affiliate link is NOT modified when the store is NOT in our list of Awin advertisers."""
-
         mock_message = AsyncMock()
         mock_message.text = "Here is a product: https://www.awin1.com/cread.php?awinmid=other_id_not_mine&awinaffid=other_affiliate_id&ued=https://www.unknownstore.com/product I hope you like it"
         mock_message.message_id = 4
@@ -150,7 +147,6 @@ class TestHandleAwinLinks(unittest.IsolatedAsyncioTestCase):
     @patch("handlers.base_handler.BaseHandler._process_message")
     async def test_awin_aliexpress_link_without_discount(self, mock_process):
         """Test AliExpress link in Awin list, no discount code added."""
-
         mock_message = AsyncMock()
         mock_message.text = "Check this out: https://www.aliexpress.com/item/1005002958205071.html I hope you like it"
         mock_message.message_id = 5
@@ -184,7 +180,6 @@ class TestHandleAwinLinks(unittest.IsolatedAsyncioTestCase):
     @patch("handlers.base_handler.BaseHandler._process_message")
     async def test_awin_aliexpress_link_with_discount(self, mock_process):
         """Test AliExpress link in Awin list, adding discount codes when applicable."""
-
         mock_message = AsyncMock()
         mock_message.text = "Here is a product: https://www.aliexpress.com/item/1005002958205071.html I hope you like it"
         mock_message.message_id = 6
@@ -220,7 +215,6 @@ class TestHandleAwinLinks(unittest.IsolatedAsyncioTestCase):
 
     async def test_awin_aliexpress_link_no_awin_config(self):
         """Test AliExpress link when AliExpress is NOT in the Awin list and discount codes should NOT be added."""
-
         mock_message = AsyncMock()
         mock_message.text = "Here is a product: https://www.aliexpress.com/item/1005002958205071.html I hope you like it"
         mock_message.message_id = 2
@@ -251,7 +245,6 @@ class TestHandleAwinLinks(unittest.IsolatedAsyncioTestCase):
     @patch("handlers.base_handler.BaseHandler._process_message")
     async def test_awin_no_aliexpress_from_link_with_discount(self, mock_process):
         """Test No AliExpress link in Awin list, the discount should not be applied."""
-
         mock_message = AsyncMock()
         mock_message.text = "Here is a product: https://www.pccomponentes.com/item/1005002958205071.html I hope you like it"
         mock_message.message_id = 6

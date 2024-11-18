@@ -1,25 +1,24 @@
 import logging
 import random
 import re
-import requests
 import threading
-
-from publicsuffix2 import get_sld
-from telegram import Update, User
-from telegram.ext import Application, CommandHandler, Defaults, filters, MessageHandler
 from typing import Tuple
 from urllib.parse import parse_qs, urlparse
 
-from handlers.pattern_handler import PatternHandler
-from handlers.aliexpress_api_handler import AliexpressAPIHandler
-from handlers.aliexpress_handler import AliexpressHandler, ALIEXPRESS_PATTERN
-from handlers.patterns import PATTERNS
 from config import (
+    all_users_configurations,
     config_data,
     domain_percentage_table,
-    all_users_configurations,
     load_configuration,
 )
+from handlers.aliexpress_api_handler import AliexpressAPIHandler
+from handlers.aliexpress_handler import ALIEXPRESS_PATTERN, AliexpressHandler
+from handlers.pattern_handler import PatternHandler
+from handlers.patterns import PATTERNS
+from publicsuffix2 import get_sld
+import requests
+from telegram import Update, User
+from telegram.ext import Application, CommandHandler, Defaults, MessageHandler, filters
 
 DOMAIN_PATTERNS = {
     "aliexpress": ALIEXPRESS_PATTERN,
@@ -35,7 +34,6 @@ logging.getLogger("httpx").setLevel(
 
 def is_user_excluded(user: User) -> bool:
     """Checks if the user is in the list of excluded users."""
-
     user_id = user.id
     username = user.username
     logger.debug(f"Checking if user {username} (ID: {user_id}) is excluded.")
@@ -65,14 +63,16 @@ def expand_shortened_url(url: str):
 
 
 def extract_embedded_url(query_params):
-    """
-    Extracts any valid URLs embedded in query parameters.
+    """Extracts any valid URLs embedded in query parameters.
 
-    Parameters:
+    Parameters
+    ----------
     - query_params: A dictionary of query parameters from a URL.
 
-    Returns:
+    Returns
+    -------
     - A set of embedded domains found in the query parameters.
+
     """
     embedded_domains = set()
     for key, values in query_params.items():
@@ -86,17 +86,19 @@ def extract_embedded_url(query_params):
 
 
 def extract_domains_from_message(message_text: str) -> Tuple[set, str]:
-    """
-    Extracts domains from a message using domain patterns and searches for embedded URLs.
+    """Extracts domains from a message using domain patterns and searches for embedded URLs.
     Additionally, expands short URLs and replaces them in the message text.
 
-    Parameters:
+    Parameters
+    ----------
     - message_text: The text of the message to search for domains.
 
-    Returns:
+    Returns
+    -------
     - A tuple containing:
         - A set of domains found in the message.
         - The modified message text with expanded URLs.
+
     """
     domains = set()
 
@@ -135,14 +137,16 @@ def extract_domains_from_message(message_text: str) -> Tuple[set, str]:
 
 
 def select_user_for_domain(domain):
-    """
-    Selects a user for the given domain based on percentages in domain_percentage_table.
+    """Selects a user for the given domain based on percentages in domain_percentage_table.
 
-    Parameters:
+    Parameters
+    ----------
     - domain: The domain to select the user for (e.g., "amazon")
 
-    Returns:
+    Returns
+    -------
     - The user_data for the selected user, or the first user's data if no random selection occurs.
+
     """
     # Get the domain data from the table
     domain_data = domain_percentage_table.get(domain, [])
@@ -168,14 +172,16 @@ def select_user_for_domain(domain):
 
 
 def choose_users(domains) -> dict:
-    """
-    Handles the domains and selects users randomly based on domain configurations.
+    """Handles the domains and selects users randomly based on domain configurations.
 
-    Parameters:
+    Parameters
+    ----------
     - domains: List of domains extracted from the message.
 
-    Returns:
+    Returns
+    -------
     - A dictionary of selected users mapped by their respective domains.
+
     """
     selected_users = {}
 
@@ -189,18 +195,20 @@ def choose_users(domains) -> dict:
 
 
 def prepare_message(message, default_domains=None) -> dict:
-    """
-    Prepares the message by extracting domains, selecting users, and returning a processing context.
+    """Prepares the message by extracting domains, selecting users, and returning a processing context.
 
-    Parameters:
+    Parameters
+    ----------
     - message: The message object containing the text with links.
     - default_domains: An optional list of domains to consider if the message is a command or lacks domains.
 
-    Returns:
+    Returns
+    -------
     - A dictionary (context) containing:
         - The original message (or None if not provided).
         - The modified message text with expanded URLs (or None if not applicable).
         - A dictionary of selected users mapped to their respective domains (or empty if no users).
+
     """
     if not message or not message.text:
         return {
@@ -232,7 +240,6 @@ def prepare_message(message, default_domains=None) -> dict:
 
 async def process_link_handlers(message) -> None:
     """Process all link handlers for Amazon, Awin, Admitad, and AliExpress."""
-
     logger.info(f"Processing link handlers for message ID: {message.message_id}...")
 
     context = prepare_message(message)
@@ -250,7 +257,6 @@ async def process_link_handlers(message) -> None:
 
 async def modify_link(update: Update, context) -> None:
     """Modifies Amazon, AliExpress, Awin, and Admitad links in messages."""
-
     logger.info(f"Received new update (ID: {update.update_id}).")
 
     if not update.message or not update.message.text:
@@ -281,17 +287,13 @@ async def modify_link(update: Update, context) -> None:
 
 
 def reload_config_periodically(interval):
-    """
-    Function to reload the configuration periodically every `interval` seconds.
-    """
+    """Function to reload the configuration periodically every `interval` seconds."""
     load_configuration()
     threading.Timer(interval, reload_config_periodically, [interval]).start()
 
 
 async def handle_discount_command(update: Update, context) -> None:
-    """
-    Maneja los comandos de descuento llamando a la función 'show_discount_codes' de AliexpressHandler.
-    """
+    """Maneja los comandos de descuento llamando a la función 'show_discount_codes' de AliexpressHandler."""
     logger.info(f"Processing discount command: {update.message.text}")
 
     context = prepare_message(update.message, ["aliexpress.com"])
@@ -301,9 +303,7 @@ async def handle_discount_command(update: Update, context) -> None:
 
 
 def register_discount_handlers(application):
-    """
-    Registra dinámicamente todos los comandos de descuento en el bot.
-    """
+    """Registra dinámicamente todos los comandos de descuento en el bot."""
     for keyword in config_data["DISCOUNT_KEYWORDS"]:
         application.add_handler(CommandHandler(keyword, handle_discount_command))
 

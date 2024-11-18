@@ -1,12 +1,12 @@
-import hmac
 import hashlib
+import hmac
 import re
-import requests
 import time
+from urllib.parse import parse_qs, unquote, urlparse, urlunparse
 
-from urllib.parse import urlparse, urlunparse, parse_qs, unquote
-from handlers.base_handler import BaseHandler
 from handlers.aliexpress_handler import ALIEXPRESS_PATTERN
+from handlers.base_handler import BaseHandler
+import requests
 
 # API endpoint for generating affiliate links
 ALIEXPRESS_API_URL = "https://api-sg.aliexpress.com/sync"
@@ -103,15 +103,17 @@ class AliexpressAPIHandler(BaseHandler):
         return None
 
     def _get_real_url(self, link: str) -> str:
-        """
-        Checks for a 'redirectUrl' parameter in the given link and extracts its value if present.
+        """Checks for a 'redirectUrl' parameter in the given link and extracts its value if present.
         If no 'redirectUrl' is found, returns the original link.
 
-        Parameters:
+        Parameters
+        ----------
         - link: The original URL to analyze.
 
-        Returns:
+        Returns
+        -------
         - A string representing the resolved URL or the original link if no redirect exists.
+
         """
         parsed_url = urlparse(link)
         query_params = parse_qs(parsed_url.query)
@@ -123,14 +125,16 @@ class AliexpressAPIHandler(BaseHandler):
         return link  # Return the original link if no redirectUrl exists
 
     def _resolve_redirects(self, message_text: str) -> dict:
-        """
-        Resolves redirected URLs (e.g., redirectUrl) in the message text.
+        """Resolves redirected URLs (e.g., redirectUrl) in the message text.
 
-        Parameters:
+        Parameters
+        ----------
         - message_text: The text of the message to process.
 
-        Returns:
+        Returns
+        -------
         - A dictionary mapping original URLs to resolved URLs.
+
         """
         urls_in_message = re.findall(r"https?://[^\s]+", message_text)
 
@@ -143,7 +147,6 @@ class AliexpressAPIHandler(BaseHandler):
 
     async def handle_links(self, context) -> bool:
         """Handles AliExpress links and converts them using the Aliexpress API."""
-
         message, modified_text, self.selected_users = self._unpack_context(context)
 
         # Retrieve the AliExpress configuration from self.selected_users

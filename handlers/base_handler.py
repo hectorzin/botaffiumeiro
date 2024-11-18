@@ -1,14 +1,12 @@
+from abc import ABC, abstractmethod
 import logging
 import re
-
-from urllib.parse import urlparse, parse_qs
-from abc import ABC, abstractmethod
-from telegram import Message
-from urllib.parse import urlencode
 from typing import Tuple
-from publicsuffix2 import get_sld
+from urllib.parse import parse_qs, urlencode, urlparse
 
 from config import config_data
+from publicsuffix2 import get_sld
+from telegram import Message
 
 # Known short URL domains for expansion
 PATTERN_URL_QUERY = r"?[^\s]+"
@@ -41,10 +39,10 @@ class BaseHandler(ABC):
         affiliate_id: str,
         advertiser_id: str = "",
     ) -> str:
-        """
-        Converts a product URL into an affiliate link based on the provided format template.
+        """Converts a product URL into an affiliate link based on the provided format template.
 
         Args:
+        ----
             original_url (str): The original product URL.
             format_template (str): The template for the affiliate URL, e.g., '{domain}/{path_before_query}?{affiliate_tag}={affiliate_id}'.
             affiliate_tag (str): The query parameter for the affiliate ID (e.g., 'tag', 'aff_id').
@@ -52,7 +50,9 @@ class BaseHandler(ABC):
             advertiser_id (str): The advertiser ID for the platform (optional).
 
         Returns:
+        -------
             str: The URL with the affiliate tag and advertiser ID added according to the template.
+
         """
         # Parse the original URL
         parsed_url = urlparse(original_url)
@@ -102,12 +102,13 @@ class BaseHandler(ABC):
         return affiliate_url
 
     async def _process_message(self, message, new_text: str):
-        """
-        Send a polite affiliate message, either by deleting the original message or replying to it.
+        """Send a polite affiliate message, either by deleting the original message or replying to it.
 
         Args:
+        ----
             message (telegram.Message): The message to modify.
             new_text (str): The modified text with affiliate links.
+
         """
         # Get user information
         user_first_name = message.from_user.first_name
@@ -139,14 +140,16 @@ class BaseHandler(ABC):
             )
 
     def _build_affiliate_url_pattern(self, advertiser_key):
-        """
-        Builds a URL pattern for a given affiliate platform (e.g., Admitad, Awin) by gathering all the advertiser domains.
+        """Builds a URL pattern for a given affiliate platform (e.g., Admitad, Awin) by gathering all the advertiser domains.
 
-        Parameters:
+        Parameters
+        ----------
         - advertiser_key: The key in selected_users that holds advertisers (e.g., 'admitad', 'awin').
 
-        Returns:
+        Returns
+        -------
         - A regex pattern string that matches any of the advertiser domains.
+
         """
         affiliate_domains = set()
 
@@ -159,7 +162,7 @@ class BaseHandler(ABC):
             advertisers.update(advertisers_n)
 
         # Add each domain, properly escaped for regex, to the affiliate_domains set
-        for domain in advertisers.keys():
+        for domain in advertisers:
             affiliate_domains.add(domain.replace(".", r"\."))
 
         # If no domains were found, return None
@@ -179,15 +182,17 @@ class BaseHandler(ABC):
         )
 
     def _extract_store_urls(self, message_text: str, url_pattern: str) -> list:
-        """
-        Extracts store URLs directly from the message text or from URLs embedded in query parameters.
+        """Extracts store URLs directly from the message text or from URLs embedded in query parameters.
 
-        Parameters:
+        Parameters
+        ----------
         - message_text: The text of the message.
         - url_pattern: The regex pattern to match store URLs.
 
-        Returns:
+        Returns
+        -------
         - A list of tuples (original_url, extracted_url, domain) matching the store pattern.
+
         """
         extracted_urls = []
 
@@ -228,7 +233,6 @@ class BaseHandler(ABC):
         affiliate_tag: str,
     ) -> bool:
         """Generic method to handle affiliate links for different platforms."""
-
         message, text, self.selected_users = self._unpack_context(context)
         url_pattern = self._build_affiliate_url_pattern(affiliate_platform)
 

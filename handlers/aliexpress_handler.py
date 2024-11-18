@@ -1,6 +1,6 @@
 import re
 
-from handlers.base_handler import BaseHandler, PATTERN_URL_QUERY
+from handlers.base_handler import PATTERN_URL_QUERY, BaseHandler
 
 ALIEXPRESS_PATTERN = (
     r"(https?://(?:[a-z]{2,3}\.)?aliexpress\.[a-z]{2,3}(?:\.[a-z]{2,3})?"
