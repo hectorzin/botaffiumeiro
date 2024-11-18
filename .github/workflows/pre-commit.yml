@@ -23,8 +23,5 @@ jobs:
           pip install pre-commit types-requests types-PyYAML
           pre-commit install-hooks
 
-      - name: Set up Pre-Commit
-        run: bash setup_precommit.sh
-            
       - name: Run Pre-Commit
         run: pre-commit run --all-files
