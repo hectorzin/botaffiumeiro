@@ -1,0 +1,5 @@
+[tool.mypy]
+install_types = true
+namespace_packages = true
+ignore_missing_imports = true
+explicit_package_bases = true
