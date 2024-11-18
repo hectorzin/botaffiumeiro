@@ -1,17 +1,5 @@
 [tool.mypy]
 ignore_missing_imports = true
-
-[tool.mypy-requests]
-ignore_missing_imports = true
-
-[tool.mypy-yaml]
-ignore_missing_imports = true
-
-[mypy]
-ignore_missing_imports = True
-
-[mypy-requests]
-ignore_missing_imports = True
-
-[mypy-yaml]
-ignore_missing_imports = True
+namespace_packages = true
+explicit_package_bases = true
+install_types = true
