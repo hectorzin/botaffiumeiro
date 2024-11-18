@@ -25,6 +25,6 @@ jobs:
 
       - name: Set up Pre-Commit
         run: bash setup_precommit.sh
-            
+
       - name: Run Pre-Commit
         run: pre-commit run --all-files
