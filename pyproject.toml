@@ -1,6 +1,8 @@
 [tool.mypy]
-[mypy-requests.*]
 ignore_missing_imports = true
 
-[mypy-yaml.*]
+[tool.mypy-requests]
+ignore_missing_imports = true
+
+[tool.mypy-yaml]
 ignore_missing_imports = true
