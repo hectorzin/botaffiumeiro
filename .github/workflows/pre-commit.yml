@@ -1,6 +1,5 @@
 name: Run Pre-Commit Checks
 
-
 on:
   push:
   pull_request:
