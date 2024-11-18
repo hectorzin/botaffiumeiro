@@ -1,6 +1,6 @@
 import json
 
-import yaml
+import yaml  # type: ignore
 
 # File paths
 json_file = "/data/options.json"
