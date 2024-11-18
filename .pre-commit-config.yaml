@@ -25,6 +25,7 @@ repos:
       - id: "mypy"
         name: "Check type hints (mypy)"
         args:
+          - "--config-file=pyproject.toml"        
           - "--explicit-package-bases"
           - "--install-types"
           - "--non-interactive"
