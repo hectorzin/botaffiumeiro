@@ -1,12 +1,11 @@
 from handlers.base_handler import PATTERN_URL_QUERY
-from typing import Dict
 
-from typing import TypedDict
+from typing import Dict, TypedDict, Optional
 
 class PatternConfig(TypedDict):
     pattern: str
     format_template: str
-    affiliate_tag: str
+    affiliate_tag: Optional[str]  # Ahora permite valores `None`.
 
 PATTERNS: Dict[str, PatternConfig] = {
     "amazon": {
