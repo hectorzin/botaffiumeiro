@@ -26,7 +26,7 @@ repos:
         name: "Check type hints (mypy)"
         args:
           - --install-types
-          - --non-interactive        
+          - --non-interactive
           - --ignore-missing-imports
           - --explicit-package-bases
         verbose: true
