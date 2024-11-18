@@ -24,7 +24,5 @@ repos:
     hooks:
       - id: "mypy"
         name: "Check type hints (mypy)"
-        args:
-          - --ignore-missing-imports
-          - --explicit-package-bases
+        args: [--ignore-missing-imports]
         verbose: true
