@@ -39,7 +39,7 @@ class AliexpressHandler(BaseHandler):
         """Handles both long and short AliExpress links in the message."""
         message, modified_text, self.selected_users = self._unpack_context(context)
         # Extraemos self.selected_users.get("aliexpress.com", {}) a una variable
-        aliexpress_data = self.selected_users.get("aliexpress.com", {})
+        self.selected_users.get("aliexpress.com", {})
 
         aliexpress_links = re.findall(ALIEXPRESS_PATTERN, modified_text)
 
