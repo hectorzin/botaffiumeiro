@@ -13,7 +13,6 @@ class TestHandler(BaseHandler):
 
 
 class TestHandleAmazonLinks(unittest.IsolatedAsyncioTestCase):
-
     @patch("handlers.base_handler.BaseHandler._process_message")
     async def test_no_amazon_link(self, mock_process):
         """Test that no action is taken if there are no Amazon links in the message."""

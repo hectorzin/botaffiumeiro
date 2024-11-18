@@ -1,13 +1,11 @@
 import unittest
 
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock
 
-from handlers.base_handler import BaseHandler
 from handlers.aliexpress_handler import AliexpressHandler
 
 
 class TestHandleAliExpressLinks(unittest.IsolatedAsyncioTestCase):
-
     async def test_aliexpress_links_without_affiliate(self):
         """Test AliExpress links when they are not in the advertiser list and APP_KEY is empty."""
 

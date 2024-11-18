@@ -49,4 +49,3 @@ schema:
       id: str?
   creator_affiliate_percentage: str?
   log_level: list(DEBUG|INFO|WARN|ERROR|CRITICAL)
-

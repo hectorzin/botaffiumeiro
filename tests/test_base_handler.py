@@ -1,6 +1,6 @@
 import unittest
 
-from unittest.mock import AsyncMock, Mock, patch
+from unittest.mock import AsyncMock, patch
 from urllib.parse import unquote
 from handlers.base_handler import BaseHandler, PATTERN_AFFILIATE_URL_QUERY
 from config import config_data
@@ -12,7 +12,6 @@ class TestHandler(BaseHandler):
 
 
 class TestGenerateAffiliateUrl(unittest.TestCase):
-
     def setUp(self):
         """Set up the TestHandler instance."""
         self.handler = TestHandler()
@@ -203,7 +202,6 @@ class TestGenerateAffiliateUrl(unittest.TestCase):
 
 
 class TestProcessMessage(unittest.TestCase):
-
     def setUp(self):
         """Set up the TestHandler instance."""
         self.handler = TestHandler()  # Pasar selected_users al crear la instancia
@@ -377,7 +375,6 @@ class TestProcessMessage(unittest.TestCase):
 
 
 class TestBuildAffiliateUrlPattern(unittest.TestCase):
-
     def test_admitad_url_pattern(self):
         """
         Test: Verify that admitad_url_pattern is correctly generated from multiple users' domains.

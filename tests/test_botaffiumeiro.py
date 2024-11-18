@@ -176,7 +176,6 @@ class TestModifyLink(unittest.IsolatedAsyncioTestCase):
 
 
 class TestExpandShortenedURL(unittest.TestCase):
-
     @patch("requests.get")
     def test_expand_amazon_short_url(self, mock_get):
         """
@@ -223,7 +222,6 @@ class TestExpandShortenedURL(unittest.TestCase):
 
 
 class TestExtractDomainsFromMessage(unittest.TestCase):
-
     def test_direct_domain_extraction(self):
         """
         Test: Extract domains directly from the message without embedded URLs.
@@ -506,7 +504,7 @@ class TestExtractDomainsFromMessage(unittest.TestCase):
         # Text with long URLs already expanded
         message_text = (
             "Check out this Amazon deal: https://www.amazon.com/dp/B08XYZ123 "
-            "and this AliExpress: https://es.aliexpress.com/item/12345.html" ## We use a localized URL because expanding always, can change generic to local URL
+            "and this AliExpress: https://es.aliexpress.com/item/12345.html"  ## We use a localized URL because expanding always, can change generic to local URL
         )
 
         # Call the function that processes the message
@@ -514,18 +512,19 @@ class TestExtractDomainsFromMessage(unittest.TestCase):
 
         # Verify that the correct domains were extracted
         self.assertIn("amazon.com", domains)  # Should find amazon.com
-        self.assertIn("aliexpress.com", domains) # Should find aliexpress.com
+        self.assertIn("aliexpress.com", domains)  # Should find aliexpress.com
 
         # Verify that the full URLs are present in the modified message
         self.assertIn("https://www.amazon.com/dp/B08XYZ123", modified_message)
-        self.assertIn("aliexpress.com/item/12345.html", modified_message) # Should find aliexpress.com (not checking exact subdomain, as it may expand to different regions)
+        self.assertIn(
+            "aliexpress.com/item/12345.html", modified_message
+        )  # Should find aliexpress.com (not checking exact subdomain, as it may expand to different regions)
 
         # Ensure there were no unnecessary modifications
         self.assertEqual(message_text, modified_message)
 
 
 class TestExtractEmbeddedUrl(unittest.TestCase):
-
     def test_no_embedded_urls(self):
         """
         Test: No embedded URLs in the query parameters.
@@ -593,7 +592,6 @@ class TestExtractEmbeddedUrl(unittest.TestCase):
 
 
 class TestPrepareMessage(unittest.TestCase):
-
     @patch("botaffiumeiro.extract_domains_from_message")
     @patch("botaffiumeiro.select_user_for_domain")
     def test_prepare_message_with_valid_domains(
@@ -701,10 +699,13 @@ class TestPrepareMessage(unittest.TestCase):
         Test: Simulate a message where one domain has a user and another domain does not.
         """
         # Mock the domains extracted from the message
-        mock_extract_domains.return_value = {
-            "amazon.com",
-            "unknown.com",
-        }, "Modified message with expanded URLs"
+        mock_extract_domains.return_value = (
+            {
+                "amazon.com",
+                "unknown.com",
+            },
+            "Modified message with expanded URLs",
+        )
 
         # Define a function for side_effect to return users based on the domain
         def select_user_side_effect(domain):
@@ -747,9 +748,10 @@ class TestPrepareMessage(unittest.TestCase):
         Test: Simulate a message where all domains are unknown.
         """
         # Mock the domains extracted from the message
-        mock_extract_domains.return_value = {
-            "unknown.com"
-        }, "Modified message with expanded URLs"
+        mock_extract_domains.return_value = (
+            {"unknown.com"},
+            "Modified message with expanded URLs",
+        )
 
         # Mock the user selection for the unknown domain
         mock_select_user.return_value = None  # No user for unknown.com
@@ -781,10 +783,13 @@ class TestPrepareMessage(unittest.TestCase):
         Test: Ensure that prepare_message returns both the selected users and the modified message.
         """
         # Mock the domains and the modified message returned by extract_domains_from_message
-        mock_extract_domains.return_value = {
-            "amazon.com",
-            "aliexpress.com",
-        }, "Modified message with expanded URLs"
+        mock_extract_domains.return_value = (
+            {
+                "amazon.com",
+                "aliexpress.com",
+            },
+            "Modified message with expanded URLs",
+        )
 
         # Define a function for side_effect to return users based on the domain
         def select_user_side_effect(domain):
@@ -839,7 +844,6 @@ class TestPrepareMessage(unittest.TestCase):
 
 
 class TestSelectUserForDomain(unittest.TestCase):
-
     @patch(
         "botaffiumeiro.domain_percentage_table",
         {

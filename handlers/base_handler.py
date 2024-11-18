@@ -4,9 +4,8 @@ import re
 from urllib.parse import urlparse, parse_qs
 from abc import ABC, abstractmethod
 from telegram import Message
-from urllib.parse import urlparse, parse_qs, urlencode
+from urllib.parse import urlencode
 from typing import Tuple
-from telegram import Message
 from publicsuffix2 import get_sld
 
 from config import config_data
@@ -17,13 +16,13 @@ PATTERN_AFFILIATE_URL_QUERY = r"/[a-zA-Z0-9\-\._~:/?#\[\]@!$&'()*+,;=%]+"
 
 
 class BaseHandler(ABC):
-
     def __init__(self):
-
         self.logger = logging.getLogger(__name__)
         self.selected_users = {}
 
-    def _unpack_context(self, context) -> Tuple[
+    def _unpack_context(
+        self, context
+    ) -> Tuple[
         Message,
         str,
     ]:
@@ -233,7 +232,7 @@ class BaseHandler(ABC):
         return url_pattern_template.format(
             domain_pattern,
         )
-    
+
     def _extract_store_urls(self, message_text: str, url_pattern: str) -> list:
         """
         Extracts store URLs directly from the message text or from URLs embedded in query parameters.
@@ -248,10 +247,12 @@ class BaseHandler(ABC):
         extracted_urls = []
 
         def _extract_and_append(original, extracted):
-                """Helper function to parse and append URL and domain."""
-                parsed_url = urlparse(extracted)
-                domain = get_sld(parsed_url.netloc)  # Use get_sld to extract domain (handles cases like .co.uk)
-                extracted_urls.append((original, extracted, domain))    
+            """Helper function to parse and append URL and domain."""
+            parsed_url = urlparse(extracted)
+            domain = get_sld(
+                parsed_url.netloc
+            )  # Use get_sld to extract domain (handles cases like .co.uk)
+            extracted_urls.append((original, extracted, domain))
 
         # Find all URLs in the message text
         urls_in_message = re.findall(r"https?://[^\s]+", message_text)
@@ -273,7 +274,6 @@ class BaseHandler(ABC):
                             _extract_and_append(url, value)
 
         return extracted_urls
-    
 
     async def _process_store_affiliate_links(
         self,
@@ -286,7 +286,6 @@ class BaseHandler(ABC):
 
         message, text, self.selected_users = self._unpack_context(context)
         url_pattern = self._build_affiliate_url_pattern(affiliate_platform)
-
 
         if not url_pattern:
             self.logger.info(f"{message.message_id}: No affiliate list")
