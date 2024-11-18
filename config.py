@@ -13,7 +13,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 domain_percentage_table = {}
-all_users_configurations = {}
+all_users_configurations: dict[str, dict] = {}
 
 config_data = {
     # Telegram

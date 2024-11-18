@@ -4,7 +4,7 @@ import re
 import requests
 import time
 
-from urllib.parse import urlparse, urlunparse, parse_qs
+from urllib.parse import urlparse, urlunparse, parse_qs, unquote
 from handlers.base_handler import BaseHandler
 from handlers.aliexpress_handler import ALIEXPRESS_PATTERN
 
@@ -119,7 +119,7 @@ class AliexpressAPIHandler(BaseHandler):
         # Check if the 'redirectUrl' parameter exists in the query
         if "redirectUrl" in query_params:
             redirect_url = query_params["redirectUrl"][0]  # Extract the first value
-            return requests.utils.unquote(redirect_url)  # Decode the URL
+            return unquote(redirect_url)  # Decode the URL
         return link  # Return the original link if no redirectUrl exists
 
     def _resolve_redirects(self, message_text: str) -> dict:

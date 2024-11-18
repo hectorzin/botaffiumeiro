@@ -25,10 +25,6 @@ DOMAIN_PATTERNS = {
     "aliexpress": ALIEXPRESS_PATTERN,
 }
 
-logging.basicConfig(
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    level=config_data["LOG_LEVEL"],
-)
 logger = logging.getLogger(__name__)
 logging.getLogger("httpx").setLevel(
     logger.getEffectiveLevel() + 10
@@ -315,6 +311,11 @@ def register_discount_handlers(application):
 def main() -> None:
     """Start the bot with python-telegram-bot"""
     load_configuration()
+
+    logging.basicConfig(
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        level=config_data["LOG_LEVEL"],
+    )
     logger.info("Configuring the bot")
 
     # Program a job to reaload config every day
