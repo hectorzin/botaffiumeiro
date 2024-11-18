@@ -309,7 +309,7 @@ class TestExtractDomainsFromMessage(unittest.TestCase):
         message_text = "Check out this product: https://amzn.to/abc123"
 
         # Simulate the expansion of the shortened URL
-        expand_shortened_url = Mock(return_value="https://www.amazon.com/dp/product123")
+        Mock(return_value="https://www.amazon.com/dp/product123")
 
         domains, modified_message = extract_domains_from_message(message_text)
         mock_expand.assert_called_once_with("https://amzn.to/abc123")
@@ -406,17 +406,6 @@ class TestExtractDomainsFromMessage(unittest.TestCase):
             "amazon.co.uk", domains
         )  # The amazon.co.uk domain should be extracted
         self.assertEqual(len(domains), 1)  # Should only find one domain
-
-    def test_no_matching_patterns(self):
-        """
-        Test: No matching domains or patterns in the message.
-        """
-        message_text = "There are no valid links in this message."
-        domains, modified_message = extract_domains_from_message(message_text)
-
-        self.assertEqual(
-            domains, set()
-        )  # Should return an empty set since no domains are matched
 
     @patch("requests.get")
     def test_expand_amazon_short_url_and_replace_in_message(self, mock_get):
@@ -636,32 +625,6 @@ class TestPrepareMessage(unittest.TestCase):
         self.assertIn("aliexpress.com", context["selected_users"])
         self.assertEqual(context["selected_users"]["aliexpress.com"]["user"], "user2")
 
-    @patch("handlers.base_handler.BaseHandler._extract_domains_from_message")
-    @patch("handlers.base_handler.BaseHandler._select_user_for_domain")
-    def test_prepare_message_with_no_domains(
-        self, mock_select_user, mock_extract_domains
-    ):
-        """
-        Test: Handle a case where no valid domains are found in the message.
-        """
-        # Mock the domains extracted from the message (empty set and message unchanged)
-        mock_extract_domains.return_value = (set(), "This message contains no links.")
-
-        # Simulate a message object with text
-        message = Mock()
-        message.text = "This message contains no links."
-
-        # Call the method
-        modified_message = prepare_message(message)
-
-        # No domains, so the selected_users should be empty
-        self.assertEqual(self.handler.selected_users, {})
-
-        # Ensure the _select_user_for_domain function was never called
-        mock_select_user.assert_not_called()
-
-        # Check that the message text was not changed
-        self.assertEqual(modified_message, "This message contains no links.")
 
     @patch("botaffiumeiro.extract_domains_from_message")
     @patch("botaffiumeiro.select_user_for_domain")

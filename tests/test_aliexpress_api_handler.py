@@ -108,6 +108,7 @@ class TestHandleAliExpressAPILinks(unittest.IsolatedAsyncioTestCase):
         )
 
         mock_process.assert_called_with(mock_message, expected_message)
+        self.assertTrue(result)
 
 
 if __name__ == "__main__":

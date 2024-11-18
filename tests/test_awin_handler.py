@@ -53,6 +53,7 @@ class TestHandleAwinLinks(unittest.IsolatedAsyncioTestCase):
             "selected_users": mock_selected_users,
         }
         result = await handler.handle_links(context)
+        self.assertFalse(result)
 
     @patch("handlers.base_handler.BaseHandler._process_message")
     async def test_awin_link_in_list(self, mock_process):
@@ -87,6 +88,7 @@ class TestHandleAwinLinks(unittest.IsolatedAsyncioTestCase):
         expected_message = "Check this out: https://www.awin1.com/cread.php?awinmid=20982&awinaffid=my_awin_id&ued=https://www.giftmio.com/some-product I hope you like it"
 
         mock_process.assert_called_with(mock_message, expected_message)
+        self.assertTrue(result)
 
     @patch("handlers.base_handler.BaseHandler._process_message")
     async def test_awin_affiliate_link_from_list(self, mock_process):
@@ -116,6 +118,7 @@ class TestHandleAwinLinks(unittest.IsolatedAsyncioTestCase):
         expected_message = "Here is a product: https://www.awin1.com/cread.php?awinmid=20982&awinaffid=my_awin_id&ued=https://www.giftmio.com/some-product I hope you like it"
 
         mock_process.assert_called_with(mock_message, expected_message)
+        self.assertTrue(result)
 
     async def test_awin_affiliate_link_not_in_list(self):
         """Test that an existing Awin affiliate link is NOT modified when the store is NOT in our list of Awin advertisers."""
@@ -142,6 +145,7 @@ class TestHandleAwinLinks(unittest.IsolatedAsyncioTestCase):
         result = await handler.handle_links(context)
 
         mock_message.chat.send_message.assert_not_called()
+        self.assertFalse(result)
 
     @patch("handlers.base_handler.BaseHandler._process_message")
     async def test_awin_aliexpress_link_without_discount(self, mock_process):
@@ -175,6 +179,7 @@ class TestHandleAwinLinks(unittest.IsolatedAsyncioTestCase):
         expected_message = "Check this out: https://www.awin1.com/cread.php?awinmid=11640&awinaffid=my_awin_id&ued=https://www.aliexpress.com/item/1005002958205071.html I hope you like it"
 
         mock_process.assert_called_with(mock_message, expected_message)
+        self.assertTrue(result)
 
     @patch("handlers.base_handler.BaseHandler._process_message")
     async def test_awin_aliexpress_link_with_discount(self, mock_process):
@@ -211,6 +216,7 @@ class TestHandleAwinLinks(unittest.IsolatedAsyncioTestCase):
         )
 
         mock_process.assert_called_with(mock_message, expected_message)
+        self.assertTrue(result)
 
     async def test_awin_aliexpress_link_no_awin_config(self):
         """Test AliExpress link when AliExpress is NOT in the Awin list and discount codes should NOT be added."""
@@ -240,6 +246,7 @@ class TestHandleAwinLinks(unittest.IsolatedAsyncioTestCase):
         result = await handler.handle_links(context)
 
         mock_message.chat.send_message.assert_not_called()
+        self.assertFalse(result)
 
     @patch("handlers.base_handler.BaseHandler._process_message")
     async def test_awin_no_aliexpress_from_link_with_discount(self, mock_process):
@@ -273,6 +280,7 @@ class TestHandleAwinLinks(unittest.IsolatedAsyncioTestCase):
         result = await handler.handle_links(context)
 
         mock_process.assert_called_with(mock_message, expected_message)
+        self.assertTrue(result)
 
 
 if __name__ == "__main__":

@@ -39,6 +39,7 @@ class TestHandleAliExpressLinks(unittest.IsolatedAsyncioTestCase):
             "💥 AliExpress discount codes: 💰 5% off!",
             reply_to_message_id=mock_message.message_id,
         )
+        self.assertTrue(result)
 
     async def test_no_discount_codes(self):
         """Test that no action is taken when ALIEXPRESS_DISCOUNT_CODES is empty."""

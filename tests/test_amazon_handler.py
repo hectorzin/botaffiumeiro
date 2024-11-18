@@ -97,6 +97,7 @@ class TestHandleAmazonLinks(unittest.IsolatedAsyncioTestCase):
             mock_message,
             "Here is a product: https://www.amazon.com/dp/B08N5WRWNW?tag=com_affiliate_id",
         )
+        self.assertTrue(result)
 
     @patch("handlers.base_handler.BaseHandler._process_message")
     async def test_amazon_link_with_affiliate(self, mock_process):
@@ -124,6 +125,7 @@ class TestHandleAmazonLinks(unittest.IsolatedAsyncioTestCase):
             mock_message,
             "Here is a product: https://www.amazon.com/dp/B08N5WRWNW?tag=our_affiliate_id",
         )
+        self.assertTrue(result)
 
     @patch("handlers.base_handler.BaseHandler._process_message")
     async def test_explicit_amazon_link_conversion(self, mock_process):
@@ -151,6 +153,7 @@ class TestHandleAmazonLinks(unittest.IsolatedAsyncioTestCase):
             re.match(expected_pattern, actual_call_args),
             f"URL '{actual_call_args}' does not match the expected pattern",
         )
+        self.assertTrue(result)
 
 
 if __name__ == "__main__":
