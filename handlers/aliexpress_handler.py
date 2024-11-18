@@ -20,10 +20,14 @@ class AliexpressHandler(BaseHandler):
         aliexpress_data = self.selected_users.get("aliexpress.com", {})
 
         # Check if there are any discount codes available for AliExpress
-        aliexpress_discount_codes = aliexpress_data.get("aliexpress", {}).get("discount_codes", None)
+        aliexpress_discount_codes = aliexpress_data.get("aliexpress", {}).get(
+            "discount_codes", None
+        )
 
         if not aliexpress_discount_codes:
-            self.logger.info(f"{message.message_id}: Discount codes are empty. Skipping reply.")
+            self.logger.info(
+                f"{message.message_id}: Discount codes are empty. Skipping reply."
+            )
             return
 
         # Send the discount codes as a response to the original message

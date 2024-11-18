@@ -48,12 +48,15 @@ def is_user_excluded(user: User) -> bool:
     logger.debug(f"User {username} (ID: {user_id}) is excluded: {excluded}")
     return excluded
 
+
 def expand_shortened_url(url: str):
     """Expands shortened URLs by following redirects using a HEAD request."""
     logger.info(f"Try expanding shortened URL: {url}")
     # Strip trailing punctuation if present
     stripped_url = url.rstrip(".,")
-    punctuation = url[len(stripped_url):]  # Store the punctuation for re-attachment if needed
+    punctuation = url[
+        len(stripped_url) :
+    ]  # Store the punctuation for re-attachment if needed
     try:
         # Utilizamos HEAD para seguir las redirecciones sin descargar todo el contenido
         response = requests.get(stripped_url, allow_redirects=True)
@@ -63,6 +66,7 @@ def expand_shortened_url(url: str):
     except requests.RequestException as e:
         logger.error(f"Error expanding shortened URL {url}: {e}")
     return url
+
 
 def extract_embedded_url(query_params):
     """

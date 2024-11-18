@@ -4,7 +4,7 @@ import re
 import requests
 import time
 
-from urllib.parse import urlparse, urlunparse,parse_qs
+from urllib.parse import urlparse, urlunparse, parse_qs
 from handlers.base_handler import BaseHandler
 from handlers.aliexpress_handler import ALIEXPRESS_PATTERN
 
@@ -37,7 +37,9 @@ class AliexpressAPIHandler(BaseHandler):
         """Converts a regular AliExpress link into an affiliate link using the Aliexpress API."""
         self.logger.info(f"Converting AliExpress link to affiliate link: {source_url}")
         parsed_url = urlparse(source_url)
-        source_url = urlunparse((parsed_url.scheme, parsed_url.netloc, parsed_url.path, '', '', ''))
+        source_url = urlunparse(
+            (parsed_url.scheme, parsed_url.netloc, parsed_url.path, "", "", "")
+        )
         timestamp = str(int(time.time() * 1000))  # Current timestamp in milliseconds
 
         # Get AliExpress-specific configuration from self.selected_users
@@ -165,7 +167,8 @@ class AliexpressAPIHandler(BaseHandler):
 
         # Extract resolved URLs that match the pattern
         aliexpress_links = [
-            resolved for original, resolved in original_to_resolved.items()
+            resolved
+            for original, resolved in original_to_resolved.items()
             if re.match(ALIEXPRESS_PATTERN, resolved)
         ]
 
@@ -187,7 +190,9 @@ class AliexpressAPIHandler(BaseHandler):
             if resolved in aliexpress_links:
                 affiliate_link = await self._convert_to_aliexpress_affiliate(resolved)
                 if affiliate_link:
-                    updated_links[original] = affiliate_link  # Replace the original link
+                    updated_links[original] = (
+                        affiliate_link  # Replace the original link
+                    )
 
         # Replace original links with their affiliate counterparts
         new_text = modified_text

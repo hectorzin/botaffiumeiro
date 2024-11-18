@@ -11,8 +11,6 @@ class TestHandler(BaseHandler):
 
 
 class TestHandleAdmitadLinks(unittest.IsolatedAsyncioTestCase):
-
-
     @patch("handlers.base_handler.BaseHandler._process_message")
     async def test_admitad_aliexpress_link_admitad_config_empty_list(
         self, mock_process

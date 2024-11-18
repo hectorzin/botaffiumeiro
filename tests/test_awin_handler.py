@@ -4,7 +4,6 @@ from handlers.pattern_handler import PatternHandler
 
 
 class TestHandleAwinLinks(unittest.IsolatedAsyncioTestCase):
-
     async def test_no_action_when_awin_publisher_id_is_none(self):
         """Test that no action is taken if AWIN_PUBLISHER_ID is None."""
 

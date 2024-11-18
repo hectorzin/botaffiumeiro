@@ -12,7 +12,6 @@ class TestHandler(BaseHandler):
 
 
 class TestHandleAliExpressAPILinks(unittest.IsolatedAsyncioTestCase):
-
     @patch("handlers.base_handler.BaseHandler._process_message")
     async def test_aliexpress_no_app_key(self, mock_process):
         """Test: No action is taken if AliExpress app_key is empty in selected_users."""

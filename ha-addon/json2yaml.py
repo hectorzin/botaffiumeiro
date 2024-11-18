@@ -15,7 +15,9 @@ config = {
         "bot_token": data.get("bot_token", ""),
         "delete_messages": data.get("delete_messages", True),
         "excluded_users": [user.get("id") for user in data.get("excluded_users", [])],
-        "discount_keywords": [user.get("key") for user in data.get("discount_keywords", [])]
+        "discount_keywords": [
+            user.get("key") for user in data.get("discount_keywords", [])
+        ],
     },
     "messages": {
         "affiliate_link_modified": data.get(
@@ -27,8 +29,7 @@ config = {
         ),
     },
     "amazon": {
-            advertiser["domain"]: advertiser["id"]
-            for advertiser in data.get("amazon", [])
+        advertiser["domain"]: advertiser["id"] for advertiser in data.get("amazon", [])
     },
     "awin": {
         "publisher_id": data.get("awin_publisher_id", ""),
@@ -61,8 +62,10 @@ config = {
     },
     "log_level": data.get("log_level", "INFO"),
     "affiliate_settings": {
-        "creator_affiliate_percentage": int(data.get("creator_affiliate_percentage", 10)),
-    }
+        "creator_affiliate_percentage": int(
+            data.get("creator_affiliate_percentage", 10)
+        ),
+    },
 }
 
 # Save the YAML file
