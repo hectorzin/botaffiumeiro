@@ -2,8 +2,8 @@ from datetime import datetime, timedelta
 import logging
 from typing import Any, Dict
 
-import requests # type: ignore
-import yaml # type: ignore
+import requests  # type: ignore
+import yaml  # type: ignore
 
 # Rutas a los archivos de configuración
 CONFIG_PATH = "data/config.yaml"
