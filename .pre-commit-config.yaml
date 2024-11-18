@@ -25,5 +25,5 @@ repos:
       - id: "mypy"
         name: "Check type hints (mypy)"
         args:
-          - "--config-file=pyproject.toml"        
+          - "--config-file=pyproject.toml"
         verbose: true
