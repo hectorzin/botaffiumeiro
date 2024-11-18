@@ -3,10 +3,12 @@ from typing import Dict
 
 from typing import TypedDict
 
+
 class PatternConfig(TypedDict):
     pattern: str
     format_template: str
     affiliate_tag: str
+
 
 PATTERNS: Dict[str, PatternConfig] = {
     "amazon": {
