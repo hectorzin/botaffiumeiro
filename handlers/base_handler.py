@@ -39,7 +39,7 @@ class BaseHandler(ABC):
         format_template: str,
         affiliate_tag: str,
         affiliate_id: str,
-        advertiser_id: str = None,
+        advertiser_id: str = "",
     ) -> str:
         """
         Converts a product URL into an affiliate link based on the provided format template.
@@ -69,7 +69,7 @@ class BaseHandler(ABC):
         query_params[affiliate_tag] = [affiliate_id]
 
         # Add or update advertiser ID if provided
-        if advertiser_id:
+        if advertiser_id != "":
             query_params["advertiser_id"] = [advertiser_id]
 
         # Build the new query string
