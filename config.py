@@ -3,6 +3,7 @@ import yaml
 import requests
 
 from datetime import datetime, timedelta
+from typing import Dict, Any
 
 # Rutas a los archivos de configuración
 CONFIG_PATH = "data/config.yaml"
@@ -15,7 +16,7 @@ logger = logging.getLogger(__name__)
 domain_percentage_table = {}
 all_users_configurations: dict[str, dict] = {}
 
-config_data = {
+config_data: Dict[str, Any] = {
     # Telegram
     "BOT_TOKEN": "",
     "DELETE_MESSAGES": "",

@@ -1,7 +1,14 @@
 from handlers.base_handler import PATTERN_URL_QUERY
-from typing import Dict, Optional
+from typing import Dict
 
-PATTERNS: Dict[str, Dict[str, Optional[str]]] = {
+from typing import TypedDict
+
+class PatternConfig(TypedDict):
+    pattern: str
+    format_template: str
+    affiliate_tag: str
+
+PATTERNS: Dict[str, PatternConfig] = {
     "amazon": {
         "pattern": (
             r"(https?://(?:www\.)?(?:amazon\.[a-z]{2,3}(?:\.[a-z]{2})?|amzn\.to|amzn\.eu)"
