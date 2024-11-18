@@ -625,7 +625,6 @@ class TestPrepareMessage(unittest.TestCase):
         self.assertIn("aliexpress.com", context["selected_users"])
         self.assertEqual(context["selected_users"]["aliexpress.com"]["user"], "user2")
 
-
     @patch("botaffiumeiro.extract_domains_from_message")
     @patch("botaffiumeiro.select_user_for_domain")
     def test_prepare_message_with_no_domains(
