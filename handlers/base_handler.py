@@ -25,68 +25,13 @@ class BaseHandler(ABC):
     ) -> Tuple[
         Message,
         str,
+        dict,
     ]:
         return (
             context["message"],
             context["modified_message"],
             context["selected_users"],
         )
-
-    def _expand_shortened_url_from_list(self, url: str, domains: list[str]) -> str:
-        """
-        Expands shortened URLs by following redirects if the domain matches one of the given domains.
-
-        Args:
-            url (str): The shortened URL to expand.
-            domains (list): A list of domains for which the URL should be expanded.
-
-        Returns:
-            str: The expanded URL if the domain matches, or the original URL otherwise.
-        """
-        parsed_url = urlparse(url)
-
-        # Check if the domain is in the list of provided domains
-        if any(domain in parsed_url.netloc for domain in domains):
-            # Call the superclass method to expand the URL
-            url = self._expand_shortened_url(url)
-
-        return url
-
-    def _expand_short_links_from_message(
-        self, message_text: str, url_pattern: str, short_domains: list
-    ) -> str:
-        """
-        Expands shortened URLs in a message using a specified pattern and list of short domains.
-
-        Args:
-            message_text (str): The text of the message to search for short links.
-            url_pattern (str): The regular expression pattern to search for short links.
-            short_domains (list): A list of domains to check for short links.
-
-        Returns:
-            str: The message text with expanded URLs.
-        """
-        new_text = message_text
-        short_links = re.findall(url_pattern, message_text)
-
-        if short_links:
-            self.logger.info(f"Found {len(short_links)} short links. Processing...")
-
-            for short_link in short_links:
-                full_link = self._expand_shortened_url_from_list(
-                    short_link, short_domains
-                )
-                new_text = new_text.replace(short_link, full_link)
-
-        return new_text
-
-    def _expand_aliexpress_links_from_message(self, message_text: str) -> str:
-        new_text = self._expand_short_links_from_message(
-            message_text=message_text,
-            url_pattern=self._domain_patterns["aliexpress_short_url_pattern"],
-            short_domains=["s.click.aliexpress.com"],
-        )
-        return new_text
 
     def _generate_affiliate_url(
         self,
