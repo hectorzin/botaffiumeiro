@@ -6,7 +6,7 @@ from urllib.parse import parse_qs, unquote, urlparse, urlunparse
 
 from handlers.aliexpress_handler import ALIEXPRESS_PATTERN
 from handlers.base_handler import BaseHandler
-import requests
+import requests # type: ignore
 
 # API endpoint for generating affiliate links
 ALIEXPRESS_API_URL = "https://api-sg.aliexpress.com/sync"
