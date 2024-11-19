@@ -1,9 +1,9 @@
 import unittest
-
-from unittest.mock import AsyncMock, Mock, patch
+from unittest.mock import AsyncMock, patch
 from urllib.parse import unquote
-from handlers.base_handler import BaseHandler, PATTERN_AFFILIATE_URL_QUERY
+
 from config import config_data
+from handlers.base_handler import PATTERN_AFFILIATE_URL_QUERY, BaseHandler
 
 
 class TestHandler(BaseHandler):
@@ -12,7 +12,6 @@ class TestHandler(BaseHandler):
 
 
 class TestGenerateAffiliateUrl(unittest.TestCase):
-
     def setUp(self):
         """Set up the TestHandler instance."""
         self.handler = TestHandler()
@@ -149,7 +148,6 @@ class TestGenerateAffiliateUrl(unittest.TestCase):
 
     def test_affiliate_and_advertiser_id_update(self):
         """Test that both affiliate_id and advertiser_id are updated correctly in the URL."""
-
         original_url = "https://www.example.com/product?tag=old_affiliate_id&advertiser_id=old_advertiser_id"
         format_template = "{domain}{path_before_query}?{affiliate_tag}={affiliate_id}&advertiser_id={advertiser_id}"
 
@@ -203,7 +201,6 @@ class TestGenerateAffiliateUrl(unittest.TestCase):
 
 
 class TestProcessMessage(unittest.TestCase):
-
     def setUp(self):
         """Set up the TestHandler instance."""
         self.handler = TestHandler()  # Pasar selected_users al crear la instancia
@@ -377,11 +374,8 @@ class TestProcessMessage(unittest.TestCase):
 
 
 class TestBuildAffiliateUrlPattern(unittest.TestCase):
-
     def test_admitad_url_pattern(self):
-        """
-        Test: Verify that admitad_url_pattern is correctly generated from multiple users' domains.
-        """
+        """Test: Verify that admitad_url_pattern is correctly generated from multiple users' domains."""
         base_handler = TestHandler()
         base_handler.selected_users = {
             "example.com": {
@@ -415,9 +409,7 @@ class TestBuildAffiliateUrlPattern(unittest.TestCase):
         )
 
     def test_admitad_no_domains(self):
-        """
-        Test: Verify that None is returned when no Admitad advertisers exist across users.
-        """
+        """Test: Verify that None is returned when no Admitad advertisers exist across users."""
         base_handler = TestHandler()
         # Generate Admitad URL pattern (should return None as no advertisers are set)
         base_handler.selected_users = {
@@ -431,9 +423,7 @@ class TestBuildAffiliateUrlPattern(unittest.TestCase):
         self.assertIsNone(admitad_url_pattern)
 
     def test_awin_url_pattern(self):
-        """
-        Test: Verify that awin_url_pattern is correctly generated from multiple users' domains.
-        """
+        """Test: Verify that awin_url_pattern is correctly generated from multiple users' domains."""
         # Generate Awin URL pattern
         base_handler = TestHandler()
         base_handler.selected_users = {
@@ -473,9 +463,7 @@ class TestBuildAffiliateUrlPattern(unittest.TestCase):
         )
 
     def test_no_users_in_configuration(self):
-        """
-        Test: Verify that None is returned when there are no users in the configuration.
-        """
+        """Test: Verify that None is returned when there are no users in the configuration."""
         # Generate Admitad URL pattern with no users in the configuration
         base_handler = TestHandler()
         base_handler.selected_users = {

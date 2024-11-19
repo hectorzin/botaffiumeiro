@@ -56,4 +56,3 @@ configuration:
   log_level:
     name: "Nivel de Log"
     description: "Configura el nivel de registro (DEBUG, INFO, WARN, ERROR, CRITICAL)."
-

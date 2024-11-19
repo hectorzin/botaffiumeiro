@@ -23,8 +23,8 @@ Below is a breakdown of all the available configuration fields, including exampl
   - id: "Username1"
   - id: "Username2"
   ```
-**NOTE**: If you want to leave the list empty you must write []
 
+  **NOTE**: If you want to leave the list empty you must write []
 
 - **discount_keywords**: List of keywords that trigger the bot to display AliExpress discount codes when used in a message. You can define multiple keywords in a list format using the following structure:
 
@@ -46,12 +46,12 @@ Below is a breakdown of all the available configuration fields, including exampl
 
 A list of domains and ids per domain:
 
-  ```yaml
-    - domain: amazon.es
-      id: botaffiumeiro_cofee-21
-    - domain: amazon.com
-      id: hectorzindomo-20
-  ```
+```yaml
+- domain: amazon.es
+  id: botaffiumeiro_cofee-21
+- domain: amazon.com
+  id: hectorzindomo-20
+```
 
 ### 4. Aliexpress settings
 
@@ -65,7 +65,8 @@ A list of domains and ids per domain:
   - line: "💥 2$ off for purchases over 20$: 【CODE1】"
   - line: "💰 5$ off for purchases over 50$: 【CODE2】"
   ```
-**NOTE**: If you want to leave the list empty you must write []
+
+  **NOTE**: If you want to leave the list empty you must write []
 
 ### 5. Awin Settings
 
@@ -78,7 +79,8 @@ A list of domains and ids per domain:
   - domain: "store2.com"
     id: "advertiser_id_2"
   ```
-**NOTE**: If you want to leave the list empty you must write []
+
+  **NOTE**: If you want to leave the list empty you must write []
 
 ### 6. Admitad Settings
 
@@ -91,7 +93,8 @@ A list of domains and ids per domain:
   - domain: "store2.com"
     id: "campaign_id_2"
   ```
-**NOTE**: If you want to leave the list empty you must write []
+
+  **NOTE**: If you want to leave the list empty you must write []
 
 ### 7. Tradedoubler Settings
 
@@ -104,7 +107,8 @@ A list of domains and ids per domain:
   - domain: "store2.com"
     id: "campaign_id_2"
   ```
-**NOTE**: If you want to leave the list empty you must write []
+
+  **NOTE**: If you want to leave the list empty you must write []
 
 ### 8. Support for creators
 
@@ -117,7 +121,8 @@ A list of domains and ids per domain:
   You can define this percentage in the following format:
 
   ```yaml
-  creator_affiliate_percentage: 10  # Example: 10%
+  creator_affiliate_percentage: 10 # Example: 10%
+  ```
 
 ### 9. LOG
 

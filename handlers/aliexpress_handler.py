@@ -1,6 +1,6 @@
 import re
 
-from handlers.base_handler import BaseHandler, PATTERN_URL_QUERY
+from handlers.base_handler import PATTERN_URL_QUERY, BaseHandler
 
 ALIEXPRESS_PATTERN = (
     r"(https?://(?:[a-z]{2,3}\.)?aliexpress\.[a-z]{2,3}(?:\.[a-z]{2,3})?"
@@ -20,10 +20,14 @@ class AliexpressHandler(BaseHandler):
         aliexpress_data = self.selected_users.get("aliexpress.com", {})
 
         # Check if there are any discount codes available for AliExpress
-        aliexpress_discount_codes = aliexpress_data.get("aliexpress", {}).get("discount_codes", None)
+        aliexpress_discount_codes = aliexpress_data.get("aliexpress", {}).get(
+            "discount_codes", None
+        )
 
         if not aliexpress_discount_codes:
-            self.logger.info(f"{message.message_id}: Discount codes are empty. Skipping reply.")
+            self.logger.info(
+                f"{message.message_id}: Discount codes are empty. Skipping reply."
+            )
             return
 
         # Send the discount codes as a response to the original message
@@ -39,7 +43,7 @@ class AliexpressHandler(BaseHandler):
         """Handles both long and short AliExpress links in the message."""
         message, modified_text, self.selected_users = self._unpack_context(context)
         # Extraemos self.selected_users.get("aliexpress.com", {}) a una variable
-        aliexpress_data = self.selected_users.get("aliexpress.com", {})
+        self.selected_users.get("aliexpress.com", {})
 
         aliexpress_links = re.findall(ALIEXPRESS_PATTERN, modified_text)
 

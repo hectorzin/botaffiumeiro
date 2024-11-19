@@ -1,6 +1,6 @@
 import unittest
-
 from unittest.mock import AsyncMock, patch
+
 from handlers.base_handler import BaseHandler
 from handlers.pattern_handler import PatternHandler
 
@@ -11,8 +11,6 @@ class TestHandler(BaseHandler):
 
 
 class TestHandleAdmitadLinks(unittest.IsolatedAsyncioTestCase):
-
-
     @patch("handlers.base_handler.BaseHandler._process_message")
     async def test_admitad_aliexpress_link_admitad_config_empty_list(
         self, mock_process

@@ -1,6 +1,15 @@
+from typing import Dict, Optional, TypedDict
+
 from handlers.base_handler import PATTERN_URL_QUERY
 
-PATTERNS = {
+
+class PatternConfig(TypedDict):
+    pattern: str
+    format_template: str
+    affiliate_tag: Optional[str]  # Ahora permite valores `None`.
+
+
+PATTERNS: Dict[str, PatternConfig] = {
     "amazon": {
         "pattern": (
             r"(https?://(?:www\.)?(?:amazon\.[a-z]{2,3}(?:\.[a-z]{2})?|amzn\.to|amzn\.eu)"
