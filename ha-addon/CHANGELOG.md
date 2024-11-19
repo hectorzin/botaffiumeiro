@@ -1,6 +1,7 @@
 # 2.1.5.0
-* bug: Redirect URLs for Aliexpress are not working by @hectorzin in https://github.com/hectorzin/botaffiumeiro/pull/75
-* Updating to release version 2.1.5
+
+- bug: Redirect URLs for Aliexpress are not working by @hectorzin in https://github.com/hectorzin/botaffiumeiro/pull/75
+- Updating to release version 2.1.5
 
 # 2.1.4.2
 
