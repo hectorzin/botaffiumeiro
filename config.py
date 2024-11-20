@@ -7,7 +7,7 @@ import logging
 from pathlib import Path
 from typing import Any
 
-import requests
+import requests  # type: ignore[import-untyped]
 import yaml  # type: ignore[import-untyped]
 
 # Configure logging

@@ -8,7 +8,7 @@ from handlers.aliexpress_api_handler import AliexpressAPIHandler
 
 
 class TestHandleAliExpressAPILinks(unittest.IsolatedAsyncioTestCase):
-    """Tests for handling Aliexpress links in Aliexpress API Habdler."""
+    """Tests for handling Aliexpress links in Aliexpress API Handler."""
 
     @patch("handlers.base_handler.BaseHandler._process_message")
     async def test_aliexpress_no_app_key(self, mock_process: AsyncMock) -> None:
