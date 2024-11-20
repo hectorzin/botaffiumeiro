@@ -3,7 +3,7 @@
 import json
 from pathlib import Path
 
-import yaml
+import yaml  # type: ignore[import-untyped]
 
 # File paths
 json_file = Path("/data/options.json")

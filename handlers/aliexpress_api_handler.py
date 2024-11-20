@@ -11,7 +11,7 @@ from urllib.parse import parse_qs, unquote, urlparse, urlunparse
 
 from config import ConfigurationManager
 import httpx
-from requests.exceptions import RequestException
+from requests.exceptions import RequestException  # type: ignore[import-untyped]
 
 from handlers.aliexpress_handler import ALIEXPRESS_PATTERN
 from handlers.base_handler import BaseHandler
