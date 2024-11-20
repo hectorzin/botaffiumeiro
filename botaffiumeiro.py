@@ -16,7 +16,14 @@ from handlers.pattern_handler import PatternHandler
 from handlers.patterns import PATTERNS
 from publicsuffix2 import get_sld
 import requests
-from telegram.ext import Application, CommandHandler, Defaults, MessageHandler, filters
+from telegram.ext import (
+    Application,
+    CallbackContext,
+    CommandHandler,
+    Defaults,
+    MessageHandler,
+    filters,
+)
 
 if TYPE_CHECKING:
     from telegram import Message, Update, User
@@ -199,7 +206,7 @@ async def process_link_handlers(message: Message) -> None:
     )
 
 
-async def modify_link(update: Update) -> None:
+async def modify_link(update: Update, _: CallbackContext) -> None:
     """Modify Amazon, AliExpress, Awin, and Admitad links in messages."""
     logger.info("Received new update (ID: %s).", update.update_id)
 
