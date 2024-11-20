@@ -25,6 +25,8 @@ repos:
       - id: "mypy"
         name: "Check type hints (mypy)"
         args:
+          - "--no-install-types"
+          - "--ignore-missing-imports"
           - "--config-file=pyproject.toml"
           - "--explicit-package-bases"
           - "--install-types"

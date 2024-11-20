@@ -273,7 +273,7 @@ def main() -> None:
     )
     logger.info("Configuring the bot")
 
-    # Program a job to reaload config every day
+    # Schedule a job to reload configuration every day
     reload_thread = threading.Thread(
         target=reload_config_periodically, args=(24 * 60 * 60,), daemon=True
     )
