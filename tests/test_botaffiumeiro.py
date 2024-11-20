@@ -7,6 +7,7 @@ import unittest
 from unittest.mock import AsyncMock, Mock, patch
 
 from telegram import Chat, Message, Update, User
+from telegram.ext import CallbackContext
 
 from botaffiumeiro import (
     extract_domains_from_message,
@@ -58,8 +59,8 @@ class TestModifyLink(unittest.IsolatedAsyncioTestCase):
     ) -> None:
         """Test modify_link when the message is empty."""
         update = Update(update_id=1)
-
-        await modify_link(update)
+        mock_context = CallbackContext(application=None)
+        await modify_link(update, mock_context)
 
         mock_is_user_excluded.assert_not_called()
         mock_process_link_handlers.assert_not_called()
@@ -82,7 +83,8 @@ class TestModifyLink(unittest.IsolatedAsyncioTestCase):
             ),
         )
 
-        await modify_link(update)
+        mock_context = CallbackContext(application=None)
+        await modify_link(update, mock_context)
 
         mock_is_user_excluded.assert_not_called()
         mock_process_link_handlers.assert_not_called()
@@ -106,7 +108,8 @@ class TestModifyLink(unittest.IsolatedAsyncioTestCase):
             ),
         )
 
-        await modify_link(update)
+        mock_context = CallbackContext(application=None)
+        await modify_link(update, mock_context)
 
         mock_is_user_excluded.assert_called_once()
         mock_process_link_handlers.assert_not_called()
@@ -130,7 +133,8 @@ class TestModifyLink(unittest.IsolatedAsyncioTestCase):
             ),
         )
 
-        await modify_link(update)
+        mock_context = CallbackContext(application=None)
+        await modify_link(update, mock_context)
 
         mock_is_user_excluded.assert_called_once()
         mock_process_link_handlers.assert_called_once()
@@ -153,7 +157,8 @@ class TestModifyLink(unittest.IsolatedAsyncioTestCase):
             ),
         )
 
-        await modify_link(update)
+        mock_context = CallbackContext(application=None)
+        await modify_link(update, mock_context)
 
         mock_is_user_excluded.asset_not_called()
         mock_process_link_handlers.assert_not_called()
