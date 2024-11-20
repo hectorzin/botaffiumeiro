@@ -701,12 +701,9 @@ class TestPrepareMessage(unittest.TestCase):
 class TestSelectUserForDomain(unittest.TestCase):
     """Tests for select_user_for_domain function."""
 
-    @patch(
-        "botaffiumeiro.config_manager",  # Parchar el config_manager global
-        new_callable=Mock,
-    )
-    def test_select_user1(self, mock_config_manager: AsyncMock) -> None:
-        """Test: When random value is within the range of the first user."""
+    def test_select_user1(self) -> None:
+        """Test: When random value is within the range of the second user."""
+        mock_config_manager = Mock()
         mock_config_manager.domain_percentage_table = {
             "amazon": [
                 {"user": "user1", "percentage": 60},
@@ -718,17 +715,18 @@ class TestSelectUserForDomain(unittest.TestCase):
             "user2": {"amazon_affiliate_id": "user2-affiliate-id"},
         }
 
-        selected_user = select_user_for_domain("amazon")
+        with patch("secrets.SystemRandom.uniform", return_value=50), patch(
+            "botaffiumeiro.config_manager", mock_config_manager
+        ):
+            selected_user = select_user_for_domain("amazon")
+
         if selected_user is None:
             self.fail("select_user_for_domain returned None, but a user was expected.")
         self.assertEqual(selected_user["amazon_affiliate_id"], "user1-affiliate-id")
 
-    @patch(
-        "botaffiumeiro.config_manager",  # Parchar el config_manager global
-        new_callable=Mock,
-    )
-    def test_select_user2(self, mock_config_manager: AsyncMock) -> None:
+    def test_select_user2(self) -> None:
         """Test: When random value is within the range of the second user."""
+        mock_config_manager = Mock()
         mock_config_manager.domain_percentage_table = {
             "amazon": [
                 {"user": "user1", "percentage": 60},
@@ -740,7 +738,11 @@ class TestSelectUserForDomain(unittest.TestCase):
             "user2": {"amazon_affiliate_id": "user2-affiliate-id"},
         }
 
-        selected_user = select_user_for_domain("amazon")
+        with patch("secrets.SystemRandom.uniform", return_value=80), patch(
+            "botaffiumeiro.config_manager", mock_config_manager
+        ):
+            selected_user = select_user_for_domain("amazon")
+
         if selected_user is None:
             self.fail("select_user_for_domain returned None, but a user was expected.")
         self.assertEqual(selected_user["amazon_affiliate_id"], "user2-affiliate-id")
@@ -813,7 +815,8 @@ class TestSelectUserForDomain(unittest.TestCase):
             "user2": {"amazon_affiliate_id": "user2-affiliate-id"},
         }
 
-        selected_user = select_user_for_domain("amazon")
+        with patch("secrets.SystemRandom.uniform", return_value=150):
+            selected_user = select_user_for_domain("amazon")
         if selected_user is None:
             self.fail("select_user_for_domain returned None, but a user was expected.")
         self.assertEqual(selected_user["amazon_affiliate_id"], "user1-affiliate-id")

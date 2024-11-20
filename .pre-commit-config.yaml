@@ -28,4 +28,6 @@ repos:
           - "--config-file=pyproject.toml"
           - "--explicit-package-bases"
           - "--ignore-missing-imports"
+          - "--install-types"
+          - "--non-interactive"
         verbose: true

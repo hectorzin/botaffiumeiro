@@ -5,6 +5,7 @@ from __future__ import annotations
 import logging
 import re
 import secrets
+import threading
 from typing import TYPE_CHECKING
 from urllib.parse import parse_qs, urlparse
 
@@ -15,6 +16,7 @@ from handlers.pattern_handler import PatternHandler
 from handlers.patterns import PATTERNS
 from publicsuffix2 import get_sld
 import requests  # type: ignore[import-untyped]
+from telegram.ext import Application, CommandHandler, Defaults, MessageHandler, filters
 
 if TYPE_CHECKING:
     from telegram import Message, Update, User
@@ -30,9 +32,7 @@ logging.getLogger("httpx").setLevel(
     else logging.CRITICAL
 )
 
-# Initialize ConfigurationManager
 config_manager = ConfigurationManager()
-config_manager.load_configuration()
 
 
 def is_user_excluded(user: User) -> bool:
@@ -231,3 +231,60 @@ async def modify_link(update: Update) -> None:
 
     await process_link_handlers(message)
     logger.info("%s: Update processed.", update.update_id)
+
+
+def reload_config_periodically(interval: int) -> None:
+    """Reload the configuration periodically every `interval` seconds."""
+    config_manager.load_configuration()
+    threading.Timer(interval, reload_config_periodically, [interval]).start()
+
+
+async def handle_discount_command(update: Update, context: dict) -> None:
+    """Manage discount codes calling 'show_discount_codes' of AliexpressHandler."""
+    logger.info("Processing discount command: %s", update.message.text)
+
+    context = prepare_message(update.message, {"aliexpress.com"})
+    await AliexpressHandler(config_manager).show_discount_codes(context)
+
+    logger.info("Discount code shown for command: %s", update.message.text)
+
+
+def register_discount_handlers(application: Application) -> None:
+    """Registry dinamically bot discount commands."""
+    for keyword in config_manager.discount_keywords:
+        application.add_handler(CommandHandler(keyword, handle_discount_command))
+
+
+def main() -> None:
+    """Start the bot application here."""
+    # Initialize ConfigurationManager
+    config_manager.load_configuration()
+
+    logging.basicConfig(
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        level=config_manager.log_level,
+    )
+    logger.info("Configuring the bot")
+
+    # Program a job to reaload config every day
+    reload_thread = threading.Thread(
+        target=reload_config_periodically, args=(24 * 60 * 60,), daemon=True
+    )
+    reload_thread.start()
+
+    defaults = Defaults(parse_mode="HTML")
+    application = (
+        Application.builder().token(config_manager.bot_token).defaults(defaults).build()
+    )
+
+    register_discount_handlers(application)
+    application.add_handler(
+        MessageHandler(filters.ALL & filters.ChatType.GROUPS, modify_link)
+    )
+
+    logger.info("Starting the bot")
+    application.run_polling()
+
+
+if __name__ == "__main__":
+    main()
