@@ -15,7 +15,7 @@ from handlers.aliexpress_handler import ALIEXPRESS_PATTERN, AliexpressHandler
 from handlers.pattern_handler import PatternHandler
 from handlers.patterns import PATTERNS
 from publicsuffix2 import get_sld
-import requests  # type: ignore[import-untyped]
+import requests
 from telegram.ext import Application, CommandHandler, Defaults, MessageHandler, filters
 
 if TYPE_CHECKING:

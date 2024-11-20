@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any
 
 import requests
-import yaml  # type: ignore[import-untyped]
+import yaml
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
