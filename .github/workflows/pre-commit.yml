@@ -17,10 +17,21 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Cache pip
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
       - name: Install dependencies
         run: |
+          pip install --index-url https://pypi.org/simple/ types-PyYAML types-requests
           python -m pip install --upgrade pip
           python -m pip install pre-commit types-PyYAML types-requests
+          pip install -r requirements.txt
+          pip install -r dev-requirements.txt
           pre-commit install-hooks
 
       - name: Run Pre-Commit
