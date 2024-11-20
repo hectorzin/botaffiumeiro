@@ -292,7 +292,7 @@ class ConfigurationManager:
 
         """
         if self.last_load_time is None:
-            return True  # Cargar si nunca se ha cargado
+            return True  # first time must Load always
         return datetime.now(timezone.utc) - self.last_load_time >= timedelta(seconds=60)
 
     def load_configuration(self) -> None:
