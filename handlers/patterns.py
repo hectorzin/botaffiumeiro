@@ -1,4 +1,4 @@
-"""Define los patrones y configuraciones para manejar enlaces de afiliados."""
+"""Defines patterns and configurations for handling affiliate links."""
 
 from __future__ import annotations
 

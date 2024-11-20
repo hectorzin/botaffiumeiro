@@ -37,7 +37,7 @@ class PatternHandler(BaseHandler):
         """
         return await self._process_store_affiliate_links(
             context=context,
-            affiliate_platform=platform,  # Usar el nombre de la plataforma
+            affiliate_platform=platform,
             format_template=data["format_template"],
             affiliate_tag=data["affiliate_tag"],
         )
