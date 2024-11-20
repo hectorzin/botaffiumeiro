@@ -1,13 +1,16 @@
-import json
+"""Convert json configuration file to yaml."""
 
-import yaml  # type: ignore
+import json
+from pathlib import Path
+
+import yaml
 
 # File paths
-json_file = "/data/options.json"
-yaml_file = "/botaffiumeiro/data/config.yaml"
+json_file = Path("/data/options.json")
+yaml_file = Path("/botaffiumeiro/data/config.yaml")
 
 # Load the JSON file
-with open(json_file) as f:
+with json_file.open("r") as f:
     data = json.load(f)
 
 # Convert JSON into the desired YAML structure
@@ -70,7 +73,5 @@ config = {
 }
 
 # Save the YAML file
-with open(yaml_file, "w") as f:
+with yaml_file.open("w") as f:
     yaml.dump(config, f, allow_unicode=True, sort_keys=False)
-
-print(f"YAML file saved to {yaml_file}")
