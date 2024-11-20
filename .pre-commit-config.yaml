@@ -27,7 +27,8 @@ repos:
         args:
           - "--config-file=pyproject.toml"
           - "--explicit-package-bases"
-          - "--ignore-missing-imports"
           - "--install-types"
+          - "false"
+          - "--ignore-missing-imports"
           - "--non-interactive"
         verbose: true
