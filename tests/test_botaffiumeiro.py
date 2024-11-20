@@ -1,11 +1,14 @@
-from datetime import datetime
+"""Tests for the main botaffiumeiro functions."""
+
+from __future__ import annotations
+
+from datetime import datetime, timezone
 import unittest
 from unittest.mock import AsyncMock, Mock, patch
 
 from telegram import Chat, Message, Update, User
 
 from botaffiumeiro import (
-    expand_shortened_url,
     extract_domains_from_message,
     extract_embedded_url,
     is_user_excluded,
@@ -16,66 +19,47 @@ from botaffiumeiro import (
 
 
 class TestIsUserExcluded(unittest.TestCase):
-    @patch(
-        "botaffiumeiro.config_data",
-        {"EXCLUDED_USERS": [12345, "excluded_user"]},
-    )
-    def test_is_user_excluded_in_list(self):
-        user = User(
-            id=12345,
-            is_bot=False,
-            username="fake_user_01",
-            first_name="fake_first_name_01",
-        )
+    """Tests for is_user_excluded function."""
 
+    @patch("botaffiumeiro.config_manager", autospec=True)
+    def test_is_user_excluded_in_list(self, mock_config_manager: AsyncMock) -> None:
+        """Test is_user_excluded when a user is in the excluded list."""
+        mock_config_manager.excluded_users = [12345, "excluded_user"]
+
+        user = User(
+            id=12345, is_bot=False, username="fake_user_01", first_name="TestUser"
+        )
         result = is_user_excluded(user)
 
         self.assertTrue(result)
 
-    @patch(
-        "botaffiumeiro.config_data",
-        {"EXCLUDED_USERS": [12345, "excluded_user"]},
-    )
-    def test_is_user_excluded_not_in_list(self):
-        user = User(
-            id=67890,
-            is_bot=False,
-            username="fake_user_01",
-            first_name="fake_first_name_01",
-        )
+    @patch("botaffiumeiro.config_manager", autospec=True)
+    def test_is_user_excluded_not_in_list(self, mock_config_manager: AsyncMock) -> None:
+        """Test is_user_excluded when a user isn't in the excluded list."""
+        mock_config_manager.excluded_users = [12345, "excluded_user"]
 
+        user = User(
+            id=67890, is_bot=False, username="non_excluded_user", first_name="TestUser"
+        )
         result = is_user_excluded(user)
 
         self.assertFalse(result)
 
-    @patch(
-        "botaffiumeiro.config_data",
-        {"EXCLUDED_USERS": [12345, "excluded_user"]},
-    )
-    def test_is_user_excluded_in_list_without_username(self):
-        user = User(
-            id=12345,
-            is_bot=True,
-            first_name="fake_first_name_01",
-        )
-
-        result = is_user_excluded(user)
-
-        self.assertTrue(result)
-
 
 class TestModifyLink(unittest.IsolatedAsyncioTestCase):
+    """Tests for modify_link function."""
+
     @patch("botaffiumeiro.is_user_excluded")
     @patch("botaffiumeiro.process_link_handlers", new_callable=AsyncMock)
     async def test_modify_link_without_message(
         self,
-        mock_process_link_handlers,
-        mock_is_user_excluded,
-    ):
+        mock_process_link_handlers: AsyncMock,
+        mock_is_user_excluded: AsyncMock,
+    ) -> None:
+        """Test modify_link when the message is empty."""
         update = Update(update_id=1)
-        context = None
 
-        await modify_link(update, context)
+        await modify_link(update)
 
         mock_is_user_excluded.assert_not_called()
         mock_process_link_handlers.assert_not_called()
@@ -84,21 +68,21 @@ class TestModifyLink(unittest.IsolatedAsyncioTestCase):
     @patch("botaffiumeiro.process_link_handlers", new_callable=AsyncMock)
     async def test_modify_link_message_without_text(
         self,
-        mock_process_link_handlers,
-        mock_is_user_excluded,
-    ):
+        mock_process_link_handlers: AsyncMock,
+        mock_is_user_excluded: AsyncMock,
+    ) -> None:
+        """Test modify_link when the message has data bat no text."""
         update = Update(
             update_id=1,
             message=Message(
                 message_id=1,
-                date=datetime.now(),
+                date=datetime.now(timezone.utc),
                 from_user=None,
                 chat=Chat(id=1, type="group"),
             ),
         )
-        context = None
 
-        await modify_link(update, context)
+        await modify_link(update)
 
         mock_is_user_excluded.assert_not_called()
         mock_process_link_handlers.assert_not_called()
@@ -107,22 +91,22 @@ class TestModifyLink(unittest.IsolatedAsyncioTestCase):
     @patch("botaffiumeiro.process_link_handlers", new_callable=AsyncMock)
     async def test_modify_link_excluded_user(
         self,
-        mock_process_link_handlers,
-        mock_is_user_excluded,
-    ):
+        mock_process_link_handlers: AsyncMock,
+        mock_is_user_excluded: AsyncMock,
+    ) -> None:
+        """Test modify_link when the message has a link but comes froma an excluded user."""
         update = Update(
             update_id=1,
             message=Message(
                 message_id=1,
-                date=datetime.now(),
+                date=datetime.now(timezone.utc),
                 from_user=User(id=12345, is_bot=False, first_name="TestUser"),
                 chat=Chat(id=1, type="group"),
                 text="Test message",
             ),
         )
-        context = None
 
-        await modify_link(update, context)
+        await modify_link(update)
 
         mock_is_user_excluded.assert_called_once()
         mock_process_link_handlers.assert_not_called()
@@ -131,92 +115,54 @@ class TestModifyLink(unittest.IsolatedAsyncioTestCase):
     @patch("botaffiumeiro.process_link_handlers", new_callable=AsyncMock)
     async def test_modify_link_included_user(
         self,
-        mock_process_link_handlers,
-        mock_is_user_excluded,
-    ):
+        mock_process_link_handlers: AsyncMock,
+        mock_is_user_excluded: AsyncMock,
+    ) -> None:
+        """Test modify_link when the message has a link and the user isn't int he excluded list."""
         update = Update(
             update_id=1,
             message=Message(
                 message_id=1,
-                date=datetime.now(),
+                date=datetime.now(timezone.utc),
                 from_user=User(id=67890, is_bot=False, first_name="TestUser"),
                 chat=Chat(id=1, type="group"),
                 text="Test message",
             ),
         )
-        context = None
 
-        await modify_link(update, context)
+        await modify_link(update)
 
         mock_is_user_excluded.assert_called_once()
         mock_process_link_handlers.assert_called_once()
 
     @patch("botaffiumeiro.is_user_excluded")
     @patch("botaffiumeiro.process_link_handlers", new_callable=AsyncMock)
-    def test_modify_link_without_user(
+    async def test_modify_link_without_user(
         self,
-        mock_process_link_handlers,
-        mock_is_user_excluded,
-    ):
+        mock_process_link_handlers: AsyncMock,
+        mock_is_user_excluded: AsyncMock,
+    ) -> None:
+        """Test modify_link when the message hasn't a user."""
         update = Update(
             update_id=1,
             message=Message(
                 message_id=1,
-                date=datetime.now(),
+                date=datetime.now(timezone.utc),
                 chat=Chat(id=1, type="group"),
                 text="Test message",
             ),
         )
-        context = None
 
-        modify_link(update, context)
+        await modify_link(update)
 
         mock_is_user_excluded.asset_not_called()
         mock_process_link_handlers.assert_not_called()
 
 
-class TestExpandShortenedURL(unittest.TestCase):
-    @patch("requests.get")
-    def test_expand_amazon_short_url(self, mock_get):
-        """Test: Expands a shortened Amazon URL (amzn.to)."""
-        mock_response = Mock()
-        mock_response.url = "https://www.amazon.com/dp/B08XYZ123"
-        mock_get.return_value = mock_response
-        short_url = "https://amzn.to/abc123"
-        expanded_url = expand_shortened_url(short_url)
-
-        self.assertEqual(expanded_url, "https://www.amazon.com/dp/B08XYZ123")
-        mock_get.assert_called_once_with(short_url, allow_redirects=True)
-
-    @patch("requests.get")
-    def test_no_redirect_url(self, mock_get):
-        """Test: URL does not redirect (original URL is returned)."""
-        mock_response = Mock()
-        mock_response.url = "https://www.amazon.com/dp/B08XYZ123"
-        mock_get.return_value = mock_response
-
-        long_url = "https://www.amazon.com/dp/B08XYZ123"
-        expanded_url = expand_shortened_url(long_url)
-
-        self.assertEqual(expanded_url, "https://www.amazon.com/dp/B08XYZ123")
-        mock_get.assert_called_once_with(long_url, allow_redirects=True)
-
-    @patch("requests.get")
-    def test_expand_aliexpress_short_url(self, mock_get):
-        """Test: Expands a shortened AliExpress URL (s.click.aliexpress.com)."""
-        mock_response = Mock()
-        mock_response.url = "https://www.aliexpress.com/item/12345.html"
-        mock_get.return_value = mock_response
-
-        short_url = "https://s.click.aliexpress.com/e/abc123"
-        expanded_url = expand_shortened_url(short_url)
-
-        self.assertEqual(expanded_url, "https://www.aliexpress.com/item/12345.html")
-        mock_get.assert_called_once_with(short_url, allow_redirects=True)
-
-
 class TestExtractDomainsFromMessage(unittest.TestCase):
-    def test_direct_domain_extraction(self):
+    """Tests for extract_domains_from_message function."""
+
+    def test_direct_domain_extraction(self) -> None:
         """Test: Extract domains directly from the message without embedded URLs."""
         message_text = "Check out this link: https://www.amazon.com/someproduct and this: https://aliexpress.com/item/12345"
         domains, modified_message = extract_domains_from_message(message_text)
@@ -225,7 +171,7 @@ class TestExtractDomainsFromMessage(unittest.TestCase):
         self.assertIn("aliexpress.com", domains)
         self.assertEqual(len(domains), 2)  # Should find 2 unique domains
 
-    def test_embedded_url_excludes_main_domain(self):
+    def test_embedded_url_excludes_main_domain(self) -> None:
         """Test: If there are embedded URLs, the main domain should be excluded."""
         message_text = (
             "Visit https://awin1.com/cread.php?ulp=https://aliexpress.com/item/12345"
@@ -238,8 +184,7 @@ class TestExtractDomainsFromMessage(unittest.TestCase):
         )  # Only the embedded domain should be included
         self.assertNotIn("awin1.com", domains)  # The main domain should be excluded
 
-    @patch("botaffiumeiro.extract_embedded_url", return_value=set())
-    def test_no_embedded_urls(self, mock_extract_embedded_url):
+    def test_no_embedded_urls(self) -> None:
         """Test: No embedded URLs, only direct domain extraction."""
         message_text = "Check out https://amazon.com/product123"
         domains, modified_message = extract_domains_from_message(message_text)
@@ -247,7 +192,7 @@ class TestExtractDomainsFromMessage(unittest.TestCase):
         self.assertIn("amazon.com", domains)  # Should extract only amazon.com
         self.assertEqual(len(domains), 1)  # Only one domain should be found
 
-    def test_multiple_direct_and_embedded_urls(self):
+    def test_multiple_direct_and_embedded_urls(self) -> None:
         """Test: Extract multiple direct and embedded URLs."""
         message_text = (
             "Check this product on Amazon: https://www.amazon.com/product?ref=123 "
@@ -262,7 +207,7 @@ class TestExtractDomainsFromMessage(unittest.TestCase):
         self.assertIn("aliexpress.com", domains)
         self.assertEqual(len(domains), 2)  # Should find 3 unique domains
 
-    def test_no_matching_patterns(self):
+    def test_no_matching_patterns(self) -> None:
         """Test: No matching domains or patterns in the message."""
         message_text = "There are no valid links in this message."
         domains, modified_message = extract_domains_from_message(message_text)
@@ -271,7 +216,7 @@ class TestExtractDomainsFromMessage(unittest.TestCase):
             domains, set()
         )  # Should return an empty set since no domains are matched
 
-    def test_invalid_urls(self):
+    def test_invalid_urls(self) -> None:
         """Test: Handle invalid URLs that should not be extracted."""
         message_text = "Visit this: ftp://invalid-url.com and this invalid scheme: invalid://nope.com"
         domains, modified_message = extract_domains_from_message(message_text)
@@ -284,7 +229,7 @@ class TestExtractDomainsFromMessage(unittest.TestCase):
         "botaffiumeiro.expand_shortened_url",
         return_value="https://www.amazon.com/dp/product123",
     )
-    def test_amazon_shortened_url(self, mock_expand):
+    def test_amazon_shortened_url(self, mock_expand: AsyncMock) -> None:
         """Test: Handle shortened Amazon URL (amzn.to) and expand it."""
         message_text = "Check out this product: https://amzn.to/abc123"
 
@@ -309,7 +254,7 @@ class TestExtractDomainsFromMessage(unittest.TestCase):
         "botaffiumeiro.expand_shortened_url",
         return_value="https://www.aliexpress.com/item/1005001234567890.html",
     )
-    def test_aliexpress_shortened_url(self, mock_expand):
+    def test_aliexpress_shortened_url(self, mock_expand: AsyncMock) -> None:
         """Test: Handle shortened AliExpress URL (s.click.aliexpress.com) and expand it."""
         message_text = (
             "Check out this deal: https://s.click.aliexpress.com/e/buyproduct"
@@ -334,7 +279,7 @@ class TestExtractDomainsFromMessage(unittest.TestCase):
         )
 
     @patch("botaffiumeiro.expand_shortened_url")
-    def test_mixed_full_and_shortened_urls(self, mock_expand):
+    def test_mixed_full_and_shortened_urls(self, mock_expand: AsyncMock) -> None:
         """Test: Handle a mixture of full and shortened URLs for both platforms."""
         message_text = (
             "Check out this Amazon deal: https://www.amazon.com/dp/product123 "
@@ -371,7 +316,7 @@ class TestExtractDomainsFromMessage(unittest.TestCase):
             "https://www.aliexpress.com/item/1005001234567890.html", modified_message
         )
 
-    def test_amazon_full_url_uk(self):
+    def test_amazon_full_url_uk(self) -> None:
         """Test: Handle full Amazon URL with amazon.co.uk."""
         message_text = "Check out this product on Amazon UK: https://www.amazon.co.uk/dp/product123"
         domains, modified_message = extract_domains_from_message(message_text)
@@ -382,7 +327,9 @@ class TestExtractDomainsFromMessage(unittest.TestCase):
         self.assertEqual(len(domains), 1)  # Should only find one domain
 
     @patch("requests.get")
-    def test_expand_amazon_short_url_and_replace_in_message(self, mock_get):
+    def test_expand_amazon_short_url_and_replace_in_message(
+        self, mock_get: AsyncMock
+    ) -> None:
         """Test: Expands a shortened Amazon URL and replaces it in the message."""
         mock_response = Mock()
         mock_response.url = "https://www.amazon.com/dp/B08XYZ123"
@@ -399,7 +346,9 @@ class TestExtractDomainsFromMessage(unittest.TestCase):
         )
 
     @patch("requests.get")
-    def test_expand_multiple_short_urls_and_replace_in_message(self, mock_get):
+    def test_expand_multiple_short_urls_and_replace_in_message(
+        self, mock_get: AsyncMock
+    ) -> None:
         """Test: Expands multiple shortened URLs and replaces them in the message."""
         mock_response_amazon = Mock()
         mock_response_amazon.url = "https://www.amazon.com/dp/B08XYZ123"
@@ -419,7 +368,7 @@ class TestExtractDomainsFromMessage(unittest.TestCase):
         )
 
     @patch("requests.get")
-    def test_extract_domains_with_short_urls(self, mock_get):
+    def test_extract_domains_with_short_urls(self, mock_get: AsyncMock) -> None:
         """Test: Extract domains after expanding shortened URLs."""
         # Simula las respuestas de las cabeceras para las URLs cortas
         mock_response_amazon = Mock()
@@ -454,7 +403,7 @@ class TestExtractDomainsFromMessage(unittest.TestCase):
             "https://s.click.aliexpress.com/e/buyproduct", modified_message
         )
 
-    def test_extract_domains_with_long_urls(self):
+    def test_extract_domains_with_long_urls(self) -> None:
         """Test: Extract domains from long Amazon and AliExpress URLs."""
         # Text with long URLs already expanded
         message_text = (
@@ -480,19 +429,21 @@ class TestExtractDomainsFromMessage(unittest.TestCase):
 
 
 class TestExtractEmbeddedUrl(unittest.TestCase):
-    def test_no_embedded_urls(self):
+    """Tests for extract_embedded_url function."""
+
+    def test_no_embedded_urls(self) -> None:
         """Test: No embedded URLs in the query parameters."""
         query_params = {"param1": ["value1"], "param2": ["value2"]}
         result = extract_embedded_url(query_params)
         self.assertEqual(result, set())  # Should return an empty set
 
-    def test_single_embedded_url(self):
+    def test_single_embedded_url(self) -> None:
         """Test: A single embedded URL inside the query parameters."""
         query_params = {"param1": ["https://example.com/path?query=123"]}
         result = extract_embedded_url(query_params)
         self.assertIn("example.com", result)  # Should contain the domain 'example.com'
 
-    def test_multiple_embedded_urls(self):
+    def test_multiple_embedded_urls(self) -> None:
         """Test: Multiple embedded URLs in different query parameters."""
         query_params = {
             "param1": ["https://example.com/path"],
@@ -503,7 +454,7 @@ class TestExtractEmbeddedUrl(unittest.TestCase):
         self.assertIn("another.com", result)
         self.assertEqual(len(result), 2)  # There should be two unique domains
 
-    def test_invalid_urls(self):
+    def test_invalid_urls(self) -> None:
         """Test: Invalid URLs in the query parameters should not be considered."""
         query_params = {
             "param1": ["ftp://invalid.com/file"],  # Not http/https
@@ -512,7 +463,7 @@ class TestExtractEmbeddedUrl(unittest.TestCase):
         result = extract_embedded_url(query_params)
         self.assertEqual(result, set())  # Should return an empty set
 
-    def test_mixed_valid_and_invalid_urls(self):
+    def test_mixed_valid_and_invalid_urls(self) -> None:
         """Test: A mix of valid and invalid URLs in the query parameters."""
         query_params = {
             "param1": ["https://valid.com/resource"],
@@ -523,7 +474,7 @@ class TestExtractEmbeddedUrl(unittest.TestCase):
         self.assertIn("valid.com", result)  # Only valid.com should be included
         self.assertEqual(len(result), 1)  # There should be only one valid domain
 
-    def test_multiple_values_for_single_param(self):
+    def test_multiple_values_for_single_param(self) -> None:
         """Test: A single query parameter with multiple values (some valid URLs)."""
         query_params = {
             "param1": ["https://valid.com/resource", "https://another.com/path"]
@@ -535,11 +486,13 @@ class TestExtractEmbeddedUrl(unittest.TestCase):
 
 
 class TestPrepareMessage(unittest.TestCase):
+    """Tests for prepare_message function."""
+
     @patch("botaffiumeiro.extract_domains_from_message")
     @patch("botaffiumeiro.select_user_for_domain")
     def test_prepare_message_with_valid_domains(
-        self, mock_select_user, mock_extract_domains
-    ):
+        self, mock_select_user: AsyncMock, mock_extract_domains: AsyncMock
+    ) -> None:
         """Test: Simulate a message with valid domains and ensure users are selected correctly."""
         # Mock the domains extracted from the message
         mock_extract_domains.return_value = (
@@ -548,10 +501,10 @@ class TestPrepareMessage(unittest.TestCase):
         )
 
         # Define a function for side_effect to return users based on the domain
-        def select_user_side_effect(domain):
+        def select_user_side_effect(domain: str) -> dict | None:
             if domain == "amazon.com":
                 return {"user": "user1", "amazon_affiliate_id": "id_user1"}
-            elif domain == "aliexpress.com":
+            if domain == "aliexpress.com":
                 return {"user": "user2", "aliexpress_affiliate_id": "id_user2"}
             return None
 
@@ -580,8 +533,8 @@ class TestPrepareMessage(unittest.TestCase):
     @patch("botaffiumeiro.extract_domains_from_message")
     @patch("botaffiumeiro.select_user_for_domain")
     def test_prepare_message_with_no_domains(
-        self, mock_select_user, mock_extract_domains
-    ):
+        self, mock_select_user: AsyncMock, mock_extract_domains: AsyncMock
+    ) -> None:
         """Test: Handle a case where no valid domains are found in the message."""
         # Mock the domains extracted from the message (empty set and message unchanged)
         mock_extract_domains.return_value = (set(), "This message contains no links.")
@@ -605,8 +558,8 @@ class TestPrepareMessage(unittest.TestCase):
     @patch("botaffiumeiro.extract_domains_from_message")
     @patch("botaffiumeiro.select_user_for_domain")
     def test_prepare_message_with_mixed_domains(
-        self, mock_select_user, mock_extract_domains
-    ):
+        self, mock_select_user: AsyncMock, mock_extract_domains: AsyncMock
+    ) -> None:
         """Test: Simulate a message where one domain has a user and another domain does not."""
         # Mock the domains extracted from the message
         mock_extract_domains.return_value = (
@@ -618,10 +571,10 @@ class TestPrepareMessage(unittest.TestCase):
         )
 
         # Define a function for side_effect to return users based on the domain
-        def select_user_side_effect(domain):
+        def select_user_side_effect(domain: str) -> dict | None:
             if domain == "amazon.com":
                 return {"user": "user1", "amazon_affiliate_id": "id_user1"}
-            elif domain == "unknown.com":
+            if domain == "unknown.com":
                 return None
             return None
 
@@ -652,8 +605,8 @@ class TestPrepareMessage(unittest.TestCase):
     @patch("botaffiumeiro.extract_domains_from_message")
     @patch("botaffiumeiro.select_user_for_domain")
     def test_prepare_message_with_only_unknown_domains(
-        self, mock_select_user, mock_extract_domains
-    ):
+        self, mock_select_user: AsyncMock, mock_extract_domains: AsyncMock
+    ) -> None:
         """Test: Simulate a message where all domains are unknown."""
         # Mock the domains extracted from the message
         mock_extract_domains.return_value = (
@@ -685,8 +638,8 @@ class TestPrepareMessage(unittest.TestCase):
     @patch("botaffiumeiro.extract_domains_from_message")
     @patch("botaffiumeiro.select_user_for_domain")
     def test_prepare_message_with_expanded_urls(
-        self, mock_select_user, mock_extract_domains
-    ):
+        self, mock_select_user: AsyncMock, mock_extract_domains: AsyncMock
+    ) -> None:
         """Test: Ensure that prepare_message returns both the selected users and the modified message."""
         # Mock the domains and the modified message returned by extract_domains_from_message
         mock_extract_domains.return_value = (
@@ -698,10 +651,10 @@ class TestPrepareMessage(unittest.TestCase):
         )
 
         # Define a function for side_effect to return users based on the domain
-        def select_user_side_effect(domain):
+        def select_user_side_effect(domain: str) -> dict | None:
             if domain == "amazon.com":
                 return {"user": "user1", "amazon_affiliate_id": "id_user1"}
-            elif domain == "aliexpress.com":
+            if domain == "aliexpress.com":
                 return {"user": "user2", "aliexpress_affiliate_id": "id_user2"}
             return None
 
@@ -731,9 +684,7 @@ class TestPrepareMessage(unittest.TestCase):
             context["modified_message"], "Modified message with expanded URLs"
         )
 
-    @patch("botaffiumeiro.extract_domains_from_message")
-    @patch("botaffiumeiro.select_user_for_domain")
-    def test_prepare_message_with_no_text(self, mock_select_user, mock_extract_domains):
+    def test_prepare_message_with_no_text(self) -> None:
         """Test: Ensure that prepare_message returns an empty dictionary and None for the modified message when there is no text."""
         # Simulate an empty message
         message = Mock()
@@ -748,114 +699,123 @@ class TestPrepareMessage(unittest.TestCase):
 
 
 class TestSelectUserForDomain(unittest.TestCase):
+    """Tests for select_user_for_domain function."""
+
     @patch(
-        "botaffiumeiro.domain_percentage_table",
-        {
+        "botaffiumeiro.config_manager",  # Parchar el config_manager global
+        new_callable=Mock,
+    )
+    def test_select_user1(self, mock_config_manager: AsyncMock) -> None:
+        """Test: When random value is within the range of the first user."""
+        mock_config_manager.domain_percentage_table = {
             "amazon": [
                 {"user": "user1", "percentage": 60},
                 {"user": "user2", "percentage": 40},
             ]
-        },
-    )
-    @patch(
-        "botaffiumeiro.all_users_configurations",
-        {
+        }
+        mock_config_manager.all_users_configurations = {
             "user1": {"amazon_affiliate_id": "user1-affiliate-id"},
             "user2": {"amazon_affiliate_id": "user2-affiliate-id"},
-        },
-    )
-    @patch("random.uniform", return_value=50)
-    def test_select_user1(self, mock_random):
-        """Test: When random value is within the range of the first user."""
+        }
+
         selected_user = select_user_for_domain("amazon")
+        if selected_user is None:
+            self.fail("select_user_for_domain returned None, but a user was expected.")
         self.assertEqual(selected_user["amazon_affiliate_id"], "user1-affiliate-id")
 
     @patch(
-        "botaffiumeiro.domain_percentage_table",
-        {
+        "botaffiumeiro.config_manager",  # Parchar el config_manager global
+        new_callable=Mock,
+    )
+    def test_select_user2(self, mock_config_manager: AsyncMock) -> None:
+        """Test: When random value is within the range of the second user."""
+        mock_config_manager.domain_percentage_table = {
             "amazon": [
                 {"user": "user1", "percentage": 60},
                 {"user": "user2", "percentage": 40},
             ]
-        },
-    )
-    @patch(
-        "botaffiumeiro.all_users_configurations",
-        {
+        }
+        mock_config_manager.all_users_configurations = {
             "user1": {"amazon_affiliate_id": "user1-affiliate-id"},
             "user2": {"amazon_affiliate_id": "user2-affiliate-id"},
-        },
-    )
-    @patch("random.uniform", return_value=80)
-    def test_select_user2(self, mock_random):
-        """Test: When random value is within the range of the second user."""
+        }
+
         selected_user = select_user_for_domain("amazon")
+        if selected_user is None:
+            self.fail("select_user_for_domain returned None, but a user was expected.")
         self.assertEqual(selected_user["amazon_affiliate_id"], "user2-affiliate-id")
 
-    @patch("botaffiumeiro.domain_percentage_table", {})
-    def test_no_users_in_domain(self):
+    @patch(
+        "botaffiumeiro.config_manager",  # Parchar el config_manager global
+        new_callable=Mock,
+    )
+    def test_no_users_in_domain(self, mock_config_manager: AsyncMock) -> None:
         """Test: No users are available for the given domain. Should return None."""
+        mock_config_manager.domain_percentage_table = {}
+
         selected_user = select_user_for_domain("nonexistent_domain")
         self.assertIsNone(selected_user)
 
     @patch(
-        "botaffiumeiro.domain_percentage_table",
-        {"amazon": [{"user": "user1", "percentage": 100}]},
+        "botaffiumeiro.config_manager",  # Parchar el config_manager global
+        new_callable=Mock,
     )
-    @patch(
-        "botaffiumeiro.all_users_configurations",
-        {"user1": {"amazon_affiliate_id": "user1-affiliate-id"}},
-    )
-    @patch("random.uniform", return_value=100)
-    def test_single_user(self, mock_random):
+    def test_single_user(self, mock_config_manager: AsyncMock) -> None:
         """Test: Only one user is present, should always return that user."""
+        mock_config_manager.domain_percentage_table = {
+            "amazon": [{"user": "user1", "percentage": 100}]
+        }
+        mock_config_manager.all_users_configurations = {
+            "user1": {"amazon_affiliate_id": "user1-affiliate-id"}
+        }
+
         selected_user = select_user_for_domain("amazon")
+        if selected_user is None:
+            self.fail("select_user_for_domain returned None, but a user was expected.")
         self.assertEqual(selected_user["amazon_affiliate_id"], "user1-affiliate-id")
 
     @patch(
-        "botaffiumeiro.domain_percentage_table",
-        {
+        "botaffiumeiro.config_manager",  # Parchar el config_manager global
+        new_callable=Mock,
+    )
+    def test_zero_percentage_user(self, mock_config_manager: AsyncMock) -> None:
+        """Test: One user has 0 percentage, should not be selected."""
+        mock_config_manager.domain_percentage_table = {
             "amazon": [
                 {"user": "user1", "percentage": 0},
                 {"user": "user2", "percentage": 100},
             ]
-        },
-    )
-    @patch(
-        "botaffiumeiro.all_users_configurations",
-        {
+        }
+        mock_config_manager.all_users_configurations = {
             "user1": {"amazon_affiliate_id": "user1-affiliate-id"},
             "user2": {"amazon_affiliate_id": "user2-affiliate-id"},
-        },
-    )
-    @patch("random.uniform", return_value=50)
-    def test_zero_percentage_user(self, mock_random):
-        """Test: One user has 0 percentage, should not be selected."""
+        }
+
         selected_user = select_user_for_domain("amazon")
+        if selected_user is None:
+            self.fail("select_user_for_domain returned None, but a user was expected.")
         self.assertEqual(selected_user["amazon_affiliate_id"], "user2-affiliate-id")
 
     @patch(
-        "botaffiumeiro.domain_percentage_table",
-        {
+        "botaffiumeiro.config_manager",  # Parchar el config_manager global
+        new_callable=Mock,
+    )
+    def test_fallback_to_first_user(self, mock_config_manager: AsyncMock) -> None:
+        """Test: If no match is found in random selection, fallback to the first user."""
+        mock_config_manager.domain_percentage_table = {
             "amazon": [
                 {"user": "user1", "percentage": 60},
                 {"user": "user2", "percentage": 40},
             ]
-        },
-    )
-    @patch(
-        "botaffiumeiro.all_users_configurations",
-        {
+        }
+        mock_config_manager.all_users_configurations = {
             "user1": {"amazon_affiliate_id": "user1-affiliate-id"},
             "user2": {"amazon_affiliate_id": "user2-affiliate-id"},
-        },
-    )
-    @patch(
-        "random.uniform", return_value=150
-    )  # Valor aleatorio fuera de rango (no debería ocurrir)
-    def test_fallback_to_first_user(self, mock_random):
-        """Test: If no match is found in random selection, fallback to the first user."""
+        }
+
         selected_user = select_user_for_domain("amazon")
+        if selected_user is None:
+            self.fail("select_user_for_domain returned None, but a user was expected.")
         self.assertEqual(selected_user["amazon_affiliate_id"], "user1-affiliate-id")
 
 

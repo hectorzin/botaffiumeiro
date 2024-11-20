@@ -1,327 +1,364 @@
-from datetime import datetime, timedelta
+"""Module to handle bot configuration and affiliate link processing."""
+
+from __future__ import annotations
+
+from datetime import datetime, timedelta, timezone
 import logging
-from typing import Any, Dict
+from pathlib import Path
+from typing import Any
 
-import requests  # type: ignore
-import yaml  # type: ignore
-
-# Rutas a los archivos de configuración
-CONFIG_PATH = "data/config.yaml"
-CREATORS_CONFIG_PATH = "creators_affiliates.yaml"
+import requests  # type: ignore[import-untyped]
+import yaml  # type: ignore[import-untyped]
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-domain_percentage_table = {}
-all_users_configurations: dict[str, dict] = {}
 
-config_data: Dict[str, Any] = {
-    # Telegram
-    "BOT_TOKEN": "",
-    "DELETE_MESSAGES": "",
-    "EXCLUDED_USERS": [],
-    "DISCOUNT_KEYWORDS": [],
-    # Messages
-    "MSG_AFFILIATE_LINK_MODIFIED": "",
-    "MSG_REPLY_PROVIDED_BY_USER": "",
-    # feed the authors
-    "CREATOR_PERCENTAGE": "",
-    # Logging Level
-    "LOG_LEVEL": "",
-}
+class ConfigurationManager:
+    """Class to manage bot configuration and affiliate link processing."""
 
+    CONFIG_PATH = Path("data/config.yaml")
+    CREATORS_CONFIG_PATH = Path("creators_affiliates.yaml")
+    TIMEOUT = 10
 
-last_load_time = None
+    def __init__(self) -> None:
+        """Initialize the configuration manager."""
+        # Telegram settings
+        self.bot_token: str = ""
+        self.delete_messages: bool = True
+        self.excluded_users: list[str] = []
+        self.discount_keywords: list[str] = []
 
+        # Messages
+        self.msg_affiliate_link_modified: str = ""
+        self.msg_reply_provided_by_user: str = ""
 
-def load_user_configuration(user, creator_percentage, user_data):
-    """Load user-specific configuration for affiliate programs and settings
-    without including global items like API tokens or messages.
-    """
-    return {
-        "user": user,
-        "percentage": creator_percentage,
-        "amazon": {
-            "advertisers": user_data.get("amazon", {}),
-        },
-        "awin": {
-            "publisher_id": user_data.get("awin", {}).get("publisher_id", None),
-            "advertisers": user_data.get("awin", {}).get("advertisers", {}),
-        },
-        "admitad": {
-            "publisher_id": user_data.get("admitad", {}).get("publisher_id", None),
-            "advertisers": user_data.get("admitad", {}).get("advertisers", {}),
-        },
-        "tradedoubler": {
-            "publisher_id": user_data.get("tradedoubler", {}).get("publisher_id", None),
-            "advertisers": user_data.get("tradedoubler", {}).get("advertisers", {}),
-        },
-        "aliexpress": {
-            "discount_codes": user_data.get("aliexpress", {}).get(
-                "discount_codes", None
-            ),
-            "app_key": user_data.get("aliexpress", {}).get("app_key", None),
-            "app_secret": user_data.get("aliexpress", {}).get("app_secret", None),
-            "tracking_id": user_data.get("aliexpress", {}).get("tracking_id", None),
-        },
-    }
+        # Affiliate settings
+        self.creator_percentage: int = 10
 
+        # Logging
+        self.log_level: str = "INFO"
 
-def load_user_configuration_from_url(user_id, percentage, url):
-    """Load user-specific configuration from a URL.
+        # Internal data
+        self.domain_percentage_table: dict[str, list[dict[str, Any]]] = {}
+        self.all_users_configurations: dict[str, dict] = {}
+        self.last_load_time: datetime | None = None
 
-    Parameters
-    ----------
-    - user_id: ID of the user.
-    - url: URL to fetch the user's configuration YAML file.
+    def _load_user_configuration(
+        self, user: str, creator_percentage: int, user_data: dict
+    ) -> dict:
+        """Load user-specific configuration for affiliate programs and settings.
 
-    Returns
-    -------
-    - Dictionary containing user configuration data.
+        Args:
+        ----
+            user (str): User ID.
+            creator_percentage (int): Percentage of creator's influence.
+            user_data (dict): User-specific configuration data.
 
-    """
-    try:
-        response = requests.get(url)
-        response.raise_for_status()
-        user_data = yaml.safe_load(response.text)
-        return load_user_configuration(
-            user_id, percentage, user_data.get("configuration", {})
-        )
-    except Exception as e:
-        logger.error(f"Error loading configuration for {user_id} from {url}: {e}")
-        return None
+        Returns:
+        -------
+            dict: Processed user configuration.
 
+        """
+        return {
+            "user": user,
+            "percentage": creator_percentage,
+            "amazon": {
+                "advertisers": user_data.get("amazon", {}),
+            },
+            "awin": {
+                "publisher_id": user_data.get("awin", {}).get("publisher_id", None),
+                "advertisers": user_data.get("awin", {}).get("advertisers", {}),
+            },
+            "admitad": {
+                "publisher_id": user_data.get("admitad", {}).get("publisher_id", None),
+                "advertisers": user_data.get("admitad", {}).get("advertisers", {}),
+            },
+            "tradedoubler": {
+                "publisher_id": user_data.get("tradedoubler", {}).get(
+                    "publisher_id", None
+                ),
+                "advertisers": user_data.get("tradedoubler", {}).get("advertisers", {}),
+            },
+            "aliexpress": {
+                "discount_codes": user_data.get("aliexpress", {}).get(
+                    "discount_codes", None
+                ),
+                "app_key": user_data.get("aliexpress", {}).get("app_key", None),
+                "app_secret": user_data.get("aliexpress", {}).get("app_secret", None),
+                "tracking_id": user_data.get("aliexpress", {}).get("tracking_id", None),
+            },
+        }
 
-def add_to_domain_table(domain, user_id, affiliate_id, percentage):
-    """Adds a user to the domain percentage table if they have an ID for the given domain.
+    def _load_user_configuration_from_url(
+        self, user_id: str, percentage: int, url: str
+    ) -> dict | None:
+        """Load user-specific configuration from a URL.
 
-    Parameters
-    ----------
-    - domain: The domain name to add to the table (e.g., "amazon", "aliexpress").
-    - user_id: The ID of the user (e.g., "user", "HectorziN").
-    - affiliate_id: The affiliate ID for the given domain.
-    - percentage: The percentage of time this user should be selected for the domain.
+        Args:
+        ----
+            user_id (str): ID of the user.
+            percentage (int): User's affiliate percentage.
+            url (str): URL to fetch the user's configuration YAML file.
 
-    """
-    if affiliate_id:
-        if domain not in domain_percentage_table:
-            domain_percentage_table[domain] = []
+        Returns:
+        -------
+            dict | None: User configuration data or None if an error occurs.
 
-        if not any(
-            entry["user"] == user_id for entry in domain_percentage_table[domain]
-        ):
-            domain_percentage_table[domain].append(
-                {"user": user_id, "percentage": percentage}
+        """
+        try:
+            response = requests.get(url, timeout=self.TIMEOUT)
+            response.raise_for_status()
+            user_data = yaml.safe_load(response.text)
+            return self._load_user_configuration(
+                user_id, percentage, user_data.get("configuration", {})
             )
+        except requests.RequestException:
+            logger.exception("Error loading configuration for %s from %s", user_id, url)
+            return None
 
+    def _add_to_domain_table(
+        self, domain: str, user_id: str, affiliate_id: str | None, percentage: int
+    ) -> None:
+        """Add a user to the domain percentage table.
 
-def add_affiliate_stores_domains(user_id, advertisers, platform_key, percentage):
-    """Processes multiple domains for networks like Awin or Admitad.
+        Args:
+        ----
+            domain (str): Domain name (e.g., "amazon").
+            user_id (str): User ID (e.g., "user", "HectorziN").
+            affiliate_id (str | None): Affiliate ID for the domain.
+            percentage (int): User's percentage share for the domain.
 
-    Parameters
-    ----------
-    - user_id: The ID of the user (e.g., "user", "HectorziN")
-    - advertisers: A dictionary of advertisers for the given platform (e.g., Awin or Admitad)
-    - platform_key: The key indicating the platform (e.g., "awin", "admitad")
-    - percentage: The percentage of time this user should be selected for these domains
-
-    """
-    if not advertisers:
-        logger.info(f"No advertisers for {platform_key}. Skipping {user_id}.")
-        return
-
-    for domain, affiliate_id in advertisers.items():
+        """
         if affiliate_id:
-            add_to_domain_table(domain, user_id, affiliate_id, percentage)
+            if domain not in self.domain_percentage_table:
+                self.domain_percentage_table[domain] = []
 
+            if not any(
+                entry["user"] == user_id
+                for entry in self.domain_percentage_table[domain]
+            ):
+                self.domain_percentage_table[domain].append(
+                    {"user": user_id, "percentage": percentage}
+                )
 
-def add_user_to_domain_percentage_table(user_id, user_data, percentage):
-    """Adds a user to the domain percentage table based on their affiliate configurations.
+    def _add_affiliate_stores_domains(
+        self,
+        user_id: str,
+        advertisers: dict[str, str],
+        platform_key: str,
+        percentage: int,
+    ) -> None:
+        """Process multiple domains for affiliate platforms.
 
-    Parameters
-    ----------
-    - user_id: ID of the user (e.g., "user", "HectorziN")
-    - user_data: Configuration data of the user (structured as amazon, awin, admitad, aliexpress)
-    - percentage: Percentage of time this user should be selected for each domain
+        Args:
+        ----
+            user_id (str): User ID.
+            advertisers (dict[str, str]): Advertiser data.
+            platform_key (str): Platform key (e.g., "awin").
+            percentage (int): User's percentage share.
 
-    """
-    logger.debug(f"Adding {user_id} with percentage {percentage}")
+        """
+        if not advertisers:
+            logger.info("No advertisers for %s. Skipping %s.", platform_key, user_id)
+            return
 
-    if user_data.get("aliexpress", {}).get("discount_codes", None):
-        add_to_domain_table(
+        for domain, affiliate_id in advertisers.items():
+            if affiliate_id:
+                self._add_to_domain_table(domain, user_id, affiliate_id, percentage)
+
+    def _add_user_to_domain_percentage_table(
+        self, user_id: str, user_data: dict, percentage: int
+    ) -> None:
+        """Add a user to the domain percentage table based on their affiliate configurations.
+
+        Args:
+        ----
+            user_id (str): User ID (e.g., "HectorziN").
+            user_data (dict): User-specific configuration data.
+            percentage (int): Percentage of user influence.
+
+        """
+        logger.debug("Adding %s with percentage %s", user_id, percentage)
+
+        if user_data.get("aliexpress", {}).get("discount_codes", None):
+            self._add_to_domain_table(
+                "aliexpress.com",
+                user_id,
+                "Discount",
+                percentage,
+            )
+        self._add_to_domain_table(
             "aliexpress.com",
             user_id,
-            "Discount",
+            user_data.get("aliexpress", {}).get("app_key", None),
             percentage,
         )
-    add_to_domain_table(
-        "aliexpress.com",
-        user_id,
-        user_data.get("aliexpress", {}).get("app_key", None),
-        percentage,
-    )
-    add_affiliate_stores_domains(
-        user_id,
-        user_data.get("amazon", {}).get("advertisers", {}),
-        "amazon",
-        percentage,
-    )
-    add_affiliate_stores_domains(
-        user_id, user_data.get("awin", {}).get("advertisers", {}), "awin", percentage
-    )
-    add_affiliate_stores_domains(
-        user_id,
-        user_data.get("admitad", {}).get("advertisers", {}),
-        "admitad",
-        percentage,
-    )
-    add_affiliate_stores_domains(
-        user_id,
-        user_data.get("tradedoubler", {}).get("advertisers", {}),
-        "tradedoubler",
-        percentage,
-    )
+        self._add_affiliate_stores_domains(
+            user_id,
+            user_data.get("amazon", {}).get("advertisers", {}),
+            "amazon",
+            percentage,
+        )
+        self._add_affiliate_stores_domains(
+            user_id,
+            user_data.get("awin", {}).get("advertisers", {}),
+            "awin",
+            percentage,
+        )
+        self._add_affiliate_stores_domains(
+            user_id,
+            user_data.get("admitad", {}).get("advertisers", {}),
+            "admitad",
+            percentage,
+        )
+        self._add_affiliate_stores_domains(
+            user_id,
+            user_data.get("tradedoubler", {}).get("advertisers", {}),
+            "tradedoubler",
+            percentage,
+        )
 
+    def _adjust_domain_affiliate_percentages(
+        self, domain: str, creator_percentage: int
+    ) -> None:
+        """Adjust percentages in domain_percentage_table to ensure they sum to 100%.
 
-def adjust_domain_affiliate_percentages(domain, creator_percentage):
-    """Adjusts the percentages of users in a given domain within domain_percentage_table, ensuring they sum to 100%.
+        Args:
+        ----
+            domain (str): Domain name (e.g., "amazon").
+            creator_percentage (int): Percentage allocated to creators.
 
-    Parameters
-    ----------
-    - domain: The domain (e.g., "amazon", "aliexpress") to adjust in domain_percentage_table.
-    - creator_percentage: The percentage of total influence given to creators by the user.
+        """
+        logger.debug("Adjusting percentages for domain: %s", domain)
+        domain_data = self.domain_percentage_table.get(domain, [])
+        user_entry = None
+        creator_entries = []
 
-    """
-    logger.debug(f"Adjusting percentages for domain: {domain}")
-    domain_data = domain_percentage_table.get(domain, [])
-    user_entry = None
-    creator_entries = []
+        for entry in domain_data:
+            if entry["user"] == "main":
+                user_entry = entry
+            else:
+                creator_entries.append(entry)
 
-    for entry in domain_data:
-        if entry["user"] == "main":
-            user_entry = entry
-        else:
-            creator_entries.append(entry)
-
-    user_percentage = 100 - creator_percentage
-    if user_entry:
-        user_entry["percentage"] = user_percentage
-        logger.debug(f"Set user percentage for domain {domain} to {user_percentage}")
-    else:
-        user_percentage = 0
-        creator_percentage = 100
-
-    total_creator_percentage = sum(entry["percentage"] for entry in creator_entries)
-    if total_creator_percentage > 0:
-        for creator_entry in creator_entries:
-            weighted_creator_percentage = creator_entry["percentage"] * (
-                creator_percentage / total_creator_percentage
-            )
-            creator_entry["percentage"] = weighted_creator_percentage
+        user_percentage = 100 - creator_percentage
+        if user_entry:
+            user_entry["percentage"] = user_percentage
             logger.debug(
-                f"Set creator percentage for domain {domain} to {weighted_creator_percentage}"
+                "Set user percentage for domain %s to %s", domain, user_percentage
             )
-    else:
-        user_entry["percentage"] = 100
-    index_offset = 0
-    if user_entry:
-        domain_data[0] = user_entry
-        index_offset = 1
-    for i in range(len(creator_entries)):
-        domain_data[i + index_offset] = creator_entries[i]
+        else:
+            user_percentage = 0
+            creator_percentage = 100
 
-    # for entry in domain_data:
-    #     entry["percentage"] = (entry["percentage"] / total_percentage) * 100
-    #     logger.debug(
-    #         f"Normalized percentage for user {entry['user']} to {entry['percentage']}"
-    #     )
-    log_message = f"Adjusted percentages for domain {domain}: "
-    log_entries = []
+        total_creator_percentage = sum(entry["percentage"] for entry in creator_entries)
+        if total_creator_percentage > 0:
+            for creator_entry in creator_entries:
+                weighted_creator_percentage = creator_entry["percentage"] * (
+                    creator_percentage / total_creator_percentage
+                )
+                creator_entry["percentage"] = weighted_creator_percentage
+                logger.debug(
+                    "Set creator percentage for domain %s to %s",
+                    domain,
+                    weighted_creator_percentage,
+                )
+        elif user_entry:
+            user_entry["percentage"] = 100
+        index_offset = 0
+        if user_entry:
+            domain_data[0] = user_entry
+            index_offset = 1
+        for i in range(len(creator_entries)):
+            domain_data[i + index_offset] = creator_entries[i]
 
-    # log percentages in a unique line for easy reding
-    for entry in domain_data:
-        log_entries.append(f"{entry['user']}:{entry['percentage']:.2f}%")
-    log_message += " ".join(log_entries)
-    logger.info(log_message)
+        log_message = f"Adjusted percentages for domain {domain}: "
 
+        # log percentages in a unique line for easy reding
+        log_entries = [
+            f"{entry['user']}:{entry['percentage']:.2f}%" for entry in domain_data
+        ]
 
-def should_reload_configuration():
-    global last_load_time
-    if last_load_time is None:
-        return True  # Cargar si nunca se ha cargado
-    return datetime.now() - last_load_time >= timedelta(seconds=60)
+        log_message += " ".join(log_entries)
+        logger.info(log_message)
 
+    def _should_reload_configuration(self) -> bool:
+        """Check if the configuration should be reloaded.
 
-def load_configuration():
-    global last_load_time
-    if not should_reload_configuration():
-        return
-    logger.info("Loading configuration")
-    domain_percentage_table.clear()
-    all_users_configurations.clear()
-    with open(CONFIG_PATH, encoding="utf-8") as file:
-        config_file_data = yaml.safe_load(file)
+        Returns
+        -------
+            bool: True if the configuration should be reloaded, False otherwise.
 
-    with open(CREATORS_CONFIG_PATH, encoding="utf-8") as file:
-        creators_file_data = yaml.safe_load(file)
+        """
+        if self.last_load_time is None:
+            return True  # Cargar si nunca se ha cargado
+        return datetime.now(timezone.utc) - self.last_load_time >= timedelta(seconds=60)
 
-    # Telegram settings
-    config_data["BOT_TOKEN"] = config_file_data.get("telegram", {}).get(
-        "bot_token", None
-    )  # None if not set
-    config_data["DELETE_MESSAGES"] = config_file_data.get("telegram", {}).get(
-        "delete_messages", True
-    )
-    config_data["EXCLUDED_USERS"] = config_file_data.get("telegram", {}).get(
-        "excluded_users", []
-    )
-    config_data["DISCOUNT_KEYWORDS"] = config_file_data.get("telegram", {}).get(
-        "discount_keywords", []
-    )
+    def load_configuration(self) -> None:
+        """Load and process the configuration files."""
+        if not self._should_reload_configuration():
+            return
+        logger.info("Loading configuration")
+        self.domain_percentage_table.clear()
+        self.all_users_configurations.clear()
+        with self.CONFIG_PATH.open(encoding="utf-8") as file:
+            config_file_data = yaml.safe_load(file)
 
-    # Messages
-    config_data["MSG_AFFILIATE_LINK_MODIFIED"] = config_file_data.get(
-        "messages", {}
-    ).get(
-        "affiliate_link_modified",
-        "Here is the modified link with our affiliate program:",
-    )
-    config_data["MSG_REPLY_PROVIDED_BY_USER"] = config_file_data.get(
-        "messages", {}
-    ).get("reply_provided_by_user", "Reply provided by")
+        with self.CREATORS_CONFIG_PATH.open(encoding="utf-8") as file:
+            creators_file_data = yaml.safe_load(file)
 
-    # feed the authors
-    config_data["CREATOR_PERCENTAGE"] = config_file_data.get(
-        "affiliate_settings", {}
-    ).get("creator_affiliate_percentage", 10)
+        # Telegram settings
+        telegram_config = config_file_data.get("telegram", {})
+        self.bot_token = telegram_config.get("bot_token", "")
+        self.delete_messages = telegram_config.get("delete_messages", True)
+        self.excluded_users = telegram_config.get("excluded_users", [])
+        self.discount_keywords = telegram_config.get("discount_keywords", [])
 
-    # Logging Level
-    config_data["LOG_LEVEL"] = config_file_data.get("log_level", "INFO")
+        # Messages
+        messages_config = config_file_data.get("messages", {})
+        self.msg_affiliate_link_modified = messages_config.get(
+            "affiliate_link_modified",
+            "Here is the modified link with our affiliate program:",
+        )
+        self.msg_reply_provided_by_user = messages_config.get(
+            "reply_provided_by_user", "Reply provided by"
+        )
 
-    # Load user configurations
-    all_users_configurations["main"] = load_user_configuration(
-        "main", 100 - config_data["CREATOR_PERCENTAGE"], config_file_data
-    )
-    for creator in creators_file_data.get("users", []):
-        creator_id = creator.get("id")
-        creator_percentage = creator.get("percentage", 0)
-        creator_url = creator.get(
-            "url"
-        )  # Assuming you have a field 'url' for each creator
-        if creator_url:
-            user_data = load_user_configuration_from_url(
-                creator_id, creator_percentage, creator_url
+        # Affiliate settings
+        affiliate_settings = config_file_data.get("affiliate_settings", {})
+        self.creator_percentage = affiliate_settings.get(
+            "creator_affiliate_percentage", 10
+        )
+
+        # Logging
+        self.log_level = config_file_data.get("log_level", "INFO")
+
+        # Load user configurations
+        self.all_users_configurations["main"] = self._load_user_configuration(
+            "main", 100 - self.creator_percentage, config_file_data
+        )
+        for creator in creators_file_data.get("users", []):
+            creator_id = creator.get("id")
+            creator_percentage = creator.get("percentage", 0)
+            creator_url = creator.get(
+                "url"
+            )  # Assuming you have a field 'url' for each creator
+            if creator_url:
+                user_data = self._load_user_configuration_from_url(
+                    creator_id, creator_percentage, creator_url
+                )
+                if user_data:
+                    self.all_users_configurations[creator_id] = user_data
+
+        # Add users to the domain percentage table
+        for user_id, user_data in self.all_users_configurations.items():
+            user_percentage = user_data.get("percentage", 0)
+            self._add_user_to_domain_percentage_table(
+                user_id, user_data, user_percentage
             )
-            if user_data:
-                all_users_configurations[creator_id] = user_data
 
-    # Add users to the domain percentage table
-    for user_id, user_data in all_users_configurations.items():
-        user_percentage = user_data.get("percentage", 0)
-        add_user_to_domain_percentage_table(user_id, user_data, user_percentage)
-
-    # Adjust percentages for each domain
-    for domain in domain_percentage_table:
-        adjust_domain_affiliate_percentages(domain, config_data["CREATOR_PERCENTAGE"])
-    last_load_time = datetime.now()
+        # Adjust percentages for each domain
+        for domain in self.domain_percentage_table:
+            self._adjust_domain_affiliate_percentages(domain, self.creator_percentage)
+        self.last_load_time = datetime.now(timezone.utc)

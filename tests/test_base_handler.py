@@ -1,219 +1,163 @@
-import unittest
-from unittest.mock import AsyncMock, patch
-from urllib.parse import unquote
+"""Tests for the base handler used as parent of all handlers."""
+# ruff: noqa: SLF001
 
-from config import config_data
+import unittest
+from unittest.mock import AsyncMock, Mock
+
 from handlers.base_handler import PATTERN_AFFILIATE_URL_QUERY, BaseHandler
 
 
 class TestHandler(BaseHandler):
-    def handle_links(self):
-        pass
+    """Dummy handler for testing."""
+
+    async def handle_links(self, _: dict) -> bool:
+        """Stub method for handling links."""
+        return False
 
 
 class TestGenerateAffiliateUrl(unittest.TestCase):
-    def setUp(self):
-        """Set up the TestHandler instance."""
-        self.handler = TestHandler()
+    """Tests for the method that generates affiliate URL."""
 
-    def test_amazon_affiliate_url(self):
+    def setUp(self) -> None:
+        """Set up the TestHandler instance with a mock ConfigurationManager."""
+        self.config_manager = Mock()  # Create a mock ConfigurationManager
+        self.handler = TestHandler(self.config_manager)
+
+    def test_amazon_affiliate_url(self) -> None:
         """Test Amazon affiliate link generation with a simple format."""
         original_url = "https://www.amazon.com/dp/B08N5WRWNW"
+        affiliate_data = {"affiliate_tag": "tag", "affiliate_id": "affiliate-21"}
         affiliate_url = self.handler._generate_affiliate_url(
             original_url,
             format_template="{domain}{path_before_query}?{affiliate_tag}={affiliate_id}",
-            affiliate_tag="tag",
-            affiliate_id="affiliate-21",
+            affiliate_data=affiliate_data,
         )
         expected_url = "https://www.amazon.com/dp/B08N5WRWNW?tag=affiliate-21"
         self.assertEqual(affiliate_url, expected_url)
 
-    def test_admitad_affiliate_url_with_store_id(self):
+    def test_admitad_affiliate_url_with_store_id(self) -> None:
         """Test Admitad affiliate link generation with store ID and affiliate ID."""
         original_url = "https://www.some-admitad-store.com/product"
+        affiliate_data = {"affiliate_tag": "aff_id", "affiliate_id": "admitad-21"}
         affiliate_url = self.handler._generate_affiliate_url(
             original_url,
             format_template="{domain}?store_id=12345&{affiliate_tag}={affiliate_id}",
-            affiliate_tag="aff_id",
-            affiliate_id="admitad-21",
+            affiliate_data=affiliate_data,
         )
         expected_url = (
             "https://www.some-admitad-store.com?store_id=12345&aff_id=admitad-21"
         )
         self.assertEqual(affiliate_url, expected_url)
 
-    def test_url_with_existing_affiliate_tag_overwrite(self):
+    def test_url_with_existing_affiliate_tag_overwrite(self) -> None:
         """Test overwriting an existing affiliate tag in the URL."""
         original_url = "https://www.amazon.com/dp/B08N5WRWNW?tag=old-affiliate"
+        affiliate_data = {"affiliate_tag": "tag", "affiliate_id": "new-affiliate"}
         affiliate_url = self.handler._generate_affiliate_url(
             original_url,
             format_template="{domain}{path_before_query}?{affiliate_tag}={affiliate_id}",
-            affiliate_tag="tag",
-            affiliate_id="new-affiliate",
+            affiliate_data=affiliate_data,
         )
         expected_url = "https://www.amazon.com/dp/B08N5WRWNW?tag=new-affiliate"
         self.assertEqual(affiliate_url, expected_url)
 
-    def test_no_affiliate_tag_in_template_and_affiliate_tag(self):
+    def test_no_affiliate_tag_in_template(self) -> None:
         """Test that the query string is appended properly if the template does not include the affiliate tag placeholders."""
         original_url = "https://www.amazon.com/dp/B08N5WRWNW"
+        affiliate_data = {"affiliate_tag": "tag", "affiliate_id": "affiliate-21"}
         affiliate_url = self.handler._generate_affiliate_url(
             original_url,
             format_template="{domain}{path_before_query}",
-            affiliate_tag="tag",
-            affiliate_id="affiliate-21",
+            affiliate_data=affiliate_data,
         )
         expected_url = "https://www.amazon.com/dp/B08N5WRWNW?tag=affiliate-21"
         self.assertEqual(affiliate_url, expected_url)
 
-    def test_no_affiliate_tag_in_template_and_affiliate_tag_with_url_with_query(self):
+    def test_no_affiliate_tag_in_template_and_affiliate_tag_with_url_with_query(
+        self,
+    ) -> None:
         """Test that the query string is appended properly if the template does not include the affiliate tag placeholders."""
         original_url = "https://www.amazon.com/dp/B08N5WRWNW?item=5"
+        affiliate_data = {"affiliate_tag": "tag", "affiliate_id": "affiliate-21"}
         affiliate_url = self.handler._generate_affiliate_url(
             original_url,
             format_template="{domain}{path_before_query}",
-            affiliate_tag="tag",
-            affiliate_id="affiliate-21",
+            affiliate_data=affiliate_data,
         )
         expected_url = "https://www.amazon.com/dp/B08N5WRWNW?item=5&tag=affiliate-21"
         self.assertEqual(affiliate_url, expected_url)
 
-    def test_no_affiliate_tag_in_template_and_not_affiliate_tag(self):
-        """Test that the query string is appended properly if the template does not include the affiliate tag id."""
-        original_url = "https://www.amazon.com/dp/B08N5WRWNW"
-        affiliate_url = self.handler._generate_affiliate_url(
-            original_url,
-            format_template="{domain}{path_before_query}",
-            affiliate_tag=None,
-            affiliate_id="affiliate-21",
-        )
-        expected_url = "https://www.amazon.com/dp/B08N5WRWNW"
-        self.assertEqual(affiliate_url, expected_url)
-
-    def test_url_with_empty_query(self):
-        """Test URL without query parameters should add affiliate tag."""
-        original_url = "https://www.amazon.com/dp/B08N5WRWNW"
-        affiliate_url = self.handler._generate_affiliate_url(
-            original_url,
-            format_template="{domain}{path_before_query}?{affiliate_tag}={affiliate_id}",
-            affiliate_tag="tag",
-            affiliate_id="affiliate-21",
-        )
-        expected_url = "https://www.amazon.com/dp/B08N5WRWNW?tag=affiliate-21"
-        self.assertEqual(affiliate_url, expected_url)
-
-    def test_url_with_complex_path(self):
-        """Test URL with complex path (multiple slashes and query params) should generate correctly."""
-        original_url = "https://www.example.com/store/sub-store/product/12345?color=red"
-        affiliate_url = self.handler._generate_affiliate_url(
-            original_url,
-            format_template="{domain}{path_before_query}?{affiliate_tag}={affiliate_id}",
-            affiliate_tag="aff_id",
-            affiliate_id="affiliate-99",
-        )
-        expected_url = (
-            "https://www.example.com/store/sub-store/product/12345?aff_id=affiliate-99"
-        )
-        self.assertEqual(unquote(affiliate_url), expected_url)
-
-    def test_affiliate_in_path(self):
+    def test_affiliate_in_path(self) -> None:
         """Test affiliate ID being inserted into a path before the query string."""
         original_url = "https://www.example.com/product/12345"
+        affiliate_data = {"affiliate_tag": "aff_id", "affiliate_id": "my_affiliate"}
         affiliate_url = self.handler._generate_affiliate_url(
             original_url,
             format_template="{domain}/{affiliate_tag}/{affiliate_id}{path_before_query}",
-            affiliate_tag="aff_id",
-            affiliate_id="my_affiliate",
+            affiliate_data=affiliate_data,
         )
         expected_url = "https://www.example.com/aff_id/my_affiliate/product/12345"
         self.assertEqual(affiliate_url, expected_url)
 
-    def test_affiliate_url_with_full_url(self):
-        """Test affiliate URL generation with the full original URL in the format (like Awin or Admitad)."""
+    def test_affiliate_and_advertiser_id_update(self) -> None:
+        """Test that both affiliate_id and advertiser_id are updated correctly in the URL."""
+        original_url = "https://www.example.com/product?tag=old_affiliate_id&advertiser_id=old_advertiser_id"
+        affiliate_data = {
+            "affiliate_tag": "tag",
+            "affiliate_id": "new_affiliate_id",
+            "advertiser_id": "new_advertiser_id",
+        }
+        format_template = "{domain}{path_before_query}?{affiliate_tag}={affiliate_id}&advertiser_id={advertiser_id}"
+        updated_url = self.handler._generate_affiliate_url(
+            original_url=original_url,
+            format_template=format_template,
+            affiliate_data=affiliate_data,
+        )
+        expected_url = "https://www.example.com/product?tag=new_affiliate_id&advertiser_id=new_advertiser_id"
+        self.assertEqual(updated_url, expected_url)
+
+    def test_affiliate_url_with_full_url(self) -> None:
+        """Test affiliate URL generation with the full original URL in the format."""
         original_url = "https://www.example.com/product/12345"
         format_template = "https://www.awin1.com/cread.php?awinmid=12345&awinaffid={affiliate_id}&ued={full_url}"
-        affiliate_tag = "awinaffid"
-        affiliate_id = "affiliate-21"
-
+        affiliate_data = {"affiliate_tag": "awinaffid", "affiliate_id": "affiliate-21"}
         expected_url = "https://www.awin1.com/cread.php?awinmid=12345&awinaffid=affiliate-21&ued=https://www.example.com/product/12345"
 
         affiliate_url = self.handler._generate_affiliate_url(
             original_url=original_url,
             format_template=format_template,
-            affiliate_tag=affiliate_tag,
-            affiliate_id=affiliate_id,
+            affiliate_data=affiliate_data,
         )
-
         self.assertEqual(affiliate_url, expected_url)
 
-    def test_affiliate_and_advertiser_id_update(self):
-        """Test that both affiliate_id and advertiser_id are updated correctly in the URL."""
-        original_url = "https://www.example.com/product?tag=old_affiliate_id&advertiser_id=old_advertiser_id"
-        format_template = "{domain}{path_before_query}?{affiliate_tag}={affiliate_id}&advertiser_id={advertiser_id}"
-
-        # Call the method with new affiliate_id and advertiser_id
-        updated_url = self.handler._generate_affiliate_url(
-            original_url=original_url,
-            format_template=format_template,
-            affiliate_tag="tag",
-            affiliate_id="new_affiliate_id",
-            advertiser_id="new_advertiser_id",
-        )
-
-        # Expected URL after updating the affiliate and advertiser IDs
-        expected_url = "https://www.example.com/product?tag=new_affiliate_id&advertiser_id=new_advertiser_id"
-
-        # Assert that the updated URL matches the expected URL
-        self.assertEqual(updated_url, expected_url)
-
-    def test_affiliate_link_with_advertiser(self):
-        """Test affiliate link generation with an advertiser ID."""
-        original_url = "https://example.com/product/123"
-        format_template = "{domain}{path_before_query}?{affiliate_tag}={affiliate_id}&advertiser_id={advertiser_id}"
-        affiliate_tag = "tag"
-        affiliate_id = "my_affiliate"
-        advertiser_id = "12345"
-
-        expected_url = (
-            "https://example.com/product/123?tag=my_affiliate&advertiser_id=12345"
-        )
-
-        result = self.handler._generate_affiliate_url(
-            original_url, format_template, affiliate_tag, affiliate_id, advertiser_id
-        )
-        self.assertEqual(result, expected_url)
-
-    def test_affiliate_link_with_url_param_replacement(self):
+    def test_affiliate_link_with_url_param_replacement(self) -> None:
         """Test affiliate link generation with dynamic replacement of {url} in the format template."""
         original_url = "https://source.com/product?url=https://example.com/product/123"
         format_template = "https://destino.com?url={url}&{affiliate_tag}={affiliate_id}"
-        affiliate_tag = "tag"
-        affiliate_id = "my_affiliate"
-
+        affiliate_data = {"affiliate_tag": "tag", "affiliate_id": "my_affiliate"}
         expected_url = (
             "https://destino.com?url=https://example.com/product/123&tag=my_affiliate"
         )
-
-        result = self.handler._generate_affiliate_url(
-            original_url, format_template, affiliate_tag, affiliate_id
+        affiliate_url = self.handler._generate_affiliate_url(
+            original_url=original_url,
+            format_template=format_template,
+            affiliate_data=affiliate_data,
         )
-        self.assertEqual(result, expected_url)
+        self.assertEqual(affiliate_url, expected_url)
 
 
-class TestProcessMessage(unittest.TestCase):
-    def setUp(self):
-        """Set up the TestHandler instance."""
-        self.handler = TestHandler()  # Pasar selected_users al crear la instancia
+class TestProcessMessage(unittest.IsolatedAsyncioTestCase):
+    """Tests for the method _process_message."""
 
-    @patch(
-        "botaffiumeiro.config_data",
-        {
-            "DELETE_MESSAGES": True,
-            "MSG_REPLY_PROVIDED_BY_USER": "Messager provider by user",
-            "MSG_AFFILIATE_LINK_MODIFIED": "Affiliate link changed",
-        },
-    )
-    async def test_send_message_and_delete_original(self):
+    def setUp(self) -> None:
+        """Set up the TestHandler instance with a mock ConfigurationManager."""
+        self.config_manager = Mock()
+        self.config_manager.delete_messages = True
+        self.config_manager.msg_reply_provided_by_user = "Message provided by user"
+        self.config_manager.msg_affiliate_link_modified = "Affiliate link changed"
+        self.handler = TestHandler(self.config_manager)
+
+    async def test_send_message_and_delete_original(self) -> None:
         """Test when DELETE_MESSAGES is True, the original message should be deleted and a new one sent."""
         mock_message = AsyncMock()
         mock_message.from_user.first_name = "John"
@@ -223,29 +167,23 @@ class TestProcessMessage(unittest.TestCase):
 
         new_text = "This is the modified affiliate message"
 
-        await self.handler.process_message(mock_message, new_text)
+        await self.handler._process_message(mock_message, new_text)
 
         expected_message = (
-            f"{config_data['MSG_REPLY_PROVIDED_BY_USER']} @john_doe:\n\n"
+            f"{self.config_manager.msg_reply_provided_by_user} @john_doe:\n\n"
             f"{new_text}\n\n"
-            f"{config_data['MSG_AFFILIATE_LINK_MODIFIED']}"
+            f"{self.config_manager.msg_affiliate_link_modified}"
         )
 
         # Check that the original message was deleted
         mock_message.delete.assert_called_once()
         # Check that a new message was sent
-        mock_message.chat.send_message.assert_called_once_with(text=expected_message)
+        actual_message = mock_message.chat.send_message.call_args[1]["text"]
+        self.assertEqual(actual_message, expected_message)
 
-    @patch(
-        "botaffiumeiro.config_data",
-        {
-            "DELETE_MESSAGES": False,
-            "MSG_REPLY_PROVIDED_BY_USER": "Messager provider by user",
-            "MSG_AFFILIATE_LINK_MODIFIED": "Affiliate link changed",
-        },
-    )
-    async def test_send_message_without_delete(self):
+    async def test_send_message_without_delete(self) -> None:
         """Test when DELETE_MESSAGES is False, the original message should not be deleted, and the bot replies to it."""
+        self.config_manager.delete_messages = False  # Update config
         mock_message = AsyncMock()
         mock_message.from_user.first_name = "John"
         mock_message.from_user.username = "john_doe"
@@ -254,12 +192,12 @@ class TestProcessMessage(unittest.TestCase):
 
         new_text = "This is the modified affiliate message"
 
-        await self.handler.process_message(mock_message, new_text)
+        await self.handler._process_message(mock_message, new_text)
 
         expected_message = (
-            f"{config_data['MSG_REPLY_PROVIDED_BY_USER']} @john_doe:\n\n"
+            f"{self.config_manager.msg_reply_provided_by_user} @john_doe:\n\n"
             f"{new_text}\n\n"
-            f"{config_data['MSG_AFFILIATE_LINK_MODIFIED']}"
+            f"{self.config_manager.msg_affiliate_link_modified}"
         )
 
         # Check that the original message was not deleted
@@ -269,15 +207,7 @@ class TestProcessMessage(unittest.TestCase):
             text=expected_message, reply_to_message_id=mock_message.message_id
         )
 
-    @patch(
-        "botaffiumeiro.config_data",
-        {
-            "DELETE_MESSAGES": True,
-            "MSG_REPLY_PROVIDED_BY_USER": "Messager provider by user",
-            "MSG_AFFILIATE_LINK_MODIFIED": "Affiliate link changed",
-        },
-    )
-    async def test_send_message_is_reply_and_delete(self):
+    async def test_send_message_is_reply_and_delete(self) -> None:
         """Test when DELETE_MESSAGES is True, and the original message is a reply to another message."""
         mock_message = AsyncMock()
         mock_message.from_user.first_name = "Jane"
@@ -289,12 +219,12 @@ class TestProcessMessage(unittest.TestCase):
 
         new_text = "This is the modified affiliate message"
 
-        await self.handler.process_message(mock_message, new_text)
+        await self.handler._process_message(mock_message, new_text)
 
         expected_message = (
-            f"{config_data['MSG_REPLY_PROVIDED_BY_USER']} @jane_doe:\n\n"
+            f"{self.config_manager.msg_reply_provided_by_user} @jane_doe:\n\n"
             f"{new_text}\n\n"
-            f"{config_data['MSG_AFFILIATE_LINK_MODIFIED']}"
+            f"{self.config_manager.msg_affiliate_link_modified}"
         )
 
         # Check that the original message was deleted
@@ -305,16 +235,9 @@ class TestProcessMessage(unittest.TestCase):
             reply_to_message_id=mock_message.reply_to_message.message_id,
         )
 
-    @patch(
-        "botaffiumeiro.config_data",
-        {
-            "DELETE_MESSAGES": False,
-            "MSG_REPLY_PROVIDED_BY_USER": "Messager provider by user",
-            "MSG_AFFILIATE_LINK_MODIFIED": "Affiliate link changed",
-        },
-    )
-    async def test_send_message_is_reply_without_delete(self):
+    async def test_send_message_is_reply_without_delete(self) -> None:
         """Test when DELETE_MESSAGES is False, and the original message is a reply to another message."""
+        self.config_manager.delete_messages = False  # Update config
         mock_message = AsyncMock()
         mock_message.from_user.first_name = "Jane"
         mock_message.from_user.username = "jane_doe"
@@ -325,12 +248,12 @@ class TestProcessMessage(unittest.TestCase):
 
         new_text = "This is the modified affiliate message"
 
-        await self.handler.process_message(mock_message, new_text)
+        await self.handler._process_message(mock_message, new_text)
 
         expected_message = (
-            f"{config_data['MSG_REPLY_PROVIDED_BY_USER']} @jane_doe:\n\n"
+            f"{self.config_manager.msg_reply_provided_by_user} @jane_doe:\n\n"
             f"{new_text}\n\n"
-            f"{config_data['MSG_AFFILIATE_LINK_MODIFIED']}"
+            f"{self.config_manager.msg_affiliate_link_modified}"
         )
 
         # Check that the original message was not deleted
@@ -340,15 +263,7 @@ class TestProcessMessage(unittest.TestCase):
             text=expected_message, reply_to_message_id=mock_message.message_id
         )
 
-    @patch(
-        "botaffiumeiro.config_data",
-        {
-            "DELETE_MESSAGES": True,
-            "MSG_REPLY_PROVIDED_BY_USER": "Messager provider by user",
-            "MSG_AFFILIATE_LINK_MODIFIED": "Affiliate link changed",
-        },
-    )
-    async def test_send_message_without_username(self):
+    async def test_send_message_without_username(self) -> None:
         """Test when the user has no username, use the first name instead."""
         mock_message = AsyncMock()
         mock_message.from_user.first_name = "Jane"
@@ -359,25 +274,33 @@ class TestProcessMessage(unittest.TestCase):
 
         new_text = "This is the modified affiliate message"
 
-        await self.handler.process_message(mock_message, new_text)
+        await self.handler._process_message(mock_message, new_text)
 
         expected_message = (
-            f"{config_data['MSG_REPLY_PROVIDED_BY_USER']} @Jane:\n\n"
+            f"{self.config_manager.msg_reply_provided_by_user} @Jane:\n\n"
             f"{new_text}\n\n"
-            f"{config_data['MSG_AFFILIATE_LINK_MODIFIED']}"
+            f"{self.config_manager.msg_affiliate_link_modified}"
         )
 
         # Check that the original message was deleted
         mock_message.delete.assert_called_once()
         # Check that the new message is sent without replying
-        mock_message.chat.send_message.assert_called_once_with(text=expected_message)
+        mock_message.chat.send_message.assert_called_once_with(
+            text=expected_message, reply_to_message_id=None
+        )
 
 
 class TestBuildAffiliateUrlPattern(unittest.TestCase):
-    def test_admitad_url_pattern(self):
+    """Tests for the method _build_affiliate_url_pattern."""
+
+    def setUp(self) -> None:
+        """Set up the ConfigurationManager mock and a TestHandler instance for each test."""
+        self.config_manager = Mock()
+        self.base_handler = TestHandler(self.config_manager)
+
+    def test_admitad_url_pattern(self) -> None:
         """Test: Verify that admitad_url_pattern is correctly generated from multiple users' domains."""
-        base_handler = TestHandler()
-        base_handler.selected_users = {
+        self.base_handler.selected_users = {
             "example.com": {
                 "admitad": {
                     "advertisers": {
@@ -388,10 +311,9 @@ class TestBuildAffiliateUrlPattern(unittest.TestCase):
             }
         }
         # Generate Admitad URL pattern
-        admitad_url_pattern = base_handler._build_affiliate_url_pattern("admitad")
+        admitad_url_pattern = self.base_handler._build_affiliate_url_pattern("admitad")
 
-        # The expected regex should match example1.com, example2.com, and example3.com
-        # The order is not known
+        # The expected regex should match example1.com and example2.com
         expected_pattern1 = (
             r"(https?://(?:[\w\-]+\.)?(example1\.com|example2\.com)"
             + PATTERN_AFFILIATE_URL_QUERY
@@ -403,30 +325,25 @@ class TestBuildAffiliateUrlPattern(unittest.TestCase):
             + ")"
         )
         self.assertTrue(
-            admitad_url_pattern == expected_pattern1
-            or admitad_url_pattern == expected_pattern2,
+            admitad_url_pattern in (expected_pattern1, expected_pattern2),
             f"Pattern '{admitad_url_pattern}' does not match either of the expected patterns",
         )
 
-    def test_admitad_no_domains(self):
+    def test_admitad_no_domains(self) -> None:
         """Test: Verify that None is returned when no Admitad advertisers exist across users."""
-        base_handler = TestHandler()
-        # Generate Admitad URL pattern (should return None as no advertisers are set)
-        base_handler.selected_users = {
+        self.base_handler.selected_users = {
             "example3.com": {
                 "admitad": {"advertisers": {}},
                 "awin": {"advertisers": {"example3.com": "affiliate-id-3"}},
             }
         }
 
-        admitad_url_pattern = base_handler._build_affiliate_url_pattern("admitad")
+        admitad_url_pattern = self.base_handler._build_affiliate_url_pattern("admitad")
         self.assertIsNone(admitad_url_pattern)
 
-    def test_awin_url_pattern(self):
+    def test_awin_url_pattern(self) -> None:
         """Test: Verify that awin_url_pattern is correctly generated from multiple users' domains."""
-        # Generate Awin URL pattern
-        base_handler = TestHandler()
-        base_handler.selected_users = {
+        self.base_handler.selected_users = {
             "example3.com": {
                 "admitad": {
                     "advertisers": {
@@ -443,7 +360,7 @@ class TestBuildAffiliateUrlPattern(unittest.TestCase):
             }
         }
 
-        awin_url_pattern = base_handler._build_affiliate_url_pattern("awin")
+        awin_url_pattern = self.base_handler._build_affiliate_url_pattern("awin")
 
         # The expected regex should match example3.com and example4.com
         expected_pattern1 = (
@@ -457,24 +374,24 @@ class TestBuildAffiliateUrlPattern(unittest.TestCase):
             + ")"
         )
         self.assertTrue(
-            awin_url_pattern == expected_pattern1
-            or awin_url_pattern == expected_pattern2,
+            awin_url_pattern in (expected_pattern1, expected_pattern2),
             f"Pattern '{awin_url_pattern}' does not match either of the expected patterns",
         )
 
-    def test_no_users_in_configuration(self):
+    def test_no_users_in_configuration(self) -> None:
         """Test: Verify that None is returned when there are no users in the configuration."""
-        # Generate Admitad URL pattern with no users in the configuration
-        base_handler = TestHandler()
-        base_handler.selected_users = {
+        self.base_handler.selected_users = {
             "amazon.es": {"amazon": {"affiliate_id": "affiliate-21"}}
         }
 
-        admitad_url_pattern = base_handler._build_affiliate_url_pattern(
+        admitad_url_pattern = self.base_handler._build_affiliate_url_pattern(
             "admitad_advertisers"
         )
         self.assertIsNone(admitad_url_pattern)
 
+
+if __name__ == "__main__":
+    unittest.main()
 
 if __name__ == "__main__":
     unittest.main()

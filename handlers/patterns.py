@@ -1,15 +1,21 @@
-from typing import Dict, Optional, TypedDict
+"""Define los patrones y configuraciones para manejar enlaces de afiliados."""
+
+from __future__ import annotations
+
+from typing import TypedDict
 
 from handlers.base_handler import PATTERN_URL_QUERY
 
 
 class PatternConfig(TypedDict):
+    """Defines patterns and configurations for handling affiliate links."""
+
     pattern: str
     format_template: str
-    affiliate_tag: Optional[str]  # Ahora permite valores `None`.
+    affiliate_tag: str | None
 
 
-PATTERNS: Dict[str, PatternConfig] = {
+PATTERNS: dict[str, PatternConfig] = {
     "amazon": {
         "pattern": (
             r"(https?://(?:www\.)?(?:amazon\.[a-z]{2,3}(?:\.[a-z]{2})?|amzn\.to|amzn\.eu)"

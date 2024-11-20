@@ -1,4 +1,8 @@
+"""Handler for managing AliExpress links and discount codes."""
+
 import re
+
+from config import ConfigurationManager
 
 from handlers.base_handler import PATTERN_URL_QUERY, BaseHandler
 
@@ -10,11 +14,26 @@ ALIEXPRESS_PATTERN = (
 
 
 class AliexpressHandler(BaseHandler):
-    def __init__(self):
-        super().__init__()
+    """Handler for managing AliExpress links and discount codes."""
 
-    async def show_discount_codes(self, context) -> None:
-        """Displays the AliExpress discount codes for the user."""
+    def __init__(self, config_manager: ConfigurationManager) -> None:
+        """Initialize the AliexpressHandler.
+
+        Args:
+        ----
+            config_manager (ConfigurationManager): The configuration manager instance.
+
+        """
+        super().__init__(config_manager)
+
+    async def show_discount_codes(self, context: dict) -> None:
+        """Display the AliExpress discount codes for the user.
+
+        Args:
+        ----
+            context (Dict): The context containing the message and selected users.
+
+        """
         # Retrieve AliExpress-specific data
         message, modified_text, self.selected_users = self._unpack_context(context)
         aliexpress_data = self.selected_users.get("aliexpress.com", {})
@@ -26,7 +45,8 @@ class AliexpressHandler(BaseHandler):
 
         if not aliexpress_discount_codes:
             self.logger.info(
-                f"{message.message_id}: Discount codes are empty. Skipping reply."
+                "%s: Discount codes are empty. Skipping reply.",
+                message.message_id,
             )
             return
 
@@ -35,12 +55,25 @@ class AliexpressHandler(BaseHandler):
             f"{aliexpress_discount_codes}",
             reply_to_message_id=message.message_id,
         )
-        self.logger.info(f"{message.message_id}: Sent AliExpress discount codes.")
+        self.logger.info(
+            "%s: Sent AliExpress discount codes.",
+            message.message_id,
+        )
         user = aliexpress_data.get("user", {})
-        self.logger.info(f"User chosen: {user}")
+        self.logger.info("User chosen: %s", user)
 
-    async def handle_links(self, context) -> bool:
-        """Handles both long and short AliExpress links in the message."""
+    async def handle_links(self, context: dict) -> bool:
+        """Handle both long and short AliExpress links in the message.
+
+        Args:
+        ----
+            context (Dict): The context containing the message and selected users.
+
+        Returns:
+        -------
+            bool: True if links were handled, False otherwise.
+
+        """
         message, modified_text, self.selected_users = self._unpack_context(context)
         # Extraemos self.selected_users.get("aliexpress.com", {}) a una variable
         self.selected_users.get("aliexpress.com", {})
@@ -49,12 +82,15 @@ class AliexpressHandler(BaseHandler):
 
         if aliexpress_links:
             self.logger.info(
-                f"{message.message_id}: Found {len(aliexpress_links)} AliExpress links. Processing..."
+                "%s: Found %d AliExpress links. Processing...",
+                message.message_id,
+                len(aliexpress_links),
             )
             await self.show_discount_codes(context)
             return True
 
         self.logger.info(
-            f"{message.message_id}: No AliExpress links found in the message."
+            "%s: No AliExpress links found in the message.",
+            message.message_id,
         )
         return False
