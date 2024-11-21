@@ -1,0 +1,4 @@
+types-PyYAML~=6.0.12.20240917
+types-requests~=2.32.0.20241016
+mypy~=1.13.0
+pre-commit~=3.5.0

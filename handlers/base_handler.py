@@ -1,12 +1,18 @@
+"""Base handler module for affiliate link processing."""
+
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
 import logging
 import re
-from typing import Tuple
+from typing import TYPE_CHECKING
 from urllib.parse import parse_qs, urlencode, urlparse
 
-from config import config_data
 from publicsuffix2 import get_sld
-from telegram import Message
+
+if TYPE_CHECKING:
+    from config import ConfigurationManager
+    from telegram import Message
 
 # Known short URL domains for expansion
 PATTERN_URL_QUERY = r"?[^\s]+"
@@ -14,17 +20,32 @@ PATTERN_AFFILIATE_URL_QUERY = r"/[a-zA-Z0-9\-\._~:/?#\[\]@!$&'()*+,;=%]+"
 
 
 class BaseHandler(ABC):
-    def __init__(self):
-        self.logger = logging.getLogger(__name__)
-        self.selected_users = {}
+    """Base handler class for affiliate platforms."""
 
-    def _unpack_context(
-        self, context
-    ) -> Tuple[
-        Message,
-        str,
-        dict,
-    ]:
+    def __init__(self, config_manager: ConfigurationManager) -> None:
+        """Initialize the BaseHandler with configuration manager.
+
+        Args:
+        ----
+            config_manager (ConfigurationManager): Configuration manager instance.
+
+        """
+        self.logger = logging.getLogger(__name__)
+        self.selected_users: dict[str, dict] = {}
+        self.config_manager = config_manager
+
+    def _unpack_context(self, context: dict) -> tuple[Message, str, dict]:
+        """Unpack the context dictionary into message, modified message, and selected users.
+
+        Args:
+        ----
+            context (dict): Context dictionary with message data.
+
+        Returns:
+        -------
+            tuple[Message, str, dict]: Unpacked message, modified message, and selected users.
+
+        """
         return (
             context["message"],
             context["modified_message"],
@@ -35,25 +56,25 @@ class BaseHandler(ABC):
         self,
         original_url: str,
         format_template: str,
-        affiliate_tag: str,
-        affiliate_id: str,
-        advertiser_id: str = "",
+        affiliate_data: dict[str, str],
     ) -> str:
-        """Converts a product URL into an affiliate link based on the provided format template.
+        """Convert a product URL into an affiliate link based on the provided format template.
 
         Args:
         ----
             original_url (str): The original product URL.
             format_template (str): The template for the affiliate URL, e.g., '{domain}/{path_before_query}?{affiliate_tag}={affiliate_id}'.
-            affiliate_tag (str): The query parameter for the affiliate ID (e.g., 'tag', 'aff_id').
-            affiliate_id (str): The affiliate ID for the platform.
-            advertiser_id (str): The advertiser ID for the platform (optional).
+            affiliate_data (dict[str, str]): Data containing affiliate_tag, affiliate_id, and advertiser_id.
 
         Returns:
         -------
             str: The URL with the affiliate tag and advertiser ID added according to the template.
 
         """
+        affiliate_tag = affiliate_data.get("affiliate_tag", "")
+        affiliate_id = affiliate_data.get("affiliate_id", "")
+        advertiser_id = affiliate_data.get("advertiser_id", "")
+
         # Parse the original URL
         parsed_url = urlparse(original_url)
 
@@ -101,7 +122,7 @@ class BaseHandler(ABC):
 
         return affiliate_url
 
-    async def _process_message(self, message, new_text: str):
+    async def _process_message(self, message: Message, new_text: str) -> None:
         """Send a polite affiliate message, either by deleting the original message or replying to it.
 
         Args:
@@ -113,9 +134,9 @@ class BaseHandler(ABC):
         # Get user information
         user_first_name = message.from_user.first_name
         user_username = message.from_user.username
-        polite_message = f"{config_data['MSG_REPLY_PROVIDED_BY_USER']} @{user_username if user_username else user_first_name}:\n\n{new_text}\n\n{config_data['MSG_AFFILIATE_LINK_MODIFIED']}"
+        polite_message = f"{self.config_manager.msg_reply_provided_by_user} @{user_username if user_username else user_first_name}:\n\n{new_text}\n\n{self.config_manager.msg_affiliate_link_modified}"
 
-        if config_data["DELETE_MESSAGES"]:
+        if self.config_manager.delete_messages:
             # Delete original message and send a new one
             reply_to_message_id = (
                 message.reply_to_message.message_id
@@ -127,7 +148,8 @@ class BaseHandler(ABC):
                 text=polite_message, reply_to_message_id=reply_to_message_id
             )
             self.logger.info(
-                f"{message.message_id}: Original message deleted and sent modified message with affiliate links."
+                "%s: Original message deleted and sent modified message.",
+                message.message_id,
             )
         else:
             # Reply to the original message
@@ -136,19 +158,19 @@ class BaseHandler(ABC):
                 text=polite_message, reply_to_message_id=reply_to_message_id
             )
             self.logger.info(
-                f"{message.message_id}: Replied to message with affiliate links."
+                "%s: Replied to message with affiliate links.", message.message_id
             )
 
-    def _build_affiliate_url_pattern(self, advertiser_key):
-        """Builds a URL pattern for a given affiliate platform (e.g., Admitad, Awin) by gathering all the advertiser domains.
+    def _build_affiliate_url_pattern(self, advertiser_key: str) -> str | None:
+        """Build a URL pattern for a given affiliate platform (e.g., Admitad, Awin) by gathering all the advertiser domains.
 
-        Parameters
-        ----------
-        - advertiser_key: The key in selected_users that holds advertisers (e.g., 'admitad', 'awin').
+        Args:
+        ----
+          advertiser_key: The key in selected_users that holds advertisers (e.g., 'admitad', 'awin').
 
-        Returns
+        Returns:
         -------
-        - A regex pattern string that matches any of the advertiser domains.
+          A regex pattern string that matches any of the advertiser domains.
 
         """
         affiliate_domains = set()
@@ -157,7 +179,7 @@ class BaseHandler(ABC):
         advertisers = {}
 
         # extract all domains handled by the current adversiter_key
-        for domain, user_data in self.selected_users.items():
+        for user_data in self.selected_users.values():
             advertisers_n = user_data.get(advertiser_key, {}).get("advertisers", {})
             advertisers.update(advertisers_n)
 
@@ -182,22 +204,22 @@ class BaseHandler(ABC):
         )
 
     def _extract_store_urls(self, message_text: str, url_pattern: str) -> list:
-        """Extracts store URLs directly from the message text or from URLs embedded in query parameters.
+        """Extract store URLs directly from the message text or from URLs embedded in query parameters.
 
-        Parameters
-        ----------
-        - message_text: The text of the message.
-        - url_pattern: The regex pattern to match store URLs.
+        Args:
+        ----
+          message_text: The text of the message.
+          url_pattern: The regex pattern to match store URLs.
 
-        Returns
+        Returns:
         -------
-        - A list of tuples (original_url, extracted_url, domain) matching the store pattern.
+        : A list of tuples (original_url, extracted_url, domain) matching the store pattern.
 
         """
         extracted_urls = []
 
-        def _extract_and_append(original, extracted):
-            """Helper function to parse and append URL and domain."""
+        def _extract_and_append(original: str, extracted: str) -> None:
+            """Parse and append URL and domain."""
             parsed_url = urlparse(extracted)
             domain = get_sld(
                 parsed_url.netloc
@@ -218,7 +240,7 @@ class BaseHandler(ABC):
                 query_params = parse_qs(parsed_url.query)
 
                 # Check if any of the query parameters contains a URL matching the store pattern
-                for key, values in query_params.items():
+                for values in query_params.values():
                     for value in values:
                         if re.match(url_pattern, value):
                             _extract_and_append(url, value)
@@ -227,17 +249,17 @@ class BaseHandler(ABC):
 
     async def _process_store_affiliate_links(
         self,
-        context,
+        context: dict,
         affiliate_platform: str,
         format_template: str,
-        affiliate_tag: str,
+        affiliate_tag: str | None,
     ) -> bool:
-        """Generic method to handle affiliate links for different platforms."""
+        """Handle affiliate links for different platforms."""
         message, text, self.selected_users = self._unpack_context(context)
         url_pattern = self._build_affiliate_url_pattern(affiliate_platform)
 
         if not url_pattern:
-            self.logger.info(f"{message.message_id}: No affiliate list")
+            self.logger.info("%s: No affiliate list", message.message_id)
             return False
 
         store_links = self._extract_store_urls(text, url_pattern)
@@ -247,7 +269,9 @@ class BaseHandler(ABC):
         new_text = text
         if store_links:
             self.logger.info(
-                f"{message.message_id}: Found {len(store_links)} store links. Processing..."
+                "%s: Found %d store links. Processing...",
+                message.message_id,
+                len(store_links),
             )
 
             for original_url, link, store_domain in store_links:
@@ -262,18 +286,22 @@ class BaseHandler(ABC):
                     requires_advertiser and not advertiser_id
                 ):
                     self.logger.info(
-                        f"{message.message_id}: No publisher or adversiter ID defined for this handler. Skipping processing."
+                        "%s: No publisher or advertiser ID defined for this handler. Skipping processing.",
+                        message.message_id,
                     )
                     continue
                 user = self.selected_users.get(store_domain, {}).get("user", {})
-                self.logger.info(f"User choosen: {user}")
+                self.logger.info("User chosen: %s", user)
 
+                affiliate_data = {
+                    "affiliate_tag": affiliate_tag,
+                    "affiliate_id": publisher_id,
+                    "advertiser_id": advertiser_id,
+                }
                 affiliate_link = self._generate_affiliate_url(
                     link,
-                    format_template=format_template,
-                    affiliate_tag=affiliate_tag,
-                    affiliate_id=publisher_id,
-                    advertiser_id=advertiser_id,
+                    format_template,
+                    affiliate_data,
                 )
                 new_text = new_text.replace(original_url, affiliate_link)
 
@@ -285,16 +313,15 @@ class BaseHandler(ABC):
                 if "aliexpress" in store_domain and aliexpress_discount_codes:
                     new_text += f"\n\n{aliexpress_discount_codes}"
                     self.logger.debug(
-                        f"{message.message_id}: Appended AliExpress discount codes."
+                        "%s: Appended AliExpress discount codes.", message.message_id
                     )
-
         if new_text != text:
             await self._process_message(message, new_text)
             return True
 
-        self.logger.info(f"{message.message_id}: No links found in the message.")
+        self.logger.info("%s: No links found in the message.", message.message_id)
         return False
 
     @abstractmethod
     async def handle_links(self, message: Message) -> bool:
-        pass
+        """Abstract method to handle links."""
