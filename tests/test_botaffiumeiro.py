@@ -720,8 +720,9 @@ class TestSelectUserForDomain(unittest.TestCase):
             "user2": {"amazon_affiliate_id": "user2-affiliate-id"},
         }
 
-        with patch("secrets.SystemRandom.uniform", return_value=50), patch(
-            "botaffiumeiro.config_manager", mock_config_manager
+        with (
+            patch("secrets.SystemRandom.uniform", return_value=50),
+            patch("botaffiumeiro.config_manager", mock_config_manager),
         ):
             selected_user = select_user_for_domain("amazon")
 
@@ -743,8 +744,9 @@ class TestSelectUserForDomain(unittest.TestCase):
             "user2": {"amazon_affiliate_id": "user2-affiliate-id"},
         }
 
-        with patch("secrets.SystemRandom.uniform", return_value=80), patch(
-            "botaffiumeiro.config_manager", mock_config_manager
+        with (
+            patch("secrets.SystemRandom.uniform", return_value=80),
+            patch("botaffiumeiro.config_manager", mock_config_manager),
         ):
             selected_user = select_user_for_domain("amazon")
 
