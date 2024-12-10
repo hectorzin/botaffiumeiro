@@ -58,19 +58,17 @@ def expand_shortened_url(url: str) -> str:
     logger.info("Try expanding shortened URL: %s", url)
     # Strip trailing punctuation if present
     stripped_url = url.rstrip(".,")
-    punctuation = url[
-        len(stripped_url) :
-    ]  # Store the punctuation for re-attachment if needed
     try:
         response = requests.get(
             stripped_url, allow_redirects=True, timeout=config_manager.TIMEOUT
         )
-        expanded_url = response.url
-        logger.info("Expanded URL %s to full link: %s", stripped_url, expanded_url)
-        return expanded_url + punctuation
     except requests.RequestException:
         logger.exception("Error expanding shortened URL: %s", url)
-    return url
+        return url
+    else:
+        expanded_url = response.url
+        logger.info("Expanded URL %s to full link: %s", stripped_url, expanded_url)
+        return expanded_url
 
 
 def extract_embedded_url(query_params: dict[str, list[str]]) -> set[str]:
