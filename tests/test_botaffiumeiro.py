@@ -4,12 +4,13 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 import unittest
-from unittest.mock import AsyncMock, Mock, patch
+from unittest.mock import ANY, AsyncMock, Mock, patch
 
 from telegram import Chat, Message, Update, User
 from telegram.ext import CallbackContext
 
 from botaffiumeiro import (
+    expand_shortened_url,
     extract_domains_from_message,
     extract_embedded_url,
     is_user_excluded,
@@ -827,6 +828,50 @@ class TestSelectUserForDomain(unittest.TestCase):
         if selected_user is None:
             self.fail("select_user_for_domain returned None, but a user was expected.")
         self.assertEqual(selected_user["amazon_affiliate_id"], "user1-affiliate-id")
+
+
+class TestExpandShortenedUrl(unittest.TestCase):
+    """Tests for the expand_shortened_url function."""
+
+    @patch("botaffiumeiro.requests.get")
+    def test_url_with_trailing_period(self, mock_get: AsyncMock) -> None:
+        """Test: Handle URLs with a trailing period."""
+        mock_response = Mock()
+        mock_response.url = "https://www.example.com/full-url"
+        mock_get.return_value = mock_response
+
+        # URL with a trailing period
+        url = "https://short.url/example."
+
+        expanded_url = expand_shortened_url(url)
+
+        # Ensure requests.get is called with the stripped URL
+        mock_get.assert_called_once_with(
+            "https://short.url/example", allow_redirects=True, timeout=ANY
+        )
+
+        # Check that the expanded URL is correct
+        self.assertEqual(expanded_url, "https://www.example.com/full-url")
+
+    @patch("botaffiumeiro.requests.get")
+    def test_url_with_trailing_comma(self, mock_get: AsyncMock) -> None:
+        """Test: Handle URLs with a trailing comma."""
+        mock_response = Mock()
+        mock_response.url = "https://www.example.com/full-url"
+        mock_get.return_value = mock_response
+
+        # URL with a trailing comma
+        url = "https://short.url/example,"
+
+        expanded_url = expand_shortened_url(url)
+
+        # Ensure requests.get is called with the stripped URL
+        mock_get.assert_called_once_with(
+            "https://short.url/example", allow_redirects=True, timeout=ANY
+        )
+
+        # Check that the expanded URL is correct
+        self.assertEqual(expanded_url, "https://www.example.com/full-url")
 
 
 if __name__ == "__main__":
