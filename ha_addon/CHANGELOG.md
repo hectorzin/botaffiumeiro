@@ -1,3 +1,10 @@
+# 2.1.6.0
+
+- Updating to release version 2.1.6
+- refactor/pre-commit rules by @hectorzin in https://github.com/hectorzin/botaffiumeiro/pull/78
+- [pre-commit.ci] pre-commit autoupdate by @pre-commit-ci in https://github.com/hectorzin/botaffiumeiro/pull/79
+- bug: bad links generated if a punctuation at the end of the link by @hectorzin in https://github.com/hectorzin/botaffiumeiro/pull/81
+
 # 2.1.5.0
 
 - bug: Redirect URLs for Aliexpress are not working by @hectorzin in https://github.com/hectorzin/botaffiumeiro/pull/75
