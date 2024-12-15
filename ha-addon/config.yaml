@@ -2,7 +2,7 @@ name: "Botaffiumeiro"
 version: "2.1.6.0"
 slug: "botaffiumeiro"
 description: "Modify Telegram links with affiliate links"
-url: "https://github.com/hectorzin/botaffiumeiro/tree/main/ha_addon"
+url: "https://github.com/hectorzin/botaffiumeiro/tree/main/ha-addon"
 init: false
 arch:
   - aarch64
