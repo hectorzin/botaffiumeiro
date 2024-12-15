@@ -67,6 +67,7 @@ combine-as-imports = true
 
 [tool.ruff.per-file-ignores]
 "ha-addon/__init__.py" = ["N999"]
+"ha-addon/json2yaml.py" = ["INP001"]
 
 [tool.pylint."MESSAGES CONTROL"]
 # Reasons disabled:
