@@ -113,7 +113,6 @@ A list of domains and ids per domain:
 ### 8. Support for creators
 
 - **creator_affiliate_percentage**: This parameter allows you to define what percentage of the links shared in Telegram groups will be replaced with affiliate links belonging to the software creators. However, there are a few important conditions to keep in mind:
-
   1. **Available Affiliate Links**: Only links that the software creators have affiliate programs for will be eligible to be replaced.
 
   2. **Affiliate Priority**: If the user does not have an affiliate link for a specific domain, but the creators of the software do, the creators' affiliate link will be used instead.
