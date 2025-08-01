@@ -14,10 +14,34 @@ startup: services
 options:
   bot_token: ""
   delete_messages: true
+  excluded_users:
+    - id: ""
+  discount_keywords:
+    - key: ""
   msg_affiliate_link_modified: "Here is the modified link with our affiliate program:"
   msg_reply_provided_by_user: "Reply provided by"
+  amazon:
+    - domain: ""
+      id: ""
+  aliexpress_app_key: ""
+  aliexpress_app_secret: ""
+  aliexpress_tracking_id: ""
+  aliexpress_discount_codes:
+    - line: ""
+  awin_publisher_id: ""
+  awin_adversiters:
+    - domain: ""
+      id: ""
+  admitad_publisher_id: ""
+  admitad_adversiters:
+    - domain: ""
+      id: ""
+  tradedoubler_publisher_id: ""
+  tradedoubler_adversiters:
+    - domain: ""
+      id: ""
   creator_affiliate_percentage: "10"
-  log_level: INFO
+  log_level: "INFO"
 schema:
   bot_token: str
   delete_messages: bool?
