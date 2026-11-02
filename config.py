@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 import logging
 from pathlib import Path
 from typing import Any
@@ -293,7 +293,7 @@ class ConfigurationManager:
         """
         if self.last_load_time is None:
             return True  # first time must Load always
-        return datetime.now(timezone.utc) - self.last_load_time >= timedelta(seconds=60)
+        return datetime.now(UTC) - self.last_load_time >= timedelta(seconds=60)
 
     def load_configuration(self) -> None:
         """Load and process the configuration files."""
@@ -361,4 +361,4 @@ class ConfigurationManager:
         # Adjust percentages for each domain
         for domain in self.domain_percentage_table:
             self._adjust_domain_affiliate_percentages(domain, self.creator_percentage)
-        self.last_load_time = datetime.now(timezone.utc)
+        self.last_load_time = datetime.now(UTC)
