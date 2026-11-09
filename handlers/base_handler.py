@@ -134,7 +134,7 @@ class BaseHandler(ABC):
         # Get user information
         user_first_name = message.from_user.first_name
         user_username = message.from_user.username
-        polite_message = f"{self.config_manager.msg_reply_provided_by_user} @{user_username if user_username else user_first_name}:\n\n{new_text}\n\n{self.config_manager.msg_affiliate_link_modified}"
+        polite_message = f"{self.config_manager.msg_reply_provided_by_user} @{user_username or user_first_name}:\n\n{new_text}\n\n{self.config_manager.msg_affiliate_link_modified}"
 
         if self.config_manager.delete_messages:
             # Delete original message and send a new one
