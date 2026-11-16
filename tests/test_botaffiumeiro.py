@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 import unittest
 from unittest.mock import ANY, AsyncMock, Mock, patch
 
@@ -78,7 +78,7 @@ class TestModifyLink(unittest.IsolatedAsyncioTestCase):
             update_id=1,
             message=Message(
                 message_id=1,
-                date=datetime.now(timezone.utc),
+                date=datetime.now(UTC),
                 from_user=None,
                 chat=Chat(id=1, type="group"),
             ),
@@ -102,7 +102,7 @@ class TestModifyLink(unittest.IsolatedAsyncioTestCase):
             update_id=1,
             message=Message(
                 message_id=1,
-                date=datetime.now(timezone.utc),
+                date=datetime.now(UTC),
                 from_user=User(id=12345, is_bot=False, first_name="TestUser"),
                 chat=Chat(id=1, type="group"),
                 text="Test message",
@@ -127,7 +127,7 @@ class TestModifyLink(unittest.IsolatedAsyncioTestCase):
             update_id=1,
             message=Message(
                 message_id=1,
-                date=datetime.now(timezone.utc),
+                date=datetime.now(UTC),
                 from_user=User(id=67890, is_bot=False, first_name="TestUser"),
                 chat=Chat(id=1, type="group"),
                 text="Test message",
@@ -152,7 +152,7 @@ class TestModifyLink(unittest.IsolatedAsyncioTestCase):
             update_id=1,
             message=Message(
                 message_id=1,
-                date=datetime.now(timezone.utc),
+                date=datetime.now(UTC),
                 chat=Chat(id=1, type="group"),
                 text="Test message",
             ),
